@@ -1,5 +1,4 @@
 const knex = require('../../db/knex')
-const projectModel = require('../projects/controller')
 module.exports = {
 
   getUserById: async (userRole, id) => {
