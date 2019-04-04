@@ -7,7 +7,6 @@ module.exports = {
   },
 
   getProjectsByStudentId: async (id) => {
-    console.log('--------------------------')
     const result = await knex('projects').select('projects.project_name_th', 'projects.project_name_en',
       'projects.project_detail_th', 'projects.project_detail_en', 'projects.count_viewer', 'projects.count_clap')
       .join('project_member', 'projects.id', 'project_member.project_id')
@@ -41,7 +40,6 @@ module.exports = {
       const outsider = await knex.select('*').from('project_outsiders').where('project_id', id)
       result.outsider = outsider
     }
-    console.log(result)
     return result
   },
 
@@ -55,7 +53,6 @@ module.exports = {
   },
 
   addProjectStudent: async (member) => {
-    console.log(member)
     await knex('project_member').insert(member)
     const members = await knex.select('*').from('project_member').where('project_id', member[0].project_id)
     return members

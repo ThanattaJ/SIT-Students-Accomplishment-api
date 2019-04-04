@@ -17,7 +17,6 @@ module.exports = {
 
   getProjectsDetailById: async (projectId) => {
     const result = await projectModel.getProjectsDetailById(projectId)
-    console.log(result.project_detail)
     if (result.project_detail.references) {
       const ref = result.project_detail.references
       result.project_detail.references = _.split(ref, ',')
