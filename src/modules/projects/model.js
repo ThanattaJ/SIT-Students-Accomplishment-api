@@ -12,7 +12,6 @@ module.exports = {
       'projects.project_detail_th', 'projects.project_detail_en', 'projects.count_viewer', 'projects.count_clap')
       .join('project_member', 'projects.id', 'project_member.project_id')
       .where('project_member.student_id', id)
-    console.log(result)
     return result
   },
 

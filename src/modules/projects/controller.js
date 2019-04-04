@@ -11,7 +11,6 @@ module.exports = {
   },
 
   getProjectsByStudentId: async (userId) => {
-    console.log('controller student id: ' + userId)
     const result = await projectModel.getProjectsByStudentId(userId)
     return result
   },
