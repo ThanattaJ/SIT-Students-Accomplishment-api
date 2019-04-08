@@ -28,10 +28,11 @@ module.exports = {
     }
   },
 
-  countProjectUser: async (id) => {
-    const total = await knex('projects').count('id as total')
-      .join('project_member', 'projects.id', 'project_member.project_id')
-      .where('project_member.student_id', id)
-    return total[0].total
+  getListStudent: async (code) => {
+    try {
+      return await knex('students').select('student_id', 'firstname_en', 'lastname_en').where('student_id', 'like', `${code}%`)
+    } catch (err) {
+      return err
+    }
   }
 }

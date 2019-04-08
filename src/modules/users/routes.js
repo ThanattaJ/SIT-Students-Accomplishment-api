@@ -1,10 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const controller = require('./controller')
+const { getUserById, getListStudent } = require('./controller')
 
-router.get('/', async (req, res) => {
-  const data = await controller.getuUserById(req.body)
-  res.send(data)
-})
+router.get('/', getUserById)
+
+router.get('/list_student/:code', getListStudent)
 
 module.exports = router
