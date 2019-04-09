@@ -1,4 +1,5 @@
 const knex = require('../../db/knex')
+const filesModel = require('../files/model')
 module.exports = {
 
   getAllProjects: async () => {
@@ -22,7 +23,7 @@ module.exports = {
   },
 
   getProjectsDetailById: async (id) => {
-    const detail = await knex.select('*').from('projects').where('projects.id', id)
+    const detail = await knex.select('projects.*', 'project_type.project_type_name').from('projects').where('projects.id', id)
       .join('project_type', 'projects.project_type_id', 'project_type.id')
     const students = await knex('project_member').select('students.student_id', 'students.firstname_en', 'students.lastname_en')
       .join('students', 'project_member.student_id', 'students.student_id')
@@ -33,7 +34,7 @@ module.exports = {
 
     const document = await knex.select('*').from('project_documents').where('project_id', id)
     const picture = await knex.select('*').from('project_pictures').where('project_id', id)
-    const video = await knex.select('*').from('project_videos').where('project_id', id)
+    const video = await filesModel.getVideo(id)
 
     const result = {
       'project_detail': detail[0],
@@ -44,18 +45,13 @@ module.exports = {
       'picture': picture,
       'video': video
     }
-    if (detail.haveOutsider === true) {
-      const outsider = await knex.select('*').from('project_outsiders').where('project_id', id)
-      result.outsider = outsider
-    }
     return result
   },
 
   createProject: async (projectData) => {
-    const projectTypeId = await knex('project_type').select('id').where('project_type_name', projectData.project_type_name)
-    projectData.project_type_id = projectTypeId[0].id
-    delete projectData.project_type_name
-    const projectId = await knex('projects').insert(projectData)
+    const projectDataNew = await getProjectTypeId(projectData)
+    const projectId = await knex('projects').insert(projectDataNew)
+    await filesModel.createVideo(projectId)
     const project = await knex.select('*').from('projects').where('id', projectId)
     return project[0]
   },
@@ -73,32 +69,33 @@ module.exports = {
     return achievement[0]
   },
 
-  updateProject: async (id, data) => {
-    const result = await knex('projects').update(data).where('id', id)
-    return result
+  updateProject: async (id, projectDetail, achievementData) => {
+    if (projectDetail.project_type_name) {
+      projectDetail = await getProjectTypeId(projectDetail)
+    }
+    await knex('projects').update(projectDetail).where('id', id)
+    await knex('project_achievement').update(achievementData).where('project_id', id)
   },
 
   updateProjectCount: async (action, projectId) => {
-    let count = 0
-    let result = {}
+    console.log(action)
+    let count = {}
     if (action === 'viewer') {
-      count = await knex.select('count_viewer').from('projects').where('id', projectId)
-      count++
-      const data = {
-        'count_viewer': count
-      }
-      result = await knex('projects').update(data).where('id', projectId)
+      console.log('viewer++')
+      count = await knex('projects').select('count_viewer').where('id', projectId)
+      count[0].count_viewer++
+      await knex('projects').update(count[0]).where('id', projectId)
     }
 
     if (action === 'clap') {
-      count = await knex.select('count_clap').from('projects').where('id', projectId)
-      count++
-      const data = {
-        'count_viewer': count
-      }
-      result = await knex('projects').update(data).where('id', projectId)
+      console.log('clap++')
+      count = await knex('projects').select('count_clap').where('id', projectId)
+      console.log(count)
+      count[0].count_clap++
+      console.log(count)
+      await knex('projects').update(count[0]).where('id', projectId)
     }
-    return result
+    return count[0]
   },
 
   updateProjectTag: async (tag, projcetId) => {
@@ -122,4 +119,11 @@ module.exports = {
     }
   }
 
+}
+
+async function getProjectTypeId (projectData) {
+  const projectTypeId = await knex('project_type').select('id').where('project_type_name', projectData.project_type_name)
+  projectData.project_type_id = projectTypeId[0].id
+  delete projectData.project_type_name
+  return projectData
 }

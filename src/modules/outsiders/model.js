@@ -1,15 +1,14 @@
 const knex = require('../../db/knex')
 module.exports = {
 
-  addProjectOutsider: async (outsider) => {
-    await knex('project_outsiders').insert(outsider)
-    const outsiders = await knex.select('*').from('project_outsiders').where('project_id', outsider[0].project_id)
+  addProjectOutsider: async (outsiders) => { await knex('project_outsiders').insert(outsiders) },
+
+  getProjectOutsider: async (projectId) => {
+    const outsiders = await knex.select('*').from('project_outsiders').where('project_id', projectId)
     return outsiders
   },
 
-  updateProjectOutsider: async (id, data) => {
-
-  },
+  updateProjectOutsider: async (outsider) => { await knex('project_outsiders').where('id', outsider.id) },
 
   deleteOutsider: async (id) => {
     try {

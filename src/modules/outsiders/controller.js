@@ -6,8 +6,15 @@ module.exports = {
     return result
   },
 
-  updateOutsider: async (data) => {
+  getOutsider: async (projectId) => {
+    const outsiders = await outsiderModel.getProjectOutsider(projectId)
+    return outsiders
+  },
 
+  updateOutsider: async (outsiders) => {
+    outsiders.forEach(async outsider => {
+      await outsiderModel.updateProjectOutsider(outsider)
+    })
   },
 
   deleteOutsider: async (req, res) => {

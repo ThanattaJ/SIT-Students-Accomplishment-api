@@ -13,7 +13,7 @@ router.post('/external', async (req, res) => {
   res.send(data)
 })
 
-router.patch('/:id', controller.updateProjectDetail)
+router.patch('/', controller.updateProjectDetail)
 
 router.patch('/counting', controller.updateProjectCount)
 
