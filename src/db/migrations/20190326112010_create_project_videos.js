@@ -1,6 +1,6 @@
 
 exports.up = async function (knex) {
-  await knex.schema.createTable('project_videos', function (table) {
+  await knex.schema.createTable('project_video', function (table) {
     table.integer('project_id').unsigned().notNullable()
     table.string('path_name')
 
@@ -18,5 +18,5 @@ exports.up = async function (knex) {
 }
 
 exports.down = async function (knex) {
-  await knex.schema.dropTable('project_videos')
+  await knex.schema.dropTable('project_video')
 }

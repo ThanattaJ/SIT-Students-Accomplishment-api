@@ -107,7 +107,7 @@ module.exports = {
   deleteProject: async (id) => {
     try {
       await knex('project_tags').del().where('project_id', id)
-      await knex('project_videos').del().where('project_id', id)
+      await knex('project_video').del().where('project_id', id)
       await knex('project_pictures').del().where('project_id', id)
       await knex('project_documents').del().where('project_id', id)
       await knex('project_achievement').del().where('project_id', id)

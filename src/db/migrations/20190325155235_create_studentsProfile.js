@@ -6,6 +6,7 @@ exports.up = async function (knex) {
     table.string('nickname_en')
     table.string('nickname_th')
     table.date('birthday')
+    table.string('telephone_number')
     table.string('gender')
     table.string('nationality_en')
     table.string('nationality_th')

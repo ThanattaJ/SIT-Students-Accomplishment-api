@@ -46,7 +46,7 @@ module.exports = {
 
     if (data.achievement !== undefined) {
       const achieveData = data.achievement
-      achieveData.date_of_event = moment(achieveData.date_of_event).format('YYYY-MM-DD')
+      achieveData.date_of_event = moment(achieveData.date_of_event, 'DD-MM-YYYY').format('YYYY-MM-DD')
       achieveData.project_id = project.id
       const achievement = await projectModel.addProjectAchievement(achieveData)
       achievement.date_of_event = moment(achievement.date_of_event).format('DD-MM-YYYY')
