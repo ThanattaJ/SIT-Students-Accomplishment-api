@@ -21,39 +21,50 @@ module.exports = {
     return result
   },
 
-  getProjectPage: async (projectId) => {
+  getProjectPage: async (req, res) => {
+    const projectId = req.params.id
     const page = await getProjectDetail(projectId)
-    return page
+    res.send(page)
   },
 
-  createProject: async (data) => {
-    const project = await projectModel.createProject(data.project_data)
-    let result = { project: project }
+  createProject: async (req, res) => {
+    // eslint-disable-next-line camelcase
+    const { project_data, member, achievement } = req.body
+    project_data.start_year_th = project_data.start_year_en + 543
+    try {
+      const project = await projectModel.createProject(project_data)
+      let result = { project: project }
 
-    if (data.member.students !== undefined) {
-      const students = data.member.students
-      students.forEach((student) => {
-        student.project_id = project.id
+      if (member.students !== undefined) {
+        const students = member.students
+        students.forEach((student) => {
+          student.project_id = project.id
+        })
+        const memberStudent = await projectModel.addProjectStudent(students)
+        result.member = { students: memberStudent }
+      }
+
+      if (project_data.haveOutsider) {
+        const membersOutsiders = await manageOutsider(member.outsiders, project.id)
+        result.member.outsiders = membersOutsiders
+      }
+
+      if (achievement !== undefined) {
+        const date = achievement.date_of_event
+        achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+        achievement.project_id = project.id
+        const achievements = await projectModel.addProjectAchievement(achievement)
+        achievements.date_of_event = moment(achievements.date_of_event).format('DD-MM-YYYY')
+        result.achievements = achievements
+      }
+
+      res.send(result)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err
       })
-      const memberStudent = await projectModel.addProjectStudent(students)
-      result.member = { students: memberStudent }
     }
-
-    if (data.project_data.haveOutsider) {
-      const membersOutsiders = await manageOutsider(data.member.outsiders, project.id)
-      result.member.outsiders = membersOutsiders
-    }
-
-    if (data.achievement !== undefined) {
-      const achieveData = data.achievement
-      achieveData.date_of_event = moment(achieveData.date_of_event, 'DD-MM-YYYY').format('YYYY-MM-DD')
-      achieveData.project_id = project.id
-      const achievement = await projectModel.addProjectAchievement(achieveData)
-      achievement.date_of_event = moment(achievement.date_of_event).format('DD-MM-YYYY')
-      result.achievement = achievement
-    }
-
-    return result
   },
 
   updateProjectDetail: async (req, res) => {
@@ -90,7 +101,21 @@ module.exports = {
     res.send(result)
   },
 
-  deleteProject: async (id) => { await projectModel.deleteProject(id) }
+  deleteProject: async (req, res) => {
+    const id = req.params.id
+    try {
+      await projectModel.deleteProject(id)
+      res.status(200).send({
+        status: 500,
+        message: 'Delete Success'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err
+      })
+    }
+  }
 }
 
 async function checkTag (tags) {

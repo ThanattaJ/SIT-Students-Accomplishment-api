@@ -10,8 +10,8 @@ exports.seed = function (knex, Promise) {
         for (let i = 1; i < 6; i++) {
           let student = {
             id: i,
-            student_id: `591305000${i}`,
-            password: `591305000${i}`,
+            student_id: `5913050000${i}`,
+            password: `5913050000${i}`,
             curriculum_id: Math.floor(Math.random() * Math.floor(3) + 1),
             firstname_en: faker.name.firstName(),
             lastname_en: faker.name.lastName(),
