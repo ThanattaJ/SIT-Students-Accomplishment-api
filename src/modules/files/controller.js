@@ -13,24 +13,33 @@ fbAdmin.initializeApp({
 const bucket = fbAdmin.storage().bucket()
 
 module.exports = {
-  multerConfig: () => {
-    const storage = multer.memoryStorage()
-    const upload = multer({
+  multerImageConfig: () => {
+    const uploadImg = multer({
       fileFilter: (req, file, cb) => {
-        const { path } = req.route
-        if (path === '/image') {
-          checkFileImgType(file, cb)
-        }
-        if (path === '/document') {
-          checkFileDocType(file, cb)
-        }
+        checkFileImgType(file, cb)
       },
-      storage: storage
+      storage: multer.memoryStorage(),
+      limits: {
+        fileSize: 100000
+      }
     })
-    return upload
+    return uploadImg
   },
 
-  pictureUpload: async (req, res) => {
+  multerDocumentConfig: () => {
+    const uploadDoc = multer({
+      fileFilter: (req, file, cb) => {
+        checkFileDocType(file, cb)
+      },
+      storage: multer.memoryStorage(),
+      limit: {
+        fileSize: 10000000
+      }
+    })
+    return uploadDoc
+  },
+
+  imageUpload: async (req, res) => {
     const { file } = req
     const projectId = req.body.project_id
     const type = req.body.type

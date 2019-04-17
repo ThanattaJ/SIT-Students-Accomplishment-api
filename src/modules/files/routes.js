@@ -2,10 +2,10 @@ const express = require('express')
 const router = express.Router()
 const controller = require('./controller')
 
-const upload = controller.multerConfig()
+const uploadImg = controller.multerImageConfig()
+router.post('/image', uploadImg.single('file'), controller.imageUpload)
 
-router.post('/image', upload.single('file'), controller.pictureUpload)
-
-router.post('/document', upload.single('file'), controller.documentUpload)
+const uploadDoc = controller.multerDocumentConfig()
+router.post('/document', uploadDoc.single('file'), controller.documentUpload)
 
 module.exports = router
