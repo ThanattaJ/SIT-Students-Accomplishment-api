@@ -18,4 +18,12 @@ knex migrate:latest
 #run app
 npm start
 
+```
+
+## Reference
+ - [Knex.js](https://knexjs.org/#Installation-migrations)
+ - [Multer API](https://github.com/expressjs/multer)
+ - [Firebase Admin](https://firebase.google.com/docs/admin/setup)
+ - [How to Upload file to Firebase Storage](https://github.com/tayalone/UploadFileFormNodeToFirebase)
+
 

@@ -65,7 +65,6 @@ module.exports = {
   addProjectAchievement: async (achieveData) => {
     await knex('project_achievement').insert(achieveData)
     const achievement = await knex.select('*').from('project_achievement').where('project_id', achieveData.project_id)
-    console.log(achievement)
     return achievement[0]
   },
 
@@ -78,21 +77,16 @@ module.exports = {
   },
 
   updateProjectCount: async (action, projectId) => {
-    console.log(action)
     let count = {}
     if (action === 'viewer') {
-      console.log('viewer++')
       count = await knex('projects').select('count_viewer').where('id', projectId)
       count[0].count_viewer++
       await knex('projects').update(count[0]).where('id', projectId)
     }
 
     if (action === 'clap') {
-      console.log('clap++')
       count = await knex('projects').select('count_clap').where('id', projectId)
-      console.log(count)
       count[0].count_clap++
-      console.log(count)
       await knex('projects').update(count[0]).where('id', projectId)
     }
     return count[0]
