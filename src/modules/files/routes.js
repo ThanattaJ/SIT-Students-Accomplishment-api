@@ -3,9 +3,13 @@ const router = express.Router()
 const controller = require('./controller')
 
 const uploadImg = controller.multerImageConfig()
-router.post('/image', uploadImg.single('file'), controller.imageUpload)
+router.post('/image', uploadImg.single('file'), controller.uploadImage)
 
 const uploadDoc = controller.multerDocumentConfig()
-router.post('/document', uploadDoc.single('file'), controller.documentUpload)
+router.post('/document', uploadDoc.single('file'), controller.uploadDocument)
+
+router.get('/image/:id', controller.getCover)
+router.delete('/image', controller.deleteImage)
+router.delete('/document', controller.deleteDocument)
 
 module.exports = router

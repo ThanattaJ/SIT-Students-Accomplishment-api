@@ -8,11 +8,16 @@ module.exports = {
   },
 
   getProjectsByStudentId: async (id) => {
-    const result = await knex('projects').select('projects.project_name_th', 'projects.project_name_en',
+    const projects = await knex('projects').select('projects.id', 'projects.project_name_th', 'projects.project_name_en',
       'projects.project_detail_th', 'projects.project_detail_en', 'projects.count_viewer', 'projects.count_clap')
       .join('project_member', 'projects.id', 'project_member.project_id')
       .where('project_member.student_id', id)
-    return result
+
+    projects.forEach(async project => {
+      const cover = await filesModel.getCoverImage(project.id)
+      project.cover_path = cover
+    })
+    return projects
   },
 
   countProjectUser: async (id) => {
@@ -32,8 +37,8 @@ module.exports = {
       .join('tags', 'project_tags.tag_id', 'tags.id')
     const achievement = await knex.select('*').from('project_achievement').where('project_id', id)
 
-    const document = await knex.select('*').from('project_documents').where('project_id', id)
-    const picture = await knex.select('*').from('project_pictures').where('project_id', id)
+    const document = await filesModel.getDocument(id)
+    const image = await filesModel.getImage(id)
     const video = await filesModel.getVideo(id)
 
     const result = {
@@ -42,7 +47,7 @@ module.exports = {
       'achievement': achievement[0],
       'tag': tag,
       'document': document,
-      'picture': picture,
+      'picture': image,
       'video': video
     }
     return result
@@ -102,7 +107,7 @@ module.exports = {
     try {
       await knex('project_tags').del().where('project_id', id)
       await knex('project_video').del().where('project_id', id)
-      await knex('project_pictures').del().where('project_id', id)
+      await knex('project_images').del().where('project_id', id)
       await knex('project_documents').del().where('project_id', id)
       await knex('project_achievement').del().where('project_id', id)
       await knex('project_outsiders').del().where('project_id', id)
