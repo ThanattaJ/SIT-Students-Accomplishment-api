@@ -40,9 +40,7 @@ module.exports = {
         path_name: link
       }
       const coverExist = await checkCoverExist(projectId)
-      if (!isCover) {
-        await filesModel.createImage(image)
-      } else if (!coverExist) {
+      if (!isCover || !coverExist) {
         await filesModel.createImage(image)
       }
       res.status(200).send({
