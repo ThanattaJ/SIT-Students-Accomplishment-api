@@ -29,6 +29,7 @@ module.exports = {
   },
 
   uploadImage: async (req, res) => {
+    console.log(req)
     const { checkStatus, err } = validate(req.body, uploadImgSchema)
     if (!checkStatus) return res.send(err)
 
@@ -102,6 +103,7 @@ module.exports = {
   },
 
   uploadDocument: async (req, res) => {
+    console.log(req)
     const { checkStatus, err } = validate(req.body, uploadDocSchema)
     if (!checkStatus) return res.send(err)
 
