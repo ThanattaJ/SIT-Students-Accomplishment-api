@@ -4,6 +4,8 @@ const filesModel = require('./model')
 const path = require('path')
 const multer = require('multer')
 const format = require('util').format
+const { validate } = require('../validation')
+const { deleteSchema, getCoverSchema, uploadImgSchema, uploadDocSchema } = require('./json_schema')
 
 const serviceAccount = require('../../../config/service_account_key.json')
 fbAdmin.initializeApp({
@@ -27,7 +29,16 @@ module.exports = {
   },
 
   uploadImage: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, uploadImgSchema)
+    if (!checkStatus) return res.send(err)
+
     const { file } = req
+    if (file === undefined) {
+      return res.status(500).send({
+        status: 500,
+        message: 'Dose Not Exsit File'
+      })
+    }
     const projectId = req.body.project_id
     const isCover = (req.body.isCover === 'true')
     if (isCover) {
@@ -56,6 +67,9 @@ module.exports = {
   },
 
   deleteImage: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, deleteSchema)
+    if (!checkStatus) return res.send(err)
+
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
@@ -88,7 +102,16 @@ module.exports = {
   },
 
   uploadDocument: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, uploadDocSchema)
+    if (!checkStatus) return res.send(err)
+
     const { file } = req
+    if (file === undefined) {
+      return res.status(500).send({
+        status: 500,
+        message: 'Dose Not Exsit File'
+      })
+    }
     const projectId = req.body.project_id
     try {
       const link = await uploadFileToStorage(file, 'document', projectId, false)
@@ -110,6 +133,9 @@ module.exports = {
   },
 
   deleteDocument: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, deleteSchema)
+    if (!checkStatus) return res.send(err)
+
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
@@ -133,9 +159,25 @@ module.exports = {
   updateVideo: async (video, projectId) => { await filesModel.updateVideo(video, projectId) },
 
   getCover: async (req, res) => {
-    const id = req.params.id
-    const check = await checkCoverExist(id)
-    res.send(check)
+    const { checkStatus, err } = validate(req.params, getCoverSchema)
+    if (!checkStatus) return res.send(err)
+
+    const id = req.params.project_id
+    try {
+      const check = await checkCoverExist(id)
+      if (check) {
+        const coverLink = await filesModel.getCoverImage(id)
+        res.status(200).send({
+          id: id,
+          link: coverLink[0].path_name
+        })
+      } else { return res.send(`Cover Imange Dose Not Exist`) }
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err
+      })
+    }
   }
 }
 
@@ -173,11 +215,11 @@ function checkFileDocType (file, cb) {
 const uploadFileToStorage = (file, fileType, projectId, isCover) => {
   let prom = new Promise((resolve, reject) => {
     let newFileName = file.originalname
-    if (isCover === false) {
-      newFileName = `${Date.now()}_${file.originalname}`
-    }
     let fileUpload
     if (fileType === 'image') {
+      if (isCover === false) {
+        newFileName = `${Date.now()}_${file.originalname}`
+      }
       fileUpload = bucket.file(`Images/${projectId}/${newFileName}`)
     }
     if (fileType === 'document') {

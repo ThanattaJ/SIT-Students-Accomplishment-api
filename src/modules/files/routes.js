@@ -8,7 +8,7 @@ router.post('/image', uploadImg.single('file'), controller.uploadImage)
 const uploadDoc = controller.multerDocumentConfig()
 router.post('/document', uploadDoc.single('file'), controller.uploadDocument)
 
-router.get('/image/:id', controller.getCover)
+router.get('/image/:project_id', controller.getCover)
 router.delete('/image', controller.deleteImage)
 router.delete('/document', controller.deleteDocument)
 
