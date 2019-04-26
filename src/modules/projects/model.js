@@ -43,7 +43,7 @@ module.exports = {
     try {
       const detail = await knex.select('projects.*', 'project_type.project_type_name').from('projects').where('projects.id', id)
         .join('project_type', 'projects.project_type_id', 'project_type.id')
-      const students = await knex('project_member').select('students.student_id', 'students.firstname_en', 'students.lastname_en')
+      const students = await knex('project_member').select('students.student_id', 'students.firstname_en', 'students.lastname_en', 'students.email')
         .join('students', 'project_member.student_id', 'students.student_id')
         .where('project_member.project_id', id)
       const tag = await knex.select('tag_id', 'tag_name').from('project_tags').where('project_id', id)
@@ -52,11 +52,12 @@ module.exports = {
       const document = await filesModel.getDocument(id)
       const image = await filesModel.getImage(id)
       const video = await filesModel.getVideo(id)
+      delete detail[0].project_type_id
       const result = {
         'project_detail': detail[0],
         'students': students,
-        'achievement': achievement[0] === undefined ? [] : achievement[0],
-        'tag': tag,
+        'achievement': achievement[0] === undefined ? [] : achievement,
+        'tags': tag,
         'document': document,
         'picture': image,
         'video': video
@@ -95,13 +96,19 @@ module.exports = {
     }
   },
 
-  updateProject: async (id, projectDetail, achievementData) => {
+  updateProjectDetail: async (id, projectDetail, achievementData) => {
     try {
       if (projectDetail.project_type_name) {
         projectDetail = await getProjectTypeId(projectDetail)
       }
       await knex('projects').update(projectDetail).where('id', id)
+    } catch (err) {
+      return err
+    }
+  },
 
+  updateProjectAchievement: async (id, achievementData) => {
+    try {
       const achievement = await getAchievement(id)
       if (achievement[0] === undefined) {
         achievementData.project_id = id
@@ -182,7 +189,7 @@ async function insertAchievement (achievementData) {
 
 async function getAchievement (projectId) {
   try {
-    const achievement = await knex.select('*').from('project_achievement').where('project_id', projectId)
+    const achievement = await knex.select('achievement_name', 'achievement_detail', 'organize_by', 'date_of_event').from('project_achievement').where('project_id', projectId)
     return achievement
   } catch (err) {
     throw new Error(err)

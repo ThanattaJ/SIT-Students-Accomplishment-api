@@ -11,16 +11,16 @@ module.exports = {
 
   getProjectOutsider: async (projectId) => {
     try {
-      const outsiders = await knex.select('*').from('project_outsiders').where('project_id', projectId)
+      const outsiders = await knex.select('id', 'firstname', 'lastname', 'email').from('project_outsiders').where('project_id', projectId)
       return outsiders
     } catch (err) {
       throw new Error(err)
     }
   },
 
-  updateProjectOutsider: async (outsider) => { 
-    try{ 
-      await knex('project_outsiders').where('id', outsider.id) 
+  updateProjectOutsider: async (outsider) => {
+    try {
+      await knex('project_outsiders').where('id', outsider.id)
     } catch (err) {
       throw new Error(err)
     }

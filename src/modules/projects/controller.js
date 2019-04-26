@@ -92,17 +92,21 @@ module.exports = {
   },
 
   updateProjectDetail: async (req, res) => {
-    const { checkStatus, err } = validate(req.params, updateProjectDetailSchema)
+    const { checkStatus, err } = validate(req.body, updateProjectDetailSchema)
     if (!checkStatus) return res.send(err)
 
     // eslint-disable-next-line camelcase
     const { project_detail, outsiders, achievement, tags, video } = req.body
     const id = project_detail.id
     try {
-      await projectModel.updateProject(id, project_detail, achievement)
-      console.log(outsiders)
+      await projectModel.updateProjectDetail(id, project_detail)
+
+      if (achievement.length > 0) {
+        const date = achievement[0].date_of_event
+        achievement[0].date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+        await projectModel.updateProjectAchievement(id, achievement[0])
+      }
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
-        console.log('hi')
         await manageOutsider(outsiders, id)
       }
       if (tags !== undefined) {
@@ -182,13 +186,13 @@ async function getProjectDetail (projectId) {
     result.project_detail.haveOutsider = result.project_detail.haveOutsider === 1
     if (result.project_detail.haveOutsider) {
       const outsiders = await outsidersController.getOutsider(projectId)
-      result.outsider = outsiders[0] === undefined ? [] : outsiders[0]
+      result.outsiders = outsiders[0] === undefined ? [] : outsiders
     }
     if (result.project_detail.references) {
       const ref = result.project_detail.references
       result.project_detail.references = _.split(ref, ',')
     }
-    result.achievement.date_of_event = moment(result.achievement.date_of_event).format('DD-MM-YYYY')
+    result.achievement[0].date_of_event = moment(result.achievement[0].date_of_event).format('DD-MM-YYYY')
     return result
   } catch (err) {
     throw new Error(err)
