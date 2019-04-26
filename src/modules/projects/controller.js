@@ -54,36 +54,34 @@ module.exports = {
   },
 
   createProject: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, createProjectSchema)
+    if (!checkStatus) return res.send(err)
+
     // eslint-disable-next-line camelcase
     const { project_data, member, achievement } = req.body
     project_data.start_year_th = project_data.start_year_en + 543
     try {
       const project = await projectModel.createProject(project_data)
-      let result = { project: project }
 
       if (member.students !== undefined && member.students.length > 0) {
         const students = member.students
         students.forEach((student) => {
           student.project_id = project.id
         })
-        const memberStudent = await projectModel.addProjectStudent(students)
-        result.member = { students: memberStudent }
+        await projectModel.addProjectStudent(students)
       }
 
-      if (project_data.haveOutsider) {
-        const membersOutsiders = await manageOutsider(member.outsiders, project.id)
-        result.member.outsiders = membersOutsiders
+      if (project_data.haveOutsider && member.outsiders !== undefined && member.outsiders.length > 0) {
+        await manageOutsider(member.outsiders, project.id)
       }
 
       if (achievement !== undefined) {
         const date = achievement.date_of_event
         achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
         achievement.project_id = project.id
-        const achievements = await projectModel.addProjectAchievement(achievement)
-        achievements.date_of_event = moment(achievements.date_of_event).format('DD-MM-YYYY')
-        result.achievements = achievements
+        await projectModel.addProjectAchievement(achievement)
       }
-
+      const result = await getProjectDetail(project.id)
       res.send(result)
     } catch (err) {
       res.status(500).send({
@@ -94,6 +92,9 @@ module.exports = {
   },
 
   updateProjectDetail: async (req, res) => {
+    const { checkStatus, err } = validate(req.params, updateProjectDetailSchema)
+    if (!checkStatus) return res.send(err)
+
     // eslint-disable-next-line camelcase
     const { project_detail, outsiders, achievement, tags, video } = req.body
     const id = project_detail.id
@@ -187,6 +188,7 @@ async function getProjectDetail (projectId) {
       const ref = result.project_detail.references
       result.project_detail.references = _.split(ref, ',')
     }
+    result.achievement.date_of_event = moment(result.achievement.date_of_event).format('DD-MM-YYYY')
     return result
   } catch (err) {
     throw new Error(err)
@@ -207,9 +209,6 @@ async function manageOutsider (outsiders, projectId) {
     if (outsiderHaveId.length > 0) {
       await outsidersController.updateOutsider(outsiderHaveId)
     }
-
-    const membersOutsiders = await outsidersController.getOutsider(projectId)
-    return membersOutsiders
   } catch (err) {
     throw new Error(err)
   }

@@ -82,8 +82,6 @@ module.exports = {
   addProjectStudent: async (member) => {
     try {
       await knex('project_member').insert(member)
-      const members = await knex.select('*').from('project_member').where('project_id', member[0].project_id)
-      return members
     } catch (err) {
       throw new Error(err)
     }
@@ -92,8 +90,6 @@ module.exports = {
   addProjectAchievement: async (achievementData) => {
     try {
       await insertAchievement(achievementData)
-      const achievement = await knex.select('*').from('project_achievement').where('project_id', achievementData.project_id)
-      return achievement[0]
     } catch (err) {
       throw new Error(err)
     }
