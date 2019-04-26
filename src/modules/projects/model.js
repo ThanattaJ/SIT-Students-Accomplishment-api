@@ -3,104 +3,149 @@ const filesModel = require('../files/model')
 module.exports = {
 
   getAllProjects: async () => {
-    const result = await knex.select('id', 'project_name_th', 'project_name_en', 'project_detail_th', 'project_detail_en').from('projects').where('isShow', true)
-    return result
+    try {
+      const result = await knex.select('id', 'project_name_th', 'project_name_en', 'project_detail_th', 'project_detail_en').from('projects').where('isShow', true)
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   getProjectsByStudentId: async (id) => {
-    const projects = await knex('projects').select('projects.id', 'projects.project_name_th', 'projects.project_name_en',
-      'projects.project_detail_th', 'projects.project_detail_en', 'projects.count_viewer', 'projects.count_clap')
-      .join('project_member', 'projects.id', 'project_member.project_id')
-      .where('project_member.student_id', id)
+    try {
+      const projects = await knex('projects').select('projects.id', 'projects.project_name_th', 'projects.project_name_en',
+        'projects.project_detail_th', 'projects.project_detail_en', 'projects.count_viewer', 'projects.count_clap')
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .where('project_member.student_id', id)
 
-    projects.forEach(async project => {
-      const cover = await filesModel.getCoverImage(project.id)
-      project.cover_path = cover
-    })
-    return projects
+      projects.forEach(async project => {
+        const cover = await filesModel.getCoverImage(project.id)
+        project.cover_path = cover
+      })
+      return projects
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   countProjectUser: async (id) => {
-    const total = await knex('projects').count('id as total')
-      .join('project_member', 'projects.id', 'project_member.project_id')
-      .where('project_member.student_id', id)
-    return total[0].total
+    try {
+      const total = await knex('projects').count('id as total')
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .where('project_member.student_id', id)
+      return total[0].total
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   getProjectsDetailById: async (id) => {
-    const detail = await knex.select('projects.*', 'project_type.project_type_name').from('projects').where('projects.id', id)
-      .join('project_type', 'projects.project_type_id', 'project_type.id')
-    const students = await knex('project_member').select('students.student_id', 'students.firstname_en', 'students.lastname_en')
-      .join('students', 'project_member.student_id', 'students.student_id')
-      .where('project_member.project_id', id)
-    const tag = await knex.select('tag_id', 'tag_name').from('project_tags').where('project_id', id)
-      .join('tags', 'project_tags.tag_id', 'tags.id')
-    const achievement = await knex.select('*').from('project_achievement').where('project_id', id)
-
-    const document = await filesModel.getDocument(id)
-    const image = await filesModel.getImage(id)
-    const video = await filesModel.getVideo(id)
-
-    const result = {
-      'project_detail': detail[0],
-      'students': students,
-      'achievement': achievement[0],
-      'tag': tag,
-      'document': document,
-      'picture': image,
-      'video': video
+    try {
+      const detail = await knex.select('projects.*', 'project_type.project_type_name').from('projects').where('projects.id', id)
+        .join('project_type', 'projects.project_type_id', 'project_type.id')
+      const students = await knex('project_member').select('students.student_id', 'students.firstname_en', 'students.lastname_en')
+        .join('students', 'project_member.student_id', 'students.student_id')
+        .where('project_member.project_id', id)
+      const tag = await knex.select('tag_id', 'tag_name').from('project_tags').where('project_id', id)
+        .join('tags', 'project_tags.tag_id', 'tags.id')
+      const achievement = await getAchievement(id)
+      const document = await filesModel.getDocument(id)
+      const image = await filesModel.getImage(id)
+      const video = await filesModel.getVideo(id)
+      const result = {
+        'project_detail': detail[0],
+        'students': students,
+        'achievement': achievement[0] === undefined ? [] : achievement[0],
+        'tag': tag,
+        'document': document,
+        'picture': image,
+        'video': video
+      }
+      return result
+    } catch (err) {
+      throw new Error(err)
     }
-    return result
   },
 
   createProject: async (projectData) => {
-    const projectDataNew = await getProjectTypeId(projectData)
-    const projectId = await knex('projects').insert(projectDataNew)
-    await filesModel.createVideo(projectId)
-    const project = await knex.select('*').from('projects').where('id', projectId)
-    return project[0]
+    try {
+      const projectDataNew = await getProjectTypeId(projectData)
+      const projectId = await knex('projects').insert(projectDataNew)
+      await filesModel.createVideo(projectId)
+      const project = await knex.select('*').from('projects').where('id', projectId)
+      return project[0]
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   addProjectStudent: async (member) => {
-    await knex('project_member').insert(member)
-    const members = await knex.select('*').from('project_member').where('project_id', member[0].project_id)
-    return members
+    try {
+      await knex('project_member').insert(member)
+      const members = await knex.select('*').from('project_member').where('project_id', member[0].project_id)
+      return members
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
-  addProjectAchievement: async (achieveData) => {
-    await knex('project_achievement').insert(achieveData)
-    const achievement = await knex.select('*').from('project_achievement').where('project_id', achieveData.project_id)
-    return achievement[0]
+  addProjectAchievement: async (achievementData) => {
+    try {
+      await insertAchievement(achievementData)
+      const achievement = await knex.select('*').from('project_achievement').where('project_id', achievementData.project_id)
+      return achievement[0]
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   updateProject: async (id, projectDetail, achievementData) => {
-    if (projectDetail.project_type_name) {
-      projectDetail = await getProjectTypeId(projectDetail)
+    try {
+      if (projectDetail.project_type_name) {
+        projectDetail = await getProjectTypeId(projectDetail)
+      }
+      await knex('projects').update(projectDetail).where('id', id)
+
+      const achievement = await getAchievement(id)
+      if (achievement[0] === undefined) {
+        achievementData.project_id = id
+        await insertAchievement(achievementData)
+      } else {
+        await knex('project_achievement').update(achievementData).where('project_id', id)
+      }
+    } catch (err) {
+      return err
     }
-    await knex('projects').update(projectDetail).where('id', id)
-    await knex('project_achievement').update(achievementData).where('project_id', id)
   },
 
   updateProjectCount: async (action, projectId) => {
-    let count = {}
-    if (action === 'viewer') {
-      count = await knex('projects').select('count_viewer').where('id', projectId)
-      count[0].count_viewer++
-      await knex('projects').update(count[0]).where('id', projectId)
-    }
+    try {
+      let count = {}
+      if (action === 'viewer') {
+        count = await knex('projects').select('count_viewer').where('id', projectId)
+        count[0].count_viewer++
+        await knex('projects').update(count[0]).where('id', projectId)
+      }
 
-    if (action === 'clap') {
-      count = await knex('projects').select('count_clap').where('id', projectId)
-      count[0].count_clap++
-      await knex('projects').update(count[0]).where('id', projectId)
+      if (action === 'clap') {
+        count = await knex('projects').select('count_clap').where('id', projectId)
+        count[0].count_clap++
+        await knex('projects').update(count[0]).where('id', projectId)
+      }
+      return count[0]
+    } catch (err) {
+      throw new Error(err)
     }
-    return count[0]
   },
 
   updateProjectTag: async (tag, projcetId) => {
-    await knex('project_tags').del().where('project_id', projcetId)
-    const result = knex('project_tags').insert(tag)
-    return result
+    try {
+      await knex('project_tags').del().where('project_id', projcetId)
+      const result = knex('project_tags').insert(tag)
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   deleteProject: async (id) => {
@@ -114,15 +159,36 @@ module.exports = {
       await knex('project_member').del().where('project_id', id)
       await knex('projects').del().where('id', id)
     } catch (err) {
-      throw Error(err)
+      throw new Error(err)
     }
   }
 
 }
 
 async function getProjectTypeId (projectData) {
-  const projectTypeId = await knex('project_type').select('id').where('project_type_name', projectData.project_type_name)
-  projectData.project_type_id = projectTypeId[0].id
-  delete projectData.project_type_name
-  return projectData
+  try {
+    const projectTypeId = await knex('project_type').select('id').where('project_type_name', projectData.project_type_name)
+    projectData.project_type_id = projectTypeId[0].id
+    delete projectData.project_type_name
+    return projectData
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
+async function insertAchievement (achievementData) {
+  try {
+    await knex('project_achievement').insert(achievementData)
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
+async function getAchievement (projectId) {
+  try {
+    const achievement = await knex.select('*').from('project_achievement').where('project_id', projectId)
+    return achievement
+  } catch (err) {
+    throw new Error(err)
+  }
 }

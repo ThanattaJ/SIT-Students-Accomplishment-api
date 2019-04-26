@@ -11,7 +11,7 @@ module.exports = {
 
   uploadImgSchema: joi.object().keys({
     project_id: joi.string().required().trim(),
-    isCover: joi.string().required()
+    isCover: joi.string().required().trim()
   }),
 
   uploadDocSchema: joi.object().keys({

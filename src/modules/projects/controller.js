@@ -4,27 +4,53 @@ const projectModel = require('./model')
 const outsidersController = require('../outsiders/controller')
 const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
+
+const { validate } = require('../validation')
+const { projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateCountingSchema } = require('./json_schema')
+
 module.exports = {
 
   getAllProjects: async () => {
-    const result = await projectModel.getAllProjects()
-    return result
+    try {
+      const result = await projectModel.getAllProjects()
+      return result
+    } catch (err) {
+      console.log(err)
+    }
   },
 
   getProjectsByStudentId: async (userId) => {
-    const result = await projectModel.getProjectsByStudentId(userId)
-    return result
+    try {
+      const result = await projectModel.getProjectsByStudentId(userId)
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   getAmountProjectUser: async (userId) => {
-    const result = await projectModel.countProjectUser(userId)
-    return result
+    try {
+      const result = await projectModel.countProjectUser(userId)
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
   },
 
   getProjectPage: async (req, res) => {
-    const projectId = req.params.id
-    const page = await getProjectDetail(projectId)
-    res.send(page)
+    const { checkStatus, err } = validate(req.params, projectPageSchema)
+    if (!checkStatus) return res.send(err)
+
+    try {
+      const projectId = req.params.id
+      const page = await getProjectDetail(projectId)
+      res.send(page)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
   },
 
   createProject: async (req, res) => {
@@ -35,7 +61,7 @@ module.exports = {
       const project = await projectModel.createProject(project_data)
       let result = { project: project }
 
-      if (member.students !== undefined) {
+      if (member.students !== undefined && member.students.length > 0) {
         const students = member.students
         students.forEach((student) => {
           student.project_id = project.id
@@ -62,7 +88,7 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         status: 500,
-        message: err
+        message: err.message
       })
     }
   },
@@ -73,7 +99,9 @@ module.exports = {
     const id = project_detail.id
     try {
       await projectModel.updateProject(id, project_detail, achievement)
-      if (project_detail.haveOutsider) {
+      console.log(outsiders)
+      if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
+        console.log('hi')
         await manageOutsider(outsiders, id)
       }
       if (tags !== undefined) {
@@ -89,21 +117,34 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         status: 500,
-        message: err
+        message: err.message
       })
     }
   },
 
   updateProjectCount: async (req, res) => {
-    const { action } = req.body
-    const projectId = req.body.project_id
-    const result = await projectModel.updateProjectCount(action, projectId)
-    res.send(result)
+    const { checkStatus, err } = validate(req.body, updateCountingSchema)
+    if (!checkStatus) return res.send(err)
+
+    try {
+      const { action } = req.body
+      const projectId = req.body.project_id
+      const result = await projectModel.updateProjectCount(action, projectId)
+      res.send(result)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
   },
 
   deleteProject: async (req, res) => {
-    const id = req.params.id
+    const { checkStatus, err } = validate(req.params, projectPageSchema)
+    if (!checkStatus) return res.send(err)
+
     try {
+      const id = req.params.id
       await projectModel.deleteProject(id)
       res.status(200).send({
         status: 500,
@@ -112,52 +153,64 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         status: 500,
-        message: err
+        message: err.message
       })
     }
   }
 }
 
 async function checkTag (tags) {
-  const tagIdUndefined = tags.filter(tag => tag.tag_id === undefined)
-  const tagId = await tagsController.createTag(tagIdUndefined)
-  tags.forEach(tag => {
-    if (tag.tag_id !== undefined) {
-      tagId.push({ tag_id: tag.tag_id })
-    }
-  })
-  return tagId
+  try {
+    const tagIdUndefined = tags.filter(tag => tag.tag_id === undefined)
+    const tagId = await tagsController.createTag(tagIdUndefined)
+    tags.forEach(tag => {
+      if (tag.tag_id !== undefined) {
+        tagId.push({ tag_id: tag.tag_id })
+      }
+    })
+    return tagId
+  } catch (err) {
+    throw new Error(err)
+  }
 }
 
 async function getProjectDetail (projectId) {
-  const result = await projectModel.getProjectsDetailById(projectId)
-  result.project_detail.isShow = result.project_detail.isShow === 1
-  result.project_detail.haveOutsider = result.project_detail.haveOutsider === 1
-  if (result.project_detail.haveOutsider) {
-    const outsiders = await outsidersController.getOutsider(projectId)
-    result.outsider = outsiders
+  try {
+    const result = await projectModel.getProjectsDetailById(projectId)
+    result.project_detail.isShow = result.project_detail.isShow === 1
+    result.project_detail.haveOutsider = result.project_detail.haveOutsider === 1
+    if (result.project_detail.haveOutsider) {
+      const outsiders = await outsidersController.getOutsider(projectId)
+      result.outsider = outsiders[0] === undefined ? [] : outsiders[0]
+    }
+    if (result.project_detail.references) {
+      const ref = result.project_detail.references
+      result.project_detail.references = _.split(ref, ',')
+    }
+    return result
+  } catch (err) {
+    throw new Error(err)
   }
-  if (result.project_detail.references) {
-    const ref = result.project_detail.references
-    result.project_detail.references = _.split(ref, ',')
-  }
-  return result
 }
 
 async function manageOutsider (outsiders, projectId) {
-  const outsiderNotId = await outsiders.filter(outsider => outsider.id === undefined)
-  if (outsiderNotId.length > 0) {
-    outsiderNotId.forEach(outsider => {
-      outsider.project_id = projectId
-    })
-    await outsidersController.createOutsider(outsiderNotId)
-  }
+  try {
+    const outsiderNotId = await outsiders.filter(outsider => outsider.id === undefined)
+    if (outsiderNotId.length > 0) {
+      outsiderNotId.forEach(outsider => {
+        outsider.project_id = projectId
+      })
+      await outsidersController.createOutsider(outsiderNotId)
+    }
 
-  const outsiderHaveId = await outsiders.filter(outsider => outsider.id !== undefined)
-  if (outsiderHaveId.length > 0) {
-    await outsidersController.updateOutsider(outsiderHaveId)
-  }
+    const outsiderHaveId = await outsiders.filter(outsider => outsider.id !== undefined)
+    if (outsiderHaveId.length > 0) {
+      await outsidersController.updateOutsider(outsiderHaveId)
+    }
 
-  const membersOutsiders = await outsidersController.getOutsider(projectId)
-  return membersOutsiders
+    const membersOutsiders = await outsidersController.getOutsider(projectId)
+    return membersOutsiders
+  } catch (err) {
+    throw new Error(err)
+  }
 }

@@ -45,6 +45,7 @@ module.exports = {
     if (isCover) {
       file.originalname = 'cover'
     }
+
     try {
       const link = await uploadFileToStorage(file, 'image', projectId, isCover)
       const image = {
@@ -74,6 +75,7 @@ module.exports = {
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
+
     try {
       await bucket.file(path).delete()
       await filesModel.deleteImage(path)
@@ -115,6 +117,7 @@ module.exports = {
       })
     }
     const projectId = req.body.project_id
+
     try {
       const link = await uploadFileToStorage(file, 'document', projectId, false)
       const doc = {
@@ -141,6 +144,7 @@ module.exports = {
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
+
     try {
       await bucket.file(path).delete()
       await filesModel.deleteDocument(path)
@@ -156,9 +160,21 @@ module.exports = {
     }
   },
 
-  getVideo: async (projectId) => { await filesModel.getVideo(projectId) },
+  getVideo: async (projectId) => {
+    try {
+      await filesModel.getVideo(projectId)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
 
-  updateVideo: async (video, projectId) => { await filesModel.updateVideo(video, projectId) },
+  updateVideo: async (video, projectId) => {
+    try {
+      await filesModel.updateVideo(video, projectId)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
 
   getCover: async (req, res) => {
     const { checkStatus, err } = validate(req.params, getCoverSchema)
@@ -195,11 +211,13 @@ function checkFileImgType (file, cb) {
 }
 
 async function checkCoverExist (projectId) {
-  const cover = await filesModel.getCoverImage(projectId)
-  if (cover.length > 0) {
-    return true
-  } else {
-    return false
+  try {
+    const cover = await filesModel.getCoverImage(projectId)
+    if (cover.length > 0) {
+      return true
+    } else { return false }
+  } catch (err) {
+    throw new Error(err)
   }
 }
 
