@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 const userModel = require('./model')
+const moment = require('moment')
 const projectController = require('../projects/controller')
 const { validate } = require('../validation')
 const { getUserIdSchema, getListStudentSchema } = require('./json_schema')
@@ -13,6 +14,7 @@ module.exports = {
 
       const { user_role, id } = req.body
       const userData = await userModel.getUserById(user_role, id)
+      userData.profile.birthday = moment(userData.profile.birthday).format('DD-MM-YYYY')
       if (user_role === 'student') {
         const project = await projectController.getProjectsByStudentId(id)
         const totalProject = await projectController.getAmountProjectUser(id)
@@ -21,7 +23,6 @@ module.exports = {
       }
       res.send(userData)
     } catch (err) {
-      console.log('hi', err)
       res.status(500).send({
         status: 500,
         message: err.message

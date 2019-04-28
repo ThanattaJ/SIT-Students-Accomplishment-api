@@ -1,10 +1,16 @@
 const knex = require('../../db/knex')
 const filesModel = require('../files/model')
+const query = require('./constants')
 module.exports = {
 
   getAllProjects: async () => {
     try {
-      const result = await knex.select('id', 'project_name_th', 'project_name_en', 'project_detail_th', 'project_detail_en').from('projects').where('isShow', true)
+      const result = await knex.select(query.queryAllProjects).from('projects').where('isShow', true)
+      result.forEach(async project => {
+        const cover = await filesModel.getCoverImage(project.id)
+        project.cover_path = cover
+      })
+
       return result
     } catch (err) {
       throw new Error(err)
@@ -13,8 +19,7 @@ module.exports = {
 
   getProjectsByStudentId: async (id) => {
     try {
-      const projects = await knex('projects').select('projects.id', 'projects.project_name_th', 'projects.project_name_en',
-        'projects.project_detail_th', 'projects.project_detail_en', 'projects.count_viewer', 'projects.count_clap')
+      const projects = await knex('projects').select(query.queryProjectsByStudentId)
         .join('project_member', 'projects.id', 'project_member.project_id')
         .where('project_member.student_id', id)
 
@@ -41,14 +46,15 @@ module.exports = {
 
   getProjectsDetailById: async (id) => {
     try {
-      const detail = await knex.select('projects.*', 'project_type.project_type_name').from('projects').where('projects.id', id)
+      const detail = await knex.select(query.queryProjectsDetailById).from('projects').where('projects.id', id)
         .join('project_type', 'projects.project_type_id', 'project_type.id')
-      const students = await knex('project_member').select('students.student_id', 'students.firstname_en', 'students.lastname_en', 'students.email')
+      const students = await knex('project_member').select(query.queryProjectStudentsMember)
         .join('students', 'project_member.student_id', 'students.student_id')
         .where('project_member.project_id', id)
-      const tag = await knex.select('tag_id', 'tag_name').from('project_tags').where('project_id', id)
-        .join('tags', 'project_tags.tag_id', 'tags.id')
       const achievement = await getAchievement(id)
+
+      const tag = await knex.select(query.queryProjectTags).from('project_tags').where('project_id', id)
+        .join('tags', 'project_tags.tag_id', 'tags.id')
       const document = await filesModel.getDocument(id)
       const image = await filesModel.getImage(id)
       const video = await filesModel.getVideo(id)
@@ -189,7 +195,7 @@ async function insertAchievement (achievementData) {
 
 async function getAchievement (projectId) {
   try {
-    const achievement = await knex.select('achievement_name', 'achievement_detail', 'organize_by', 'date_of_event').from('project_achievement').where('project_id', projectId)
+    const achievement = await knex.select(query.queryProjectAchievement).from('project_achievement').where('project_id', projectId)
     return achievement
   } catch (err) {
     throw new Error(err)

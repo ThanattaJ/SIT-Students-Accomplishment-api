@@ -7,7 +7,7 @@ exports.up = async function (knex) {
     table.string('district_en')
     table.string('subdistrict_en')
     table.string('province_en')
-    table.string('postcode')
+    table.string('postcode_en')
 
     table
       .timestamp('created_at')

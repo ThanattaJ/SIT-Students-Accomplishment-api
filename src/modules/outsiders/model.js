@@ -1,4 +1,5 @@
 const knex = require('../../db/knex')
+const { queryProjectOutsider } = require('./constants')
 module.exports = {
 
   addProjectOutsider: async (outsiders) => {
@@ -11,7 +12,7 @@ module.exports = {
 
   getProjectOutsider: async (projectId) => {
     try {
-      const outsiders = await knex.select('id', 'firstname', 'lastname', 'email').from('project_outsiders').where('project_id', projectId)
+      const outsiders = await knex.select(queryProjectOutsider).from('project_outsiders').where('project_id', projectId)
       return outsiders
     } catch (err) {
       throw new Error(err)

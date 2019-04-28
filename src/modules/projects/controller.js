@@ -44,6 +44,8 @@ module.exports = {
     try {
       const projectId = req.params.id
       const page = await getProjectDetail(projectId)
+      page.project_detail.created_at = moment(page.project_detail.created_at).format('LLL')
+      page.project_detail.updated_at = moment(page.project_detail.updated_at).format('LLL')
       res.send(page)
     } catch (err) {
       res.status(500).send({
@@ -149,8 +151,8 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     try {
-      const id = req.params.id
-      await projectModel.deleteProject(id)
+      const projectId = req.params.id
+      await projectModel.deleteProject(projectId)
       res.status(200).send({
         status: 500,
         message: 'Delete Success'

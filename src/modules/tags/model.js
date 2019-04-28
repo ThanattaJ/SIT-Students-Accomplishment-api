@@ -1,4 +1,5 @@
 const knex = require('../../db/knex')
+const { queryTagByChar } = require('./constants')
 module.exports = {
 
   createTag: async (tagName) => {
@@ -14,7 +15,7 @@ module.exports = {
 
   getTagByChar: async (char) => {
     try {
-      const tags = await knex('tags').select('id', 'tag_name').where('tag_name', 'like', `${char}%`)
+      const tags = await knex('tags').select(queryTagByChar).where('tag_name', 'like', `${char}%`)
       return tags
     } catch (err) {
       throw new Error(err)

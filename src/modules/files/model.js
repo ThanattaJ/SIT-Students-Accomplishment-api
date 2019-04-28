@@ -1,4 +1,5 @@
 const knex = require('../../db/knex')
+const { queryPathName } = require('./constants')
 module.exports = {
 
   createImage: async (image) => {
@@ -26,7 +27,7 @@ module.exports = {
 
   deleteImage: async (path) => {
     try {
-      await knex('project_images').del().where('path_name', 'like', `%${path}`)
+      await knex('project_images').del().where(queryPathName, 'like', `%${path}`)
     } catch (err) {
       throw new Error(err)
     }
@@ -34,7 +35,7 @@ module.exports = {
 
   deleteDocument: async (path) => {
     try {
-      await knex('project_documents').del().where('path_name', 'like', `%${path}`)
+      await knex('project_documents').del().where(queryPathName, 'like', `%${path}`)
     } catch (err) {
       throw new Error(err)
     }
@@ -42,7 +43,7 @@ module.exports = {
 
   getImage: async (projectId) => {
     try {
-      const image = await knex.select('path_name').from('project_images').where('project_id', projectId)
+      const image = await knex.select(queryPathName).from('project_images').where('project_id', projectId)
       return image
     } catch (err) {
       throw new Error(err)
@@ -51,9 +52,9 @@ module.exports = {
 
   getCoverImage: async (projectId) => {
     try {
-      const image = await knex.select('path_name').from('project_images')
+      const image = await knex.select(queryPathName).from('project_images')
         .where('project_id', projectId)
-        .andWhere('path_name', 'like', '%cover%')
+        .andWhere(queryPathName, 'like', '%cover%')
       return image
     } catch (err) {
       throw new Error(err)
@@ -62,7 +63,7 @@ module.exports = {
 
   getDocument: async (projectId) => {
     try {
-      const document = await knex.select('path_name').from('project_documents').where('project_id', projectId)
+      const document = await knex.select(queryPathName).from('project_documents').where('project_id', projectId)
       return document
     } catch (err) {
       throw new Error(err)
@@ -71,7 +72,7 @@ module.exports = {
 
   getVideo: async (projectId) => {
     try {
-      const video = await knex('project_video').select('path_name').where('project_id', projectId)
+      const video = await knex('project_video').select(queryPathName).where('project_id', projectId)
       return video[0]
     } catch (err) {
       throw new Error(err)
