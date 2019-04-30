@@ -79,8 +79,7 @@ module.exports = {
       const projectDataNew = await getProjectTypeId(projectData)
       const projectId = await knex('projects').insert(projectDataNew)
       await filesModel.createVideo(projectId)
-      const project = await knex.select('*').from('projects').where('id', projectId)
-      return project[0]
+      return projectId[0]
     } catch (err) {
       throw new Error(err)
     }

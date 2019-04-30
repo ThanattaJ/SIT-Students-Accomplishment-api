@@ -23,7 +23,7 @@ module.exports = {
           student_id: joi.string().required().trim().length(11)
         })
       ),
-      outsider: joi.array().items(
+      outsiders: joi.array().items(
         joi.object().keys({
           firstname: joi.string().required().trim(),
           lastname: joi.string().required().trim(),

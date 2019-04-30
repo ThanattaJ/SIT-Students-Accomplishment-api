@@ -63,28 +63,31 @@ module.exports = {
     const { project_data, member, achievement } = req.body
     project_data.start_year_th = project_data.start_year_en + 543
     try {
-      const project = await projectModel.createProject(project_data)
+      const projectId = await projectModel.createProject(project_data)
 
       if (member.students !== undefined && member.students.length > 0) {
         const students = member.students
         students.forEach((student) => {
-          student.project_id = project.id
+          student.project_id = projectId
         })
         await projectModel.addProjectStudent(students)
       }
 
       if (project_data.haveOutsider && member.outsiders !== undefined && member.outsiders.length > 0) {
-        await manageOutsider(member.outsiders, project.id)
+        await manageOutsider(member.outsiders, projectId)
       }
 
       if (achievement !== undefined) {
         const date = achievement.date_of_event
         achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
-        achievement.project_id = project.id
+        achievement.project_id = projectId
         await projectModel.addProjectAchievement(achievement)
       }
-      const result = await getProjectDetail(project.id)
-      res.send(result)
+      // const result = await getProjectDetail(project.id)
+      res.status(200).send({
+        status: 200,
+        project_id: projectId
+      })
     } catch (err) {
       res.status(500).send({
         status: 500,
