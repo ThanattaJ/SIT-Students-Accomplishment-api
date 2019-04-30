@@ -29,7 +29,6 @@ module.exports = {
   },
 
   uploadImage: async (req, res) => {
-    console.log(req)
     const { checkStatus, err } = validate(req.body, uploadImgSchema)
     if (!checkStatus) return res.send(err)
 
@@ -105,7 +104,6 @@ module.exports = {
   },
 
   uploadDocument: async (req, res) => {
-    console.log(req)
     const { checkStatus, err } = validate(req.body, uploadDocSchema)
     if (!checkStatus) return res.send(err)
 
@@ -138,9 +136,11 @@ module.exports = {
   },
 
   deleteDocument: async (req, res) => {
+    console.log('req', req)
     const { checkStatus, err } = validate(req.body, deleteSchema)
     if (!checkStatus) return res.send(err)
 
+    console.log('----------------------', req.body)
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
@@ -243,6 +243,7 @@ const uploadFileToStorage = (file, fileType, projectId, isCover) => {
       fileUpload = bucket.file(`Images/${projectId}/${newFileName}`)
     }
     if (fileType === 'document') {
+      newFileName = `${Date.now()}_${file.originalname}`
       fileUpload = bucket.file(`Documents/${projectId}/${newFileName}`)
     }
 
