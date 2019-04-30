@@ -12,8 +12,8 @@ module.exports = {
       project_type_name: joi.string().required().trim(),
       project_detail_th: joi.string().required().trim().allow(null),
       project_detail_en: joi.string().required().trim().allow(null),
-      start_month: joi.number().required(),
-      start_year_en: joi.number(),
+      start_month: joi.number(),
+      start_year_en: joi.number().required(),
       haveOutsider: joi.boolean().required()
 
     }),
