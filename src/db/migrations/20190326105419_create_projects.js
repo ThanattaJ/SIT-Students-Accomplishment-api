@@ -4,8 +4,8 @@ exports.up = async function (knex) {
     table.increments('id').primary()
     table.string('project_name_th').notNullable()
     table.string('project_name_en').notNullable()
-    table.string('project_detail_th')
-    table.string('project_detail_en')
+    table.string('project_detail')
+    table.string('project_abstract')
     table.integer('project_type_id').unsigned().notNullable()
     table.boolean('haveOutsider').defaultTo(false).notNullable()
     table.boolean('isShow').defaultTo(false).notNullable()
@@ -16,6 +16,9 @@ exports.up = async function (knex) {
     table.integer('start_month')
     table.integer('start_year_th')
     table.integer('start_year_en')
+    table.integer('end_month')
+    table.integer('end_year_th')
+    table.integer('end_year_en')
 
     table
       .timestamp('created_at')
