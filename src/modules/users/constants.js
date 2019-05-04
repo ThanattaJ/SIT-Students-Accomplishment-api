@@ -55,5 +55,12 @@ module.exports = {
     'student_id',
     'firstname_en',
     'lastname_en'
+  ],
+
+  queryProjectOutsider: [
+    'id',
+    'firstname',
+    'lastname',
+    'email'
   ]
 }

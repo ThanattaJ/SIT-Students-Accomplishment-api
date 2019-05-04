@@ -1,5 +1,5 @@
 const knex = require('../../db/knex')
-const { queryStudentInformation, queryStudentLanuage, queryStudentEducation, queryListStudent } = require('./constants')
+const { queryStudentInformation, queryStudentLanuage, queryStudentEducation, queryListStudent, queryProjectOutsider } = require('./constants')
 module.exports = {
 
   getUserById: async (userRole, id) => {
@@ -38,6 +38,39 @@ module.exports = {
   getListStudent: async (code) => {
     try {
       return await knex('students').select(queryListStudent).where('student_id', 'like', `${code}%`)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  addProjectOutsider: async (outsiders) => {
+    try {
+      await knex('project_outsiders').insert(outsiders)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getProjectOutsider: async (projectId) => {
+    try {
+      const outsiders = await knex.select(queryProjectOutsider).from('project_outsiders').where('project_id', projectId)
+      return outsiders
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateProjectOutsider: async (outsider) => {
+    try {
+      await knex('project_outsiders').where('id', outsider.id)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  deleteOutsider: async (id) => {
+    try {
+      await knex('project_outsiders').del().where('id', id)
     } catch (err) {
       throw new Error(err)
     }

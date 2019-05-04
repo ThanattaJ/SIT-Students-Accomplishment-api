@@ -8,5 +8,9 @@ module.exports = {
 
   getListStudentSchema: joi.object().keys({
     code: joi.number().required().positive()
+  }),
+
+  deleteOutsiderSchema: joi.object().keys({
+    id: joi.number().required()
   })
 }

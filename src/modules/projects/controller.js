@@ -1,7 +1,7 @@
 const moment = require('moment')
 const _ = require('lodash')
 const projectModel = require('./model')
-const outsidersController = require('../outsiders/controller')
+const userController = require('../users/controller')
 const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
 
@@ -190,7 +190,7 @@ async function getProjectDetail (projectId) {
     result.project_detail.isShow = result.project_detail.isShow === 1
     result.project_detail.haveOutsider = result.project_detail.haveOutsider === 1
     if (result.project_detail.haveOutsider) {
-      const outsiders = await outsidersController.getOutsider(projectId)
+      const outsiders = await userController.getOutsider(projectId)
       result.outsiders = outsiders[0] === undefined ? [] : outsiders
     }
     if (result.project_detail.references) {
@@ -211,12 +211,12 @@ async function manageOutsider (outsiders, projectId) {
       outsiderNotId.forEach(outsider => {
         outsider.project_id = projectId
       })
-      await outsidersController.createOutsider(outsiderNotId)
+      await userController.createOutsider(outsiderNotId)
     }
 
     const outsiderHaveId = await outsiders.filter(outsider => outsider.id !== undefined)
     if (outsiderHaveId.length > 0) {
-      await outsidersController.updateOutsider(outsiderHaveId)
+      await userController.updateOutsider(outsiderHaveId)
     }
   } catch (err) {
     throw new Error(err)
