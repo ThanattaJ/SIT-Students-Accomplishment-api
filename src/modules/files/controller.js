@@ -7,16 +7,12 @@ const format = require('util').format
 const { validate } = require('../validation')
 const { deleteSchema, getCoverSchema, uploadImgSchema, uploadDocSchema } = require('./json_schema')
 
-console.log(process.env.private_key_id)
-console.log(process.env.private_key)
-console.log('-----------------------------------------------------------------------')
-const privateKey = process.env.private_key.replace(/\\n/g, '\n')
 fbAdmin.initializeApp({
   credential: fbAdmin.credential.cert({
     'type': process.env.type,
     'project_id': process.env.project_id,
     'private_key_id': process.env.private_key_id,
-    'private_key': privateKey,
+    'private_key': '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDILhMHRI1klWft\nkvltRrEoSGuLtLw+Vv7WJYDtMTp7NsUokOGQSZuPcO6t35q1/ZSr05Rb9l2rnF7Q\nmbcRjpzItTQv9VgW9xazxRRgsUDgVFTUclb/YBOrtFIoFVUCuPJIWlS5PIJQNoHC\nn3Y6R0O/wY+5VZ0VwUr7OHoczZTrsY7nkWgnZhtvmWMjE4+s1NeZb99vfdvT1OHi\nYY8W8F4aSgHZl+rUVGeasS+3qJa6AzWwHDM18vjJ3aYeStE0xTka+qlXrW4abxVP\n3/OsWz1oy8El6TNzrdPq9mCEQ1EaUOPOmERx+A1UglpfqAWSmosjQ3BGROmIJrzl\nJ23ClXfDAgMBAAECggEACzI0g0AMznbiyLFjPP7qsq+WQEqcCrqP50dStjF+LV0L\nWvD7hLfxOO0elGAAxbQIqDGdxyT46TvGO9GVISjCUSF9aT9GLYalYOmhcaUIVWOy\nGO3KOt9TSlO8Epza09unRW+z9GZTfYwG5u1HTgwlWGjJkpqcvhZBDNsETW8cKLB8\n1DVE9VFA20q6BiSFojbGvrQYK0UBYWtmrhS8rl29k1Y7G9SBr0jvHRiY4SpUW8tA\nifcmTLqPa/uCnOVs+1KdAKp9S4lNqJQFDLULHtQrnCyhwaHjgZpkAErPGV/ZdI4x\nL8smmXWbqETNqaKWQJjw0qhRzQ+rc6NGv3TjN+5E1QKBgQDkjxlpN0kPgwKfRyzV\nTrT1gfPwrg0bBe2VkiTfa/ATmao7VZPkkBP8YimX2PoRELgYhPPFLE+ZbCHJsHU6\nYb0vVuLXGVXQTrHj0nZaG8eMEUZGZrx0yhRAEH4ZX9jnRg01TvuvFC4p252TS3/A\nbyXU+TE44/srxSL5+0qHi4Ui9wKBgQDgNrqcqpuD8RZ7Kgyqveq8zGHJS7ZWr+Mr\nqg6/cdec8ZHPqRfJzKRDRR8CSc1j0KQITlglsQU+SzIp/kvoRpxST4esY2K+CRTV\nh3aIScX7ayExiRuxrDnjkD4ksrgWezUjTrwWxd8KxB1ReMenWyzRAtiH9AMYxvrL\nfNUigANSlQKBgG3PbtcFT93bBOR/rsOhOAIIeKo3BWbpVzeYaozJcCQKnSY6vH6A\n1olYpEEnZyXR0ZE+N1yRKIE+2ZDsbbYqBVn8NapAquEVHhSmJmSumhXqqsfiTkMS\nX95TzjHkwfKDzo7BLtz0JiXINRHyoSNUg2mqfAKoTiG+akqOeEVdPA8LAoGBALsh\nsnqTghyLGUJOhCf1Pne49Vx2TobnYejNlGWAdH5OuG3jKTGKFQb4J7tXMY8/UciE\n6tj6d+/X/tRBo8UHOe0Q56GfiYgmODdHSkzRleYTMa8QSgbuQZqGhvdGGpLY3i7L\nxfwTxeZMbFPVRH2PgUYo4+QEaplBaYxwccrLoPpJAoGAKlBSjehkengW47JN6zil\nnvKty7WmDvEUBW3YxHVMCJDpk1iMtgC8LaYPFE8ZT1zEoU+GoBTwSF47rso41bA/\nFYvPGMpWRzVHn2G2ji9QSQS1aS6jyDIs43rmtx/DfPs4aDkUav5NT1F11wHwwAeH\ni0m1Sugwi4hND/cJdgGPDEE=\n-----END PRIVATE KEY-----\n',
     'client_email': process.env.client_email,
     'client_id': process.env.client_id,
     'auth_uri': process.env.auth_uri,
