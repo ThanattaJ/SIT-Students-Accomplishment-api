@@ -7,6 +7,7 @@ const format = require('util').format
 const { validate } = require('../validation')
 const { deleteSchema, getCoverSchema, uploadImgSchema, uploadDocSchema } = require('./json_schema')
 
+console.log(process.env.private_key);
 const privateKey = process.env.private_key.replace(/\\n/g, '\n')
 fbAdmin.initializeApp({
   credential: fbAdmin.credential.cert({
