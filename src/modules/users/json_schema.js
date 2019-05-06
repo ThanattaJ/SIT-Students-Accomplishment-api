@@ -11,6 +11,6 @@ module.exports = {
   }),
 
   deleteOutsiderSchema: joi.object().keys({
-    id: joi.number().required()
+    outsider_id: joi.number().required()
   })
 }

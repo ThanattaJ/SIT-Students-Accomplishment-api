@@ -75,11 +75,11 @@ module.exports = {
   },
 
   deleteOutsider: async (req, res) => {
-    const id = req.params.id
     const { checkStatus, err } = validate(req.params, userModel)
     if (!checkStatus) return res.send(err)
 
     try {
+      const id = req.params.outsider_id
       await userModel.deleteOutsider(id)
       res.status(200).send({
         status: 200,

@@ -6,6 +6,6 @@ router.get('/', getUserById)
 
 router.get('/list_student/:code', getListStudent)
 
-router.delete('/:id', deleteOutsider)
+router.delete('/:outsider_id', deleteOutsider)
 
 module.exports = router
