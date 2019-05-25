@@ -62,9 +62,10 @@ module.exports = {
         path_name: link
       }
       const coverExist = await checkCoverExist(projectId)
-      if (!isCover || !coverExist) {
-        await filesModel.createImage(image)
+      if (isCover && coverExist !== undefined) {
+        await deleteImageStorage(coverExist)
       }
+      await filesModel.createImage(image)
       res.status(200).send({
         status: 'success',
         url: link
@@ -72,7 +73,7 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         status: 500,
-        message: 'Unable to upload'
+        message: err.message
       })
     }
   },
@@ -83,11 +84,8 @@ module.exports = {
 
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
-    const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
-
     try {
-      await bucket.file(path).delete()
-      await filesModel.deleteImage(path)
+      await deleteImageStorage(path_name)
       res.status(200).send({
         status: 'success',
         url: 'Delete Image Success'
@@ -224,8 +222,8 @@ async function checkCoverExist (projectId) {
   try {
     const cover = await filesModel.getCoverImage(projectId)
     if (cover.length > 0) {
-      return true
-    } else { return false }
+      return cover[0].path_name
+    } else { return undefined }
   } catch (err) {
     throw new Error(err)
   }
@@ -247,9 +245,7 @@ const uploadFileToStorage = (file, fileType, projectId, isCover) => {
     let newFileName = file.originalname
     let fileUpload
     if (fileType === 'image') {
-      if (isCover === false) {
-        newFileName = `${Date.now()}_${file.originalname}`
-      }
+      newFileName = `${Date.now()}_${file.originalname}`
       fileUpload = bucket.file(`Images/${projectId}/${newFileName}`)
     }
     if (fileType === 'document') {
@@ -276,4 +272,10 @@ const uploadFileToStorage = (file, fileType, projectId, isCover) => {
     blobStream.end(file.buffer)
   })
   return prom
+}
+
+async function deleteImageStorage (pathName) {
+  const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
+  await bucket.file(path).delete()
+  await filesModel.deleteImage(path)
 }
