@@ -199,7 +199,7 @@ async function getProjectDetail (projectId) {
       result.project_detail.references = _.split(ref, ',')
     }
     if (result.achievement.length > 0) {
-      result.achievement[0].date_of_event = moment(result.achievement[0].date_of_event).format('DD-MM-YYYY')
+      result.achievement[0].date_of_event = result.achievement[0].date_of_event === null ? null : moment(result.achievement[0].date_of_event).format('DD-MM-YYYY')
     }
 
     return result
