@@ -15,6 +15,13 @@ app.use(bodyParser.urlencoded({
   extended: true
 }))
 
+app.all('/*', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://34.73.213.209:7000/')
+  res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, PATCH, DELETE, OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Option')
+  next()
+})
+
 app.get('/', function (req, res) {
   res.status(200).send({
     status: 200,
