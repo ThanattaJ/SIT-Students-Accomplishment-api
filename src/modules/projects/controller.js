@@ -189,7 +189,6 @@ async function getProjectDetail (projectId) {
     const result = await projectModel.getProjectsDetailById(projectId)
     result.project_detail.isShow = result.project_detail.isShow === 1
     result.project_detail.haveOutsider = result.project_detail.haveOutsider === 1
-    console.log(result)
     if (result.project_detail.haveOutsider) {
       const outsiders = await userController.getOutsider(projectId)
       result.outsiders = outsiders[0] === undefined ? [] : outsiders
@@ -199,7 +198,7 @@ async function getProjectDetail (projectId) {
       result.project_detail.references = _.split(ref, ',')
     }
     if (result.achievement.length > 0) {
-      result.achievement[0].date_of_event = result.achievement[0].date_of_event === null ? null : moment(result.achievement[0].date_of_event).format('DD-MM-YYYY')
+      result.achievement[0].date_of_event = result.achievement[0].date_of_event === '0000-00-00' ? null : moment(result.achievement[0].date_of_event).format('DD-MM-YYYY')
     }
 
     return result
