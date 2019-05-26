@@ -240,7 +240,7 @@ function checkFileDocType (file, cb) {
   }
 }
 
-const uploadFileToStorage = (file, fileType, projectId, isCover) => {
+const uploadFileToStorage = (file, fileType, projectId) => {
   let prom = new Promise((resolve, reject) => {
     let newFileName = file.originalname
     let fileUpload

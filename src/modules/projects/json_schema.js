@@ -33,9 +33,9 @@ module.exports = {
     }),
     achievement: joi.object().keys({
       achievement_name: joi.string().required().trim(),
-      achievement_detail: joi.string().trim(),
-      organize_by: joi.string().trim(),
-      date_of_event: joi.string().trim()
+      achievement_detail: joi.string().trim().allow(null),
+      organize_by: joi.string().trim().allow(null),
+      date_of_event: joi.string().trim().allow(null)
     })
   }),
 
