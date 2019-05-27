@@ -56,7 +56,6 @@ module.exports = {
   },
 
   createProject: async (req, res) => {
-    console.log(req.body)
     const { checkStatus, err } = validate(req.body, createProjectSchema)
     if (!checkStatus) return res.send(err)
 
@@ -75,8 +74,6 @@ module.exports = {
       }
 
       if (project_data.haveOutsider && member.outsiders !== undefined && member.outsiders.length > 0) {
-        console.log('do in if outsider check')
-        console.log(member.outsiders)
         await manageOutsider(member.outsiders, projectId)
       }
 
@@ -172,7 +169,7 @@ module.exports = {
   }
 }
 
-async function checkTag(tags) {
+async function checkTag (tags) {
   try {
     const tagIdUndefined = tags.filter(tag => tag.tag_id === undefined)
     const tagId = await tagsController.createTag(tagIdUndefined)
@@ -187,7 +184,7 @@ async function checkTag(tags) {
   }
 }
 
-async function getProjectDetail(projectId) {
+async function getProjectDetail (projectId) {
   try {
     const result = await projectModel.getProjectsDetailById(projectId)
     result.project_detail.isShow = result.project_detail.isShow === 1
@@ -210,9 +207,8 @@ async function getProjectDetail(projectId) {
   }
 }
 
-async function manageOutsider(outsiders, projectId) {
+async function manageOutsider (outsiders, projectId) {
   try {
-    console.log('do in manage outsider', outsiders)
     const outsiderNotId = await outsiders.filter(outsider => outsider.id === undefined)
     if (outsiderNotId.length > 0) {
       outsiderNotId.forEach(outsider => {
