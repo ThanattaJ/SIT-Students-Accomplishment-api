@@ -5,10 +5,8 @@ exports.up = async function (knex) {
     table.string('lecturer_id').notNullable()
     table.string('password').notNullable()
     table.integer('position_id').unsigned()
-    table.string('firstname_en').notNullable()
-    table.string('lastname_en').notNullable()
-    table.string('firstname_th')
-    table.string('lastname_th')
+    table.string('firstname').notNullable()
+    table.string('lastname').notNullable()
     table.string('email')
     table.boolean('isAdmin')
 

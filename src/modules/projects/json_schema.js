@@ -10,10 +10,12 @@ module.exports = {
       project_name_th: joi.string().required().trim(),
       project_name_en: joi.string().required().trim(),
       project_type_name: joi.string().required().trim(),
-      project_detail_th: joi.string().required().trim().allow(null),
-      project_detail_en: joi.string().required().trim().allow(null),
+      project_detail: joi.string().required().trim().allow(null),
+      project_abstract: joi.string().required().trim().allow(null),
       start_month: joi.number(),
       start_year_en: joi.number().required(),
+      end_month: joi.number(),
+      end_year_en: joi.number().required(),
       haveOutsider: joi.boolean().required()
 
     }),
@@ -44,8 +46,8 @@ module.exports = {
       id: joi.number().required(),
       project_name_th: joi.string().required().trim(),
       project_name_en: joi.string().required().trim(),
-      project_detail_th: joi.string().trim().allow(null),
-      project_detail_en: joi.string().trim().allow(null),
+      project_detail: joi.string().trim().allow(null),
+      project_abstract: joi.string().trim().allow(null),
       project_type_name: joi.string().trim(),
       isShow: joi.boolean(),
       haveOutsider: joi.boolean(),
@@ -55,13 +57,16 @@ module.exports = {
       count_clap: joi.number(),
       start_month: joi.number(),
       start_year_en: joi.number(),
-      start_year_th: joi.number()
+      start_year_th: joi.number(),
+      end_month: joi.number(),
+      end_year_en: joi.number(),
+      end_year_th: joi.number()
     }).required(),
     students: joi.array().items(
       joi.object().keys({
         student_id: joi.string().required().trim().length(11),
-        firstname_en: joi.string().trim(),
-        lastname_en: joi.string().trim(),
+        firstname: joi.string().trim(),
+        lastname: joi.string().trim(),
         email: joi.string().trim().email()
       })
     ),
@@ -73,7 +78,7 @@ module.exports = {
         email: joi.string().trim().email().allow(null)
       })
     ),
-    achievement: joi.array().items(
+    achievements: joi.array().items(
       joi.object().keys({
         achievement_name: joi.string().trim(),
         achievement_detail: joi.string().trim().allow(null),

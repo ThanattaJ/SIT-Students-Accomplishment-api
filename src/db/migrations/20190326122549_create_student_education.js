@@ -4,13 +4,10 @@ exports.up = async function (knex) {
     table.increments('id').primary()
     table.integer('students_profile_id').unsigned().references('students_profile.id')
     table.integer('education_level_id').unsigned().references('education_level.id')
-    table.string('school_name_en').notNullable()
-    table.string('school_name_th').notNullable()
+    table.string('school_name').notNullable()
     table.float('gpa', 3, 2)
-    table.integer('start_year_th')
-    table.integer('end_year_th')
-    table.integer('start_year_en')
-    table.integer('end_year_en')
+    table.integer('start_year')
+    table.integer('end_year')
 
     table
       .timestamp('created_at')

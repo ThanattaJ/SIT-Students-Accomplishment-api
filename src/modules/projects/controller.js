@@ -19,24 +19,6 @@ module.exports = {
     }
   },
 
-  getProjectsByStudentId: async (userId) => {
-    try {
-      const result = await projectModel.getProjectsByStudentId(userId)
-      return result
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
-  getAmountProjectUser: async (userId) => {
-    try {
-      const result = await projectModel.countProjectUser(userId)
-      return result
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
   getProjectPage: async (req, res) => {
     const { checkStatus, err } = validate(req.params, projectPageSchema)
     if (!checkStatus) return res.send(err)
@@ -62,6 +44,7 @@ module.exports = {
     // eslint-disable-next-line camelcase
     const { project_data, member, achievement } = req.body
     project_data.start_year_th = project_data.start_year_en + 543
+    project_data.end_year_th = project_data.end_year_en + 543
     try {
       const projectId = await projectModel.createProject(project_data)
 
@@ -83,7 +66,6 @@ module.exports = {
         achievement.project_id = projectId
         await projectModel.addProjectAchievement(achievement)
       }
-      // const result = await getProjectDetail(project.id)
       res.status(200).send({
         status: 200,
         project_id: projectId
@@ -101,15 +83,18 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     // eslint-disable-next-line camelcase
-    const { project_detail, outsiders, achievement, tags, video } = req.body
+    const { project_detail, outsiders, achievements, tags, video } = req.body
     const id = project_detail.id
     try {
       await projectModel.updateProjectDetail(id, project_detail)
 
-      if (achievement.length > 0) {
-        const date = achievement[0].date_of_event
-        achievement[0].date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
-        await projectModel.updateProjectAchievement(id, achievement[0])
+      if (achievements.length > 0) {
+        achievements.forEach(achievement => {
+          achievements.project_id = id
+          const date = achievement.date_of_event
+          achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+        })
+        await projectModel.updateProjectAchievement(id, achievements)
       }
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
         await manageOutsider(outsiders, id)
@@ -197,8 +182,10 @@ async function getProjectDetail (projectId) {
       const ref = result.project_detail.references
       result.project_detail.references = _.split(ref, ',')
     }
-    if (result.achievement.length > 0) {
-      result.achievement[0].date_of_event = result.achievement[0].date_of_event === '0000-00-00' ? null : moment(result.achievement[0].date_of_event).format('DD-MM-YYYY')
+    if (result.achievements.length > 0) {
+      result.achievements.forEach(achievement => {
+        achievement.date_of_event = achievement.date_of_event === '0000-00-00' ? null : moment(achievement.date_of_event).format('DD-MM-YYYY')
+      })
     }
 
     return result
@@ -221,6 +208,24 @@ async function manageOutsider (outsiders, projectId) {
     if (outsiderHaveId.length > 0) {
       await userController.updateOutsider(outsiderHaveId)
     }
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
+exports.getProjectsByStudentId = async function (userId) {
+  try {
+    const result = await projectModel.getProjectsByStudentId(userId)
+    return result
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
+exports.getAmountProjectUser = async function (userId) {
+  try {
+    const result = await projectModel.countProjectUser(userId)
+    return result
   } catch (err) {
     throw new Error(err)
   }

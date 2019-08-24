@@ -2,7 +2,7 @@
 exports.up = async function (knex) {
   await knex.schema.createTable('languages', function (table) {
     table.increments('id').primary()
-    table.string('language_name_en').notNullable()
+    table.string('language_name').notNullable()
 
     table
       .timestamp('created_at')

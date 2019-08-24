@@ -62,7 +62,7 @@ module.exports = {
       const result = {
         'project_detail': detail[0],
         'students': students,
-        'achievement': achievement[0] === undefined ? [] : achievement,
+        'achievements': achievement[0] === undefined ? [] : achievement,
         'tags': tag,
         'document': document,
         'picture': image,
@@ -112,15 +112,13 @@ module.exports = {
     }
   },
 
-  updateProjectAchievement: async (id, achievementData) => {
+  updateProjectAchievement: async (projectId, achievementData) => {
     try {
-      const achievement = await getAchievement(id)
-      if (achievement[0] === undefined) {
-        achievementData.project_id = id
-        await insertAchievement(achievementData)
-      } else {
-        await knex('project_achievement').update(achievementData).where('project_id', id)
-      }
+      await knex('project_achievement').del().where('project_id', projectId)
+      achievementData.forEach(achievement => {
+        achievement.project_id = projectId
+      })
+      await insertAchievement(achievementData)
     } catch (err) {
       return err
     }

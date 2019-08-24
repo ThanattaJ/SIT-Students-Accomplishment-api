@@ -1,5 +1,5 @@
 const knex = require('../../db/knex')
-const { queryStudentInformation, queryStudentLanuage, queryStudentEducation, queryListStudent, queryProjectOutsider } = require('./constants')
+const { queryStudentInformation, queryStudentLanguage, queryStudentEducation, queryListStudent, queryProjectOutsider } = require('./constants')
 module.exports = {
 
   getUserById: async (userRole, id) => {
@@ -10,13 +10,12 @@ module.exports = {
           .join('curriculum', 'students.curriculum_id', 'curriculum.id')
           .join('students_profile', 'students.student_id', 'students_profile.student_id')
           .where('students.student_id', id)
-          .join('student_address_th', 'students_profile.id', 'student_address_th.students_profile_id')
-          .join('student_address_en', 'students_profile.id', 'student_address_en.students_profile_id')
-        const languages = await knex.select(queryStudentLanuage).from('student_language').where('students_profile_id', profile[0].students_profile_id)
+          .join('student_address', 'students_profile.id', 'student_address.students_profile_id')
+        const languages = await knex.select(queryStudentLanguage).from('student_language').where('students_profile_id', profile[0].id)
           .join('languages', 'student_language.language_id', 'languages.id')
           .join('languages_level', 'student_language.level_id', 'languages_level.id')
 
-        const education = await knex.select(queryStudentEducation).from('student_education').where('students_profile_id', profile[0].students_profile_id)
+        const education = await knex.select(queryStudentEducation).from('student_education').where('students_profile_id', profile[0].id)
           .join('education_level', 'student_education.education_level_id', 'education_level.id')
 
         result = {

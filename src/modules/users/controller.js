@@ -16,10 +16,9 @@ module.exports = {
       const userData = await userModel.getUserById(user_role, id)
       userData.profile.birthday = moment(userData.profile.birthday).format('DD-MM-YYYY')
       if (user_role === 'student') {
-        const project = await projectController.getProjectsByStudentId(id)
-        const totalProject = await projectController.getAmountProjectUser(id)
-        userData.total_projects = totalProject
-        userData.projects = project
+        const project = await getProjectByStudentId(id)
+        userData.projects = project.project
+        userData.totalProject = project.totalProject
       }
       res.send(userData)
     } catch (err) {
@@ -93,4 +92,12 @@ module.exports = {
     }
   }
 
+}
+
+async function getProjectByStudentId (userId) {
+  const result = {}
+  result.project = await projectController.getProjectsByStudentId(userId)
+  result.totalProject = await projectController.getAmountProjectUser(userId)
+
+  return result
 }
