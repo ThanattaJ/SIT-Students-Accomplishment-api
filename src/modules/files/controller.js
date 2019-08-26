@@ -38,7 +38,7 @@ module.exports = {
     return uploadImg
   },
 
-  uploadImage: async (req, res) => {
+  uploadProjectImage: async (req, res) => {
     const { checkStatus, err } = validate(req.body, uploadImgSchema)
     if (!checkStatus) return res.send(err)
 
@@ -56,16 +56,16 @@ module.exports = {
     }
 
     try {
-      const link = await uploadFileToStorage(file, 'image', projectId, isCover)
+      const link = await this.uploadFileToStorage(file, 'image', projectId, false)
       const image = {
         project_id: projectId,
         path_name: link
       }
       const coverExist = await checkCoverExist(projectId)
       if (isCover && coverExist !== undefined) {
-        await deleteImageStorage(coverExist)
+        await this.deleteObjectStorage(coverExist, false)
       }
-      await filesModel.createImage(image)
+      await filesModel.createProjectImage(image)
       res.status(200).send({
         status: 'success',
         url: link
@@ -78,14 +78,14 @@ module.exports = {
     }
   },
 
-  deleteImage: async (req, res) => {
+  deleteProjectImage: async (req, res) => {
     const { checkStatus, err } = validate(req.body, deleteSchema)
     if (!checkStatus) return res.send(err)
 
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     try {
-      await deleteImageStorage(path_name)
+      await this.deleteObjectStorage(path_name, 'image')
       res.status(200).send({
         status: 'success',
         url: 'Delete Image Success'
@@ -111,7 +111,7 @@ module.exports = {
     return uploadDoc
   },
 
-  uploadDocument: async (req, res) => {
+  uploadProjectDocument: async (req, res) => {
     const { checkStatus, err } = validate(req.body, uploadDocSchema)
     if (!checkStatus) return res.send(err)
 
@@ -125,12 +125,12 @@ module.exports = {
     const projectId = req.body.project_id
 
     try {
-      const link = await uploadFileToStorage(file, 'document', projectId, false)
+      const link = await this.uploadFileToStorage(file, 'document', projectId, false)
       const doc = {
         project_id: projectId,
         path_name: link
       }
-      await filesModel.createDocument(doc)
+      await filesModel.createProjectDocument(doc)
       res.status(200).send({
         status: 'success',
         url: link
@@ -143,17 +143,15 @@ module.exports = {
     }
   },
 
-  deleteDocument: async (req, res) => {
+  deleteProjectDocument: async (req, res) => {
     const { checkStatus, err } = validate(req.body, deleteSchema)
     if (!checkStatus) return res.send(err)
 
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
-    const path = path_name.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
 
     try {
-      await bucket.file(path).delete()
-      await filesModel.deleteDocument(path)
+      await this.deleteObjectStorage(path_name, 'document')
       res.status(200).send({
         status: 'success',
         url: 'Delete Document Success'
@@ -202,6 +200,55 @@ module.exports = {
         message: err
       })
     }
+  },
+
+  uploadFileToStorage: (file, fileType, id, isProfile) => {
+    let prom = new Promise((resolve, reject) => {
+      let newFileName = file.originalname
+      let fileUpload
+      if (fileType === 'image') {
+        newFileName = `${Date.now()}_${file.originalname}`
+        if (isProfile === false) {
+          fileUpload = bucket.file(`Images/${id}/${newFileName}`)
+        } else if (isProfile === true) {
+          fileUpload = bucket.file(`ProfileImage/${id}/${newFileName}`)
+        }
+      }
+
+      if (fileType === 'document') {
+        newFileName = `${Date.now()}_${file.originalname}`
+        fileUpload = bucket.file(`Documents/${id}/${newFileName}`)
+      }
+
+      const blobStream = fileUpload.createWriteStream({
+        metadata: {
+          contentType: file.mimetype
+        }
+      })
+
+      blobStream.on('error', () => {
+        reject(new Error('Something is wrong! Unable to upload at the moment.'))
+      })
+
+      blobStream.on('finish', () => {
+        fileUpload.makePublic()
+        const url = format(`https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`)
+        resolve(url)
+      })
+
+      blobStream.end(file.buffer)
+    })
+    return prom
+  },
+
+  deleteObjectStorage: async (pathName, typeObject) => {
+    const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
+    await bucket.file(path).delete()
+    if (typeObject === 'image') {
+      await filesModel.deleteProjectImage(path)
+    } else if (typeObject === 'document') {
+      await filesModel.deleteProjectDocument(path)
+    }
   }
 }
 
@@ -236,44 +283,4 @@ function checkFileDocType (file, cb) {
   } else {
     return cb(new Error('Please provide only Documents(.pdf)'))
   }
-}
-
-const uploadFileToStorage = (file, fileType, projectId) => {
-  let prom = new Promise((resolve, reject) => {
-    let newFileName = file.originalname
-    let fileUpload
-    if (fileType === 'image') {
-      newFileName = `${Date.now()}_${file.originalname}`
-      fileUpload = bucket.file(`Images/${projectId}/${newFileName}`)
-    }
-    if (fileType === 'document') {
-      newFileName = `${Date.now()}_${file.originalname}`
-      fileUpload = bucket.file(`Documents/${projectId}/${newFileName}`)
-    }
-
-    const blobStream = fileUpload.createWriteStream({
-      metadata: {
-        contentType: file.mimetype
-      }
-    })
-
-    blobStream.on('error', () => {
-      reject(new Error('Something is wrong! Unable to upload at the moment.'))
-    })
-
-    blobStream.on('finish', () => {
-      fileUpload.makePublic()
-      const url = format(`https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`)
-      resolve(url)
-    })
-
-    blobStream.end(file.buffer)
-  })
-  return prom
-}
-
-async function deleteImageStorage (pathName) {
-  const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
-  await bucket.file(path).delete()
-  await filesModel.deleteImage(path)
 }

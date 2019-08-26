@@ -1,4 +1,26 @@
 module.exports = {
+  queryStudentDefaultInformation: [
+    'students.id',
+    'students.student_id',
+    'students.firstname',
+    'students.lastname',
+    'students.email',
+    'students.profile_picture',
+    'students.viwer',
+    'students.resume_gen_count',
+    'curriculum.curriculum_name',
+    'students_profile.nickname'
+  ],
+  queryLecturerDefaultInformation: [
+    'lecturers.id',
+    'lecturers.lecturer_id',
+    'lecturers.firstname',
+    'lecturers.lastname',
+    'lecturers.email',
+    'lecturers.profile_picture',
+    'lecturers_position.position_name'
+  ],
+
   queryStudentInformation: [
     'students.id',
     'students.student_id',

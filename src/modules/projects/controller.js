@@ -224,7 +224,7 @@ exports.getProjectsByStudentId = async function (userId) {
 
 exports.getAmountProjectUser = async function (userId) {
   try {
-    const result = await projectModel.countProjectUser(userId)
+    const result = await projectModel.countProjectByYear(userId)
     return result
   } catch (err) {
     throw new Error(err)

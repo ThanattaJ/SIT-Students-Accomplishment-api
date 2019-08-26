@@ -58,5 +58,9 @@ module.exports = {
   queryProjectTags: [
     'tag_id',
     'tag_name'
+  ],
+
+  queryCountProjectByYear: [
+    'projects.start_year_en'
   ]
 }

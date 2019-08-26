@@ -33,12 +33,13 @@ module.exports = {
     }
   },
 
-  countProjectUser: async (id) => {
+  countProjectByYear: async (id) => {
     try {
-      const total = await knex('projects').count('id as total')
+      const total = await knex('projects').select(query.queryCountProjectByYear).count('id as total')
         .join('project_member', 'projects.id', 'project_member.project_id')
         .where('project_member.student_id', id)
-      return total[0].total
+        .groupBy('projects.start_year_en')
+      return total
     } catch (err) {
       throw new Error(err)
     }

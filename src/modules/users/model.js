@@ -1,21 +1,92 @@
 const knex = require('../../db/knex')
-const { queryStudentInformation, queryStudentLanguage, queryStudentEducation, queryListStudent, queryProjectOutsider } = require('./constants')
+const query = require('./constants')
 module.exports = {
 
+  getUserDefaultInformation: async (userRole, id) => {
+    try {
+      let result = {}
+      if (userRole === 'student') {
+        const profile = await knex('students').select(query.queryStudentDefaultInformation)
+          .join('curriculum', 'students.curriculum_id', 'curriculum.id')
+          .join('students_profile', 'students.student_id', 'students_profile.student_id')
+          .where('students.student_id', id)
+        result = {
+          'profile': profile[0]
+        }
+
+        return result
+      } else {
+        result = await knex.select(query.queryLecturerDefaultInformation).from('lecturers')
+          .join('lecturers_position', 'lecturers.position_id', 'lecturers_position.id')
+          .where('lecturer_id', id)
+        return result[0]
+      }
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateUserEmail: async (userRole, id, email) => {
+    try {
+      let result
+      if (userRole === 'student') {
+        result = await knex('students').where('student_id', id).update('email', email)
+      } else if (userRole === 'lecturer') {
+        result = await knex('lecturers').where('lecturer_id', id).update('email', email)
+      } else {
+        throw new Error('Incorrect users role')
+      }
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateUserImage: async (userRole, id, link) => {
+    try {
+      let result
+      if (userRole === 'student') {
+        result = await knex('students').where('student_id', id).update('profile_picture', link)
+      } else if (userRole === 'lecturer') {
+        result = await knex('lecturers').where('lecturer_id', id).update('profile_picture', link)
+      } else {
+        throw new Error('Incorrect users role')
+      }
+      return result
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getUserImage: async (userRole, id) => {
+    try {
+      let result
+      if (userRole === 'student') {
+        result = await knex('students').select('profile_picture').where('student_id', id)
+      } else if (userRole === 'lecturer') {
+        result = await knex('lecturers').select('profile_picture').where('lecturer_id', id)
+      } else {
+        throw new Error('Incorrect users role')
+      }
+      return result[0].profile_picture
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
   getUserById: async (userRole, id) => {
     try {
       let result = {}
       if (userRole === 'student') {
-        const profile = await knex('students').select(queryStudentInformation)
+        const profile = await knex('students').select(query.queryStudentInformation)
           .join('curriculum', 'students.curriculum_id', 'curriculum.id')
           .join('students_profile', 'students.student_id', 'students_profile.student_id')
           .where('students.student_id', id)
           .join('student_address', 'students_profile.id', 'student_address.students_profile_id')
-        const languages = await knex.select(queryStudentLanguage).from('student_language').where('students_profile_id', profile[0].id)
+        const languages = await knex.select(query.queryStudentLanguage).from('student_language').where('students_profile_id', profile[0].id)
           .join('languages', 'student_language.language_id', 'languages.id')
           .join('languages_level', 'student_language.level_id', 'languages_level.id')
 
-        const education = await knex.select(queryStudentEducation).from('student_education').where('students_profile_id', profile[0].id)
+        const education = await knex.select(query.queryStudentEducation).from('student_education').where('students_profile_id', profile[0].id)
           .join('education_level', 'student_education.education_level_id', 'education_level.id')
 
         result = {
@@ -36,7 +107,7 @@ module.exports = {
 
   getListStudent: async (code) => {
     try {
-      return await knex('students').select(queryListStudent).where('student_id', 'like', `${code}%`)
+      return await knex('students').select(query.queryListStudent).where('student_id', 'like', `${code}%`)
     } catch (err) {
       throw new Error(err)
     }
@@ -52,7 +123,7 @@ module.exports = {
 
   getProjectOutsider: async (projectId) => {
     try {
-      const outsiders = await knex.select(queryProjectOutsider).from('project_outsiders').where('project_id', projectId)
+      const outsiders = await knex.select(query.queryProjectOutsider).from('project_outsiders').where('project_id', projectId)
       return outsiders
     } catch (err) {
       throw new Error(err)

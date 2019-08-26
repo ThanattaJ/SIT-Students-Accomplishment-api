@@ -8,6 +8,7 @@ exports.up = async function (knex) {
     table.string('firstname').notNullable()
     table.string('lastname').notNullable()
     table.string('email')
+    table.string('profile_picture')
     table.boolean('isAdmin')
 
     table
