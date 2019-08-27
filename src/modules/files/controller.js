@@ -32,10 +32,38 @@ module.exports = {
       },
       storage: multer.memoryStorage(),
       limits: {
-        fileSize: 100000
+        fileSize: 700000
       }
     })
     return uploadImg
+  },
+
+  uploadProjectImageMulti: async (req, res) => {
+    try {
+      const { files } = req
+      const projectId = req.body.project_id
+      const images = []
+      const promise = files.map(async file => {
+        const link = await this.uploadFileToStorage(file, 'image', projectId, false)
+        const image = {
+          project_id: projectId,
+          path_name: link
+        }
+        images.push(image)
+      })
+      await Promise.all(promise)
+      await filesModel.createProjectImage(images)
+
+      res.status(200).send({
+        status: 'success',
+        url: images
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
   },
 
   uploadProjectImage: async (req, res) => {
@@ -202,45 +230,6 @@ module.exports = {
     }
   },
 
-  uploadFileToStorage: (file, fileType, id, isProfile) => {
-    let prom = new Promise((resolve, reject) => {
-      let newFileName = file.originalname
-      let fileUpload
-      if (fileType === 'image') {
-        newFileName = `${Date.now()}_${file.originalname}`
-        if (isProfile === false) {
-          fileUpload = bucket.file(`Images/${id}/${newFileName}`)
-        } else if (isProfile === true) {
-          fileUpload = bucket.file(`ProfileImage/${id}/${newFileName}`)
-        }
-      }
-
-      if (fileType === 'document') {
-        newFileName = `${Date.now()}_${file.originalname}`
-        fileUpload = bucket.file(`Documents/${id}/${newFileName}`)
-      }
-
-      const blobStream = fileUpload.createWriteStream({
-        metadata: {
-          contentType: file.mimetype
-        }
-      })
-
-      blobStream.on('error', () => {
-        reject(new Error('Something is wrong! Unable to upload at the moment.'))
-      })
-
-      blobStream.on('finish', () => {
-        fileUpload.makePublic()
-        const url = format(`https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`)
-        resolve(url)
-      })
-
-      blobStream.end(file.buffer)
-    })
-    return prom
-  },
-
   deleteObjectStorage: async (pathName, typeObject) => {
     const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
     await bucket.file(path).delete()
@@ -283,4 +272,43 @@ function checkFileDocType (file, cb) {
   } else {
     return cb(new Error('Please provide only Documents(.pdf)'))
   }
+}
+
+exports.uploadFileToStorage = (file, fileType, id, isProfile) => {
+  let prom = new Promise((resolve, reject) => {
+    let newFileName = file.originalname
+    let fileUpload
+    if (fileType === 'image') {
+      newFileName = `${Date.now()}_${file.originalname}`
+      if (isProfile === false) {
+        fileUpload = bucket.file(`Images/${id}/${newFileName}`)
+      } else if (isProfile === true) {
+        fileUpload = bucket.file(`ProfileImage/${id}/${newFileName}`)
+      }
+    }
+
+    if (fileType === 'document') {
+      newFileName = `${Date.now()}_${file.originalname}`
+      fileUpload = bucket.file(`Documents/${id}/${newFileName}`)
+    }
+
+    const blobStream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimetype
+      }
+    })
+
+    blobStream.on('error', () => {
+      reject(new Error('Something is wrong! Unable to upload at the moment.'))
+    })
+
+    blobStream.on('finish', () => {
+      fileUpload.makePublic()
+      const url = format(`https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`)
+      resolve(url)
+    })
+
+    blobStream.end(file.buffer)
+  })
+  return prom
 }

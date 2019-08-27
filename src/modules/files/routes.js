@@ -4,6 +4,7 @@ const controller = require('./controller')
 
 const uploadImg = controller.multerImageConfig()
 router.post('/image', uploadImg.single('file'), controller.uploadProjectImage)
+router.post('/imageMul', uploadImg.array('files', 7), controller.uploadProjectImageMulti)
 
 const uploadDoc = controller.multerDocumentConfig()
 router.post('/document', uploadDoc.single('file'), controller.uploadProjectDocument)
