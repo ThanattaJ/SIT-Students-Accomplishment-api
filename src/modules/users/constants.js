@@ -24,15 +24,12 @@ module.exports = {
   queryStudentInformation: [
     'students.id',
     'students.student_id',
-    'students.password',
     'students.introduce_detail',
     'students.firstname',
     'students.lastname',
     'students.university_gpa',
     'students.email',
     'students.profile_picture',
-    'students.viwer',
-    'students.resume_gen_count',
     'curriculum.curriculum_name',
     'students_profile.nickname',
     'students_profile.birthday',
@@ -46,11 +43,14 @@ module.exports = {
   ],
 
   queryStudentLanguage: [
+    'languages.id as languages_id',
     'languages.language_name',
+    'languages_level.id as languages_level_id',
     'languages_level.level_name'
   ],
 
   queryStudentEducation: [
+    'student_education.id',
     'student_education.school_name',
     'student_education.gpa',
     'student_education.start_year',

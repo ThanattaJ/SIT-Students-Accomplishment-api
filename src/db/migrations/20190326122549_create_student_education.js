@@ -5,6 +5,7 @@ exports.up = async function (knex) {
     table.integer('students_profile_id').unsigned().references('students_profile.id')
     table.integer('education_level_id').unsigned().references('education_level.id')
     table.string('school_name').notNullable()
+    table.string('program')
     table.float('gpa', 3, 2)
     table.integer('start_year')
     table.integer('end_year')

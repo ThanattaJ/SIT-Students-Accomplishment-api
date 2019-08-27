@@ -4,7 +4,7 @@ const moment = require('moment')
 const projectController = require('../projects/controller')
 const fileController = require('../files/controller')
 const { validate } = require('../validation')
-const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateUserImageSchema } = require('./json_schema')
+const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateUserImageSchema, updateUserIdSchema } = require('./json_schema')
 
 module.exports = {
 
@@ -78,14 +78,17 @@ module.exports = {
     }
   },
 
-  getUserById: async (req, res) => {
+  getUserInformation: async (req, res) => {
     try {
       const { checkStatus, err } = validate(req.body, getUserIdSchema)
       if (!checkStatus) return res.send(err)
 
       const { user_role, id } = req.body
-      const userData = await userModel.getUserById(user_role, id)
+      const userData = await userModel.getUserInformationById(user_role, id)
       userData.profile.birthday = moment(userData.profile.birthday).format('DD-MM-YYYY')
+      const project = await getProjectByStudentId(id)
+      userData.projects = project.project
+
       res.send(userData)
     } catch (err) {
       res.status(500).send({
@@ -96,8 +99,41 @@ module.exports = {
   },
 
   updateUserInformation: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, updateUserIdSchema)
+    if (!checkStatus) return res.send(err)
     try {
+      const { profile, address, languages, educations } = req.body
+      const profileId = await userModel.updateUserInformation(profile, address)
 
+      if (languages.length > 0) {
+        console.log(languages)
+        await userModel.deleteUserLanguage(profileId)
+        languages.forEach(async language => {
+          language.students_profile_id = profileId
+        })
+        await userModel.addUserLanguage(languages)
+      }
+
+      if (educations.length > 0) {
+        const educationNotId = await educations.filter(education => education.id === undefined)
+        if (educationNotId.length > 0) {
+          educationNotId.forEach(education => {
+            education.students_profile_id = profileId
+          })
+          await userModel.addUserEducation(educationNotId)
+        }
+
+        const educationHaveId = await educations.filter(education => education.id !== undefined)
+        if (educationHaveId.length > 0) {
+          educationHaveId.forEach(async education => {
+            await userModel.updateUserEducation(education)
+          })
+        }
+      }
+      res.status(200).send({
+        status: 200,
+        message: 'Update Success'
+      })
     } catch (err) {
       res.status(500).send({
         status: 500,
@@ -113,6 +149,35 @@ module.exports = {
 
       const code = req.params.code
       const list = await userModel.getListStudent(code)
+      res.send(list)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  getLanguages: async (req, res) => {
+    try {
+      const list_languages = await userModel.getLanguages()
+      const list_level = await userModel.getLanguagesLevel()
+      const list = {
+        language: list_languages,
+        level: list_level
+      }
+      res.send(list)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  getEducationLevel: async (req, res) => {
+    try {
+      const list = await userModel.getEducationLevel()
       res.send(list)
     } catch (err) {
       res.status(500).send({

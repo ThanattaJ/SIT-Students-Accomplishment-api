@@ -73,7 +73,8 @@ module.exports = {
       throw new Error(err)
     }
   },
-  getUserById: async (userRole, id) => {
+
+  getUserInformationById: async (userRole, id) => {
     try {
       let result = {}
       if (userRole === 'student') {
@@ -100,6 +101,87 @@ module.exports = {
         result = await knex.select().from('lecturer').where('lecturer_id', id)
         return result
       }
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateUserInformation: async (profile, address) => {
+    try {
+      const dataForStudentDB = {
+        introduce_detail: profile.biology,
+        university_gpa: profile.gpa,
+        email: profile.email
+      }
+      const a = await knex('students').where('student_id', profile.student_id).update(dataForStudentDB)
+      console.log('a', a)
+
+      const dataForStudentProfileDB = {
+        nickname: profile.nickname,
+        birthday: profile.birthday,
+        telephone_number: profile.telephone_number,
+        gender: profile.gender
+      }
+      const b = await knex('students_profile').where('student_id', profile.student_id).update(dataForStudentProfileDB)
+      console.log('b', b)
+
+      const profileId = await knex('students_profile').select('id').where('student_id', profile.student_id)
+      console.log('profileId', profileId[0].id)
+      const c = await knex('student_address').where('id', profileId[0].id).update(address)
+      console.log('c', c)
+
+      return profileId[0].id
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  addUserLanguage: async (languages) => {
+    try {
+      await knex('student_language').insert(languages)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  addUserEducation: async (educations) => {
+    try {
+      await knex('student_education').insert(educations)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateUserEducation: async (education) => {
+    try {
+      await knex('student_education').update(education).where('id', education.id)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getEducationLevel: async () => {
+    try {
+      const list = await knex('education_level').select('id', 'level_name')
+      return list
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getLanguages: async () => {
+    try {
+      const list = await knex('languages').select('id', 'language_name')
+      return list
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getLanguagesLevel: async () => {
+    try {
+      const list = await knex('languages_level').select('id', 'level_name')
+      return list
     } catch (err) {
       throw new Error(err)
     }
@@ -132,7 +214,7 @@ module.exports = {
 
   updateProjectOutsider: async (outsider) => {
     try {
-      await knex('project_outsiders').where('id', outsider.id)
+      await knex('project_outsiders').where('id', outsider.id).update(outsider)
     } catch (err) {
       throw new Error(err)
     }
@@ -141,6 +223,14 @@ module.exports = {
   deleteOutsider: async (id) => {
     try {
       await knex('project_outsiders').del().where('id', id)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  deleteUserLanguage: async (profileId) => {
+    try {
+      await knex('student_language').del().where('students_profile_id', profileId)
     } catch (err) {
       throw new Error(err)
     }

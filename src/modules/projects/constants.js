@@ -13,8 +13,10 @@ module.exports = {
     'projects.project_name_th',
     'projects.project_name_en',
     'projects.project_detail',
+    'projects.project_abstract',
     'projects.count_viewer',
-    'projects.count_clap'
+    'projects.count_clap',
+    'projects.start_year_en'
   ],
 
   queryProjectsDetailById: [
