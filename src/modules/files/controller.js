@@ -187,7 +187,7 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         status: 500,
-        message: 'Delete Failure'
+        message: err.message
       })
     }
   },
@@ -227,16 +227,6 @@ module.exports = {
         status: 500,
         message: err
       })
-    }
-  },
-
-  deleteObjectStorage: async (pathName, typeObject) => {
-    const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
-    await bucket.file(path).delete()
-    if (typeObject === 'image') {
-      await filesModel.deleteProjectImage(path)
-    } else if (typeObject === 'document') {
-      await filesModel.deleteProjectDocument(path)
     }
   }
 }
@@ -311,4 +301,14 @@ exports.uploadFileToStorage = (file, fileType, id, isProfile) => {
     blobStream.end(file.buffer)
   })
   return prom
+}
+
+exports.deleteObjectStorage = async (pathName, typeObject) => {
+  const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
+  await bucket.file(path).delete()
+  if (typeObject === 'image') {
+    await filesModel.deleteProjectImage(path)
+  } else if (typeObject === 'document') {
+    await filesModel.deleteProjectDocument(path)
+  }
 }
