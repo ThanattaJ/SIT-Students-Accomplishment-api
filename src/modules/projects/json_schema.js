@@ -109,6 +109,6 @@ module.exports = {
 
   updateCountingSchema: joi.object().keys({
     action: joi.string().required().trim(),
-    id: joi.number().required()
+    project_id: joi.number().required()
   })
 }

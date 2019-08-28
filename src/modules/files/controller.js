@@ -24,6 +24,88 @@ fbAdmin.initializeApp({
 })
 const bucket = fbAdmin.storage().bucket()
 
+const uploadFileToStorage = function (file, fileType, id, isProfile) {
+  let prom = new Promise((resolve, reject) => {
+    let newFileName = file.originalname
+    let fileUpload
+    if (fileType === 'image') {
+      newFileName = `${Date.now()}_${file.originalname}`
+      if (isProfile === false) {
+        fileUpload = bucket.file(`Images/${id}/${newFileName}`)
+      } else if (isProfile === true) {
+        fileUpload = bucket.file(`ProfileImage/${id}/${newFileName}`)
+      }
+    }
+
+    if (fileType === 'document') {
+      newFileName = `${Date.now()}_${file.originalname}`
+      fileUpload = bucket.file(`Documents/${id}/${newFileName}`)
+    }
+
+    const blobStream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimetype
+      }
+    })
+
+    blobStream.on('error', () => {
+      reject(new Error('Something is wrong! Unable to upload at the moment.'))
+    })
+
+    blobStream.on('finish', () => {
+      fileUpload.makePublic()
+      const url = format(`https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`)
+      resolve(url)
+    })
+
+    blobStream.end(file.buffer)
+  })
+  return prom
+}
+
+const deleteObjectStorage = async function (pathName, typeObject) {
+  const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
+  await bucket.file(path).delete()
+  if (typeObject === 'image') {
+    await filesModel.deleteProjectImage(path)
+  } else if (typeObject === 'document') {
+    await filesModel.deleteProjectDocument(path)
+  }
+}
+
+function checkFileImgType (file, cb) {
+  const filetypes = /jpeg|jpg|png|gif/
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
+  const mimetype = filetypes.test(file.mimetype)
+  if (mimetype && extname) {
+    return cb(null, true)
+  } else {
+    return cb(new Error('Please provide only Images(.jpeg|.jpg|.png|.gif)'))
+  }
+}
+
+async function checkCoverExist (projectId) {
+  try {
+    const cover = await filesModel.getCoverImage(projectId)
+    if (cover.length > 0) {
+      return cover[0].path_name
+    } else { return undefined }
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
+function checkFileDocType (file, cb) {
+  const filetypes = /pdf/
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
+  const mimetype = filetypes.test(file.mimetype)
+  if (mimetype && extname) {
+    return cb(null, true)
+  } else {
+    return cb(new Error('Please provide only Documents(.pdf)'))
+  }
+}
+
 module.exports = {
   multerImageConfig: () => {
     const uploadImg = multer({
@@ -44,7 +126,7 @@ module.exports = {
       const projectId = req.body.project_id
       const images = []
       const promise = files.map(async file => {
-        const link = await this.uploadFileToStorage(file, 'image', projectId, false)
+        const link = await uploadFileToStorage(file, 'image', projectId, false)
         const image = {
           project_id: projectId,
           path_name: link
@@ -84,14 +166,14 @@ module.exports = {
     }
 
     try {
-      const link = await this.uploadFileToStorage(file, 'image', projectId, false)
+      const link = await uploadFileToStorage(file, 'image', projectId, false)
       const image = {
         project_id: projectId,
         path_name: link
       }
       const coverExist = await checkCoverExist(projectId)
       if (isCover && coverExist !== undefined) {
-        await this.deleteObjectStorage(coverExist, false)
+        await deleteObjectStorage(coverExist, false)
       }
       await filesModel.createProjectImage(image)
       res.status(200).send({
@@ -113,7 +195,7 @@ module.exports = {
     // eslint-disable-next-line camelcase
     const { path_name } = req.body
     try {
-      await this.deleteObjectStorage(path_name, 'image')
+      await deleteObjectStorage(path_name, 'image')
       res.status(200).send({
         status: 'success',
         url: 'Delete Image Success'
@@ -153,7 +235,7 @@ module.exports = {
     const projectId = req.body.project_id
 
     try {
-      const link = await this.uploadFileToStorage(file, 'document', projectId, false)
+      const link = await uploadFileToStorage(file, 'document', projectId, false)
       const doc = {
         project_id: projectId,
         path_name: link
@@ -179,7 +261,7 @@ module.exports = {
     const { path_name } = req.body
 
     try {
-      await this.deleteObjectStorage(path_name, 'document')
+      await deleteObjectStorage(path_name, 'document')
       res.status(200).send({
         status: 'success',
         url: 'Delete Document Success'
@@ -191,6 +273,9 @@ module.exports = {
       })
     }
   },
+
+  uploadFileToStorage,
+  deleteObjectStorage,
 
   getVideo: async (projectId) => {
     try {
@@ -228,87 +313,5 @@ module.exports = {
         message: err
       })
     }
-  }
-}
-
-function checkFileImgType (file, cb) {
-  const filetypes = /jpeg|jpg|png|gif/
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
-  const mimetype = filetypes.test(file.mimetype)
-  if (mimetype && extname) {
-    return cb(null, true)
-  } else {
-    return cb(new Error('Please provide only Images(.jpeg|.jpg|.png|.gif)'))
-  }
-}
-
-async function checkCoverExist (projectId) {
-  try {
-    const cover = await filesModel.getCoverImage(projectId)
-    if (cover.length > 0) {
-      return cover[0].path_name
-    } else { return undefined }
-  } catch (err) {
-    throw new Error(err)
-  }
-}
-
-function checkFileDocType (file, cb) {
-  const filetypes = /pdf/
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
-  const mimetype = filetypes.test(file.mimetype)
-  if (mimetype && extname) {
-    return cb(null, true)
-  } else {
-    return cb(new Error('Please provide only Documents(.pdf)'))
-  }
-}
-
-exports.uploadFileToStorage = (file, fileType, id, isProfile) => {
-  let prom = new Promise((resolve, reject) => {
-    let newFileName = file.originalname
-    let fileUpload
-    if (fileType === 'image') {
-      newFileName = `${Date.now()}_${file.originalname}`
-      if (isProfile === false) {
-        fileUpload = bucket.file(`Images/${id}/${newFileName}`)
-      } else if (isProfile === true) {
-        fileUpload = bucket.file(`ProfileImage/${id}/${newFileName}`)
-      }
-    }
-
-    if (fileType === 'document') {
-      newFileName = `${Date.now()}_${file.originalname}`
-      fileUpload = bucket.file(`Documents/${id}/${newFileName}`)
-    }
-
-    const blobStream = fileUpload.createWriteStream({
-      metadata: {
-        contentType: file.mimetype
-      }
-    })
-
-    blobStream.on('error', () => {
-      reject(new Error('Something is wrong! Unable to upload at the moment.'))
-    })
-
-    blobStream.on('finish', () => {
-      fileUpload.makePublic()
-      const url = format(`https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`)
-      resolve(url)
-    })
-
-    blobStream.end(file.buffer)
-  })
-  return prom
-}
-
-exports.deleteObjectStorage = async (pathName, typeObject) => {
-  const path = pathName.replace(`https://storage.googleapis.com/${bucket.name}/`, '')
-  await bucket.file(path).delete()
-  if (typeObject === 'image') {
-    await filesModel.deleteProjectImage(path)
-  } else if (typeObject === 'document') {
-    await filesModel.deleteProjectDocument(path)
   }
 }
