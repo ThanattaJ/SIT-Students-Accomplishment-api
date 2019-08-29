@@ -4,6 +4,7 @@ const projectModel = require('./model')
 const userController = require('../users/controller')
 const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
+const notiController = require('../notificatioon/controller')
 
 const { validate } = require('../validation')
 const { projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateCountingSchema } = require('./json_schema')
@@ -26,8 +27,6 @@ module.exports = {
     try {
       const projectId = req.params.id
       const page = await getProjectDetail(projectId)
-      page.project_detail.created_at = moment(page.project_detail.created_at).format('LLL')
-      page.project_detail.updated_at = moment(page.project_detail.updated_at).format('LLL')
       res.send(page)
     } catch (err) {
       res.status(500).send({
@@ -66,6 +65,8 @@ module.exports = {
         achievement.project_id = projectId
         await projectModel.addProjectAchievement(achievement)
       }
+      const page = await getProjectDetail(projectId)
+      await notiController.sendEmail(page, 'create')
       res.status(200).send({
         status: 200,
         project_id: projectId
@@ -107,8 +108,10 @@ module.exports = {
         await projectModel.updateProjectTag(tagsCheked, id)
       }
       await filesController.updateVideo(video, id)
-      const page = await getProjectDetail(id)
-      res.send(page)
+      const newDetail = await getProjectDetail(id)
+      notiController.sendEmail(newDetail, 'Update')
+
+      res.send(newDetail)
     } catch (err) {
       res.status(500).send({
         status: 500,
@@ -187,6 +190,9 @@ async function getProjectDetail (projectId) {
         achievement.date_of_event = achievement.date_of_event === '0000-00-00' ? null : moment(achievement.date_of_event).format('DD-MM-YYYY')
       })
     }
+
+    result.project_detail.created_at = moment(result.project_detail.created_at).format('LLL')
+    result.project_detail.updated_at = moment(result.project_detail.updated_at).format('LLL')
 
     return result
   } catch (err) {

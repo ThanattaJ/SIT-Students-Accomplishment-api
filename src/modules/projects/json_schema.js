@@ -80,6 +80,7 @@ module.exports = {
     ),
     achievements: joi.array().items(
       joi.object().keys({
+        project_id: joi.number(),
         achievement_name: joi.string().trim(),
         achievement_detail: joi.string().trim().allow(null),
         organize_by: joi.string().trim().allow(null),
