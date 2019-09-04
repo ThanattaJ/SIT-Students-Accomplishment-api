@@ -3,7 +3,7 @@ const router = express.Router()
 const { getUserDefaultInformation, getStudentInformation, getListStudent, deleteOutsider, updateStudentInformation, updateUserEmail, updateUserImage, getEducationLevel, getLanguages } = require('./controller')
 const fileController = require('../files/controller')
 
-router.get('/:user_role/:id', getUserDefaultInformation)
+router.get('/', getUserDefaultInformation)
 router.patch('/email', updateUserEmail)
 
 const uploadImg = fileController.multerImageConfig()

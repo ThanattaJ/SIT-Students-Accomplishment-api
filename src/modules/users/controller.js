@@ -10,9 +10,9 @@ module.exports = {
 
   getUserDefaultInformation: async (req, res) => {
     try {
-      const { checkStatus, err } = validate(req.params, getUserIdSchema)
+      const { checkStatus, err } = validate(req.query, getUserIdSchema)
       if (!checkStatus) return res.send(err)
-      const { user_role, id } = req.params
+      const { user_role, id } = req.query
       const userData = await userModel.getUserDefaultInformation(user_role, id)
       if (user_role === 'student') {
         const project = await getProjectByStudentId(id)
