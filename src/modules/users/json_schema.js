@@ -6,6 +6,10 @@ module.exports = {
     id: joi.string().required().trim().length(11)
   }),
 
+  getStudentIdSchema: joi.object().keys({
+    id: joi.string().required().trim().length(11)
+  }),
+
   updateUserEmailSchema: joi.object().keys({
     user_role: joi.string().required().trim(),
     id: joi.string().required().trim().length(11),
@@ -17,7 +21,7 @@ module.exports = {
     id: joi.string().required().trim()
   }),
 
-  updateUserIdSchema: joi.object().keys({
+  updateStudentIdSchema: joi.object().keys({
     profile: joi.object().keys({
       id: joi.number().required(),
       student_id: joi.string().required().trim().length(11),

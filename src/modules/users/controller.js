@@ -4,16 +4,15 @@ const moment = require('moment')
 const projectController = require('../projects/controller')
 const fileController = require('../files/controller')
 const { validate } = require('../validation')
-const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateUserImageSchema, updateUserIdSchema } = require('./json_schema')
+const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateUserImageSchema, updateStudentIdSchema, getStudentIdSchema } = require('./json_schema')
 
 module.exports = {
 
   getUserDefaultInformation: async (req, res) => {
     try {
-      const { checkStatus, err } = validate(req.body, getUserIdSchema)
+      const { checkStatus, err } = validate(req.params, getUserIdSchema)
       if (!checkStatus) return res.send(err)
-
-      const { user_role, id } = req.body
+      const { user_role, id } = req.params
       const userData = await userModel.getUserDefaultInformation(user_role, id)
       if (user_role === 'student') {
         const project = await getProjectByStudentId(id)
@@ -78,13 +77,13 @@ module.exports = {
     }
   },
 
-  getUserInformation: async (req, res) => {
+  getStudentInformation: async (req, res) => {
     try {
-      const { checkStatus, err } = validate(req.body, getUserIdSchema)
+      const { checkStatus, err } = validate(req.params, getStudentIdSchema)
       if (!checkStatus) return res.send(err)
 
-      const { user_role, id } = req.body
-      const userData = await userModel.getUserInformationById(user_role, id)
+      const { id } = req.params
+      const userData = await userModel.getStudentInformationById(id)
       userData.profile.birthday = moment(userData.profile.birthday).format('DD-MM-YYYY')
       const project = await getProjectByStudentId(id)
       userData.projects = project.project
@@ -98,12 +97,12 @@ module.exports = {
     }
   },
 
-  updateUserInformation: async (req, res) => {
-    const { checkStatus, err } = validate(req.body, updateUserIdSchema)
+  updateStudentInformation: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, updateStudentIdSchema)
     if (!checkStatus) return res.send(err)
     try {
       const { profile, address, languages, educations } = req.body
-      const profileId = await userModel.updateUserInformation(profile, address)
+      const profileId = await userModel.updateStudentInformation(profile, address)
 
       if (languages.length > 0) {
         console.log(languages)
