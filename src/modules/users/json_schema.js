@@ -31,7 +31,7 @@ module.exports = {
       gpa: joi.number().allow(null),
       email: joi.string().trim().email(),
       nickname: joi.string().trim(),
-      birthday: joi.date(),
+      birthday: joi.date().allow(null),
       telephone_number: joi.string().trim().allow(null),
       gender: joi.string().trim().allow(null)
     }).required(),

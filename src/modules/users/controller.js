@@ -84,7 +84,7 @@ module.exports = {
 
       const { id } = req.params
       const userData = await userModel.getStudentInformationById(id)
-      userData.profile.birthday = moment(userData.profile.birthday).format('DD-MM-YYYY')
+      userData.profile.birthday = userData.profile.birthday === null ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
       const project = await getProjectByStudentId(id)
       userData.projects = project.project
 
