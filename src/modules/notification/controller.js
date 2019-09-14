@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 
 module.exports = {
 
-  sendEmail: async (data, status) => {
+  sendEmail: async (user, data, status) => {
     try {
       const email = []
       const { students } = data
@@ -23,7 +23,7 @@ module.exports = {
         subject: `"SIT Student Accomlishment: The ${data.project_detail.project_name_en} project is ${status}!"`,
         html: `
               Hello, \n
-              <p>_______________ ${status} the project's detail</p> \n\n
+              <p>${user} ${status} the project's detail</p> \n\n
               <p>Can see more detail in link at below. \n
               <b><u>Link:</u></b>: https://www.w3schools.com/tags/tag_noscript.asp </p> \n\n
               <b>Best Regard</b>, \n

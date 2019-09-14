@@ -231,6 +231,33 @@ module.exports = {
         message: err.message
       })
     }
+  },
+
+  createUser: async (role, payload) => {
+    let data = {}
+    const name = payload.fullname.split(' ')
+    if (role === 'student') {
+      data = {
+        student_id: payload.uid,
+        firstname: name[0],
+        lastname: name[1],
+        email: payload.email
+      }
+    } else {
+      data = {
+        lecturer_id: payload.uid,
+        firstname: name[0],
+        lastname: name[1],
+        email: payload.email || null
+      }
+    }
+    console.log(data)
+    await userModel.createUser(role, data, payload.description)
+  },
+
+  checkUser: async (role, userId) => {
+    const exist = await userModel.checkUser(role, userId)
+    return exist
   }
 
 }

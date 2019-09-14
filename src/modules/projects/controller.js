@@ -1,6 +1,7 @@
 const moment = require('moment')
 const _ = require('lodash')
 const projectModel = require('./model')
+const authenController = require('../authentication/controller')
 const userController = require('../users/controller')
 const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
@@ -40,15 +41,19 @@ module.exports = {
     const { checkStatus, err } = validate(req.body, createProjectSchema)
     if (!checkStatus) return res.send(err)
 
-    // eslint-disable-next-line camelcase
-    const { project_data, member, achievement } = req.body
-    project_data.start_year_th = project_data.start_year_en + 543
-    project_data.end_year_th = project_data.end_year_en + 543
     try {
+      // eslint-disable-next-line camelcase
+      const { project_data, member, achievement } = req.body
+      const authen = authenController.authorization(req.headers.authorization)
+      project_data.start_year_th = project_data.start_year_en + 543
+      project_data.end_year_th = project_data.end_year_en + 543
       const projectId = await projectModel.createProject(project_data)
 
       if (member.students !== undefined && member.students.length > 0) {
         const students = member.students
+        students.push({
+          student_id: authen.uid
+        })
         students.forEach((student) => {
           student.project_id = projectId
         })
@@ -66,7 +71,7 @@ module.exports = {
         await projectModel.addProjectAchievement(achievement)
       }
       const page = await getProjectDetail(projectId)
-      await notiController.sendEmail(page, 'create')
+      await notiController.sendEmail(authen.fullname, page, 'create')
       res.status(200).send({
         status: 200,
         project_id: projectId
@@ -83,10 +88,11 @@ module.exports = {
     const { checkStatus, err } = validate(req.body, updateProjectDetailSchema)
     if (!checkStatus) return res.send(err)
 
-    // eslint-disable-next-line camelcase
-    const { project_detail, outsiders, achievements, tags, video } = req.body
-    const id = project_detail.id
     try {
+    // eslint-disable-next-line camelcase
+      const { project_detail, outsiders, achievements, tags, video } = req.body
+      const authen = authenController.authorization(req.headers.authorization)
+      const id = project_detail.id
       await projectModel.updateProjectDetail(id, project_detail)
 
       if (achievements.length > 0) {
@@ -109,7 +115,7 @@ module.exports = {
       }
       await filesController.updateVideo(video, id)
       const newDetail = await getProjectDetail(id)
-      notiController.sendEmail(newDetail, 'Update')
+      notiController.sendEmail(authen.fullname, newDetail, 'Update')
 
       res.send(newDetail)
     } catch (err) {

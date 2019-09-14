@@ -3,7 +3,6 @@ exports.up = async function (knex) {
   await knex.schema.createTable('students', function (table) {
     table.increments('id').primary()
     table.string('student_id').notNullable()
-    table.string('password').notNullable()
     table.integer('curriculum_id').unsigned()
     table.text('introduce_detail')
     table.string('firstname').notNullable()

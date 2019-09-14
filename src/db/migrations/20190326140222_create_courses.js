@@ -4,7 +4,7 @@ exports.up = async function (knex) {
     table.increments('id').primary()
     table.string('course_code').notNullable()
     table.string('course_name').notNullable()
-    table.string('course_detail').notNullable()
+    table.string('course_detail')
 
     table
       .timestamp('created_at')

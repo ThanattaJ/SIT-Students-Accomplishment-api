@@ -10,6 +10,6 @@ router.use('/projects', projectRoutes)
 router.use('/users', userRoutes)
 router.use('/tags', tagRoutes)
 router.use('/files', fileRoutes)
-router.use('/authentication', authenRoutes)
+router.use('/login', authenRoutes)
 
 module.exports = router

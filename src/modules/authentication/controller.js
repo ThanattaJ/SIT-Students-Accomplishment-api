@@ -1,27 +1,32 @@
 require('dotenv').config()
 const passport = require('passport')
 const Ldapstrategy = require('passport-ldapauth')
+const jwt = require('jwt-simple')
 const { validate } = require('../validation')
 const { authenSchema } = require('./json_schema')
+const userController = require('../users/controller')
 
 module.exports = {
-  authenticate: (req, res, next) => {
+  login: (req, res, next) => {
     const { checkStatus, err } = validate(req.body, authenSchema)
     if (!checkStatus) return res.send(err)
-
-    const { username, user_type, password } = req.body
+    const { username, userType, password } = req.body
+    const detail = {
+      role: userType === process.env.at_sign ? 'student' : 'lecturer',
+      searchBase: userType === process.env.at_sign ? process.env.search_base_student : process.env.staff
+    }
     const OPTS = Ldapstrategy.Options = {
       server: {
         url: process.env.LDAP_URL,
-        bindDn: 'uid=student01,ou=People,ou=st,dc=sit,dc=kmutt,dc=ac,dc=th',
+        bindDn: `uid=${username},ou=People,${detail.searchBase}`,
         bindCredentials: password,
-        searchBase: 'ou=People,ou=st,dc=sit,dc=kmutt,dc=ac,dc=th',
+        searchBase: `ou=People,${detail.searchBase}`,
         searchFilter: 'uid={{username}}'
       }
     }
 
     passport.use(new Ldapstrategy(OPTS))
-    passport.authenticate('ldapauth', (err, user, info) => {
+    passport.authenticate('ldapauth', async (err, user, info) => {
       var error = err || info
       if (error) {
         res.send({
@@ -34,11 +39,30 @@ module.exports = {
           data: 'User Not Found'
         })
       } else {
-        res.send({
-          status: 200,
-          data: user
-        })
+        const payload = {
+          uid: user.uid,
+          fullname: user.givenName,
+          email: user.mail || '',
+          description: user.description,
+          role: detail.role,
+          iat: new Date().getTime()
+        }
+        const exist = await userController.checkUser(detail.role, payload.uid)
+        if (!exist) {
+          await userController.createUser(detail.role, payload)
+        }
+        const SECRET = process.env.AUTHEN_SECRET_KEY
+        res.send(jwt.encode(payload, SECRET))
       }
     })(req, res, next)
+  },
+
+  authorization: async (token) => {
+    const SECRET = process.env.AUTHEN_SECRET_KEY
+    try {
+      return jwt.decode(token, SECRET)
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }

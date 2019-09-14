@@ -228,5 +228,33 @@ module.exports = {
     } catch (err) {
       throw new Error(err)
     }
+  },
+
+  checkUser: async (role, userId) => {
+    if (role === 'student') {
+      const id = await knex('students').select('student_id').where('student_id', userId)
+      return id.length > 0
+    } else if (role === 'lecturer') {
+      const id = await knex('lecturers').select('lecturer_id').where('lecturer_id', userId)
+      return id.length > 0
+    } else {
+      throw new Error('Invalid role_ user')
+    }
+  },
+
+  createUser: async (role, data, description) => {
+    try {
+      if (role === 'student') {
+        const curriculumId = await knex('curriculum').select('id').where('curriculum_name', description)
+        data.curriculum_id = curriculumId[0].id
+        await knex('students').insert(data)
+        const profileId = await knex('students_profile').insert({ student_id: data.student_id }).returning('id')
+        await knex('student_address').insert({ students_profile_id: profileId[0] })
+      } else if (role === 'lecturer') {
+
+      }
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }

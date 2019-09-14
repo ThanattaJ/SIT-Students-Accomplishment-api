@@ -3,13 +3,12 @@ exports.up = async function (knex) {
   await knex.schema.createTable('lecturers', function (table) {
     table.increments('id').primary()
     table.string('lecturer_id').notNullable()
-    table.string('password').notNullable()
     table.integer('position_id').unsigned()
     table.string('firstname').notNullable()
     table.string('lastname').notNullable()
     table.string('email')
     table.string('profile_picture')
-    table.boolean('isAdmin')
+    table.boolean('isAdmin').defaultTo(false)
 
     table
       .timestamp('created_at')
