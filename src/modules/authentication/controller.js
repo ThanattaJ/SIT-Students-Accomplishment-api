@@ -55,14 +55,14 @@ module.exports = {
         res.send(jwt.encode(payload, SECRET))
       }
     })(req, res, next)
-  },
+  }
+}
 
-  authorization: async (token) => {
-    const SECRET = process.env.AUTHEN_SECRET_KEY
-    try {
-      return jwt.decode(token, SECRET)
-    } catch (err) {
-      throw new Error(err)
-    }
+exports.authorization = async (token) => {
+  const SECRET = process.env.AUTHEN_SECRET_KEY
+  try {
+    return jwt.decode(token, SECRET)
+  } catch (err) {
+    throw new Error(err)
   }
 }
