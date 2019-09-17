@@ -3,6 +3,7 @@ const userModel = require('./model')
 const moment = require('moment')
 const projectController = require('../projects/controller')
 const fileController = require('../files/controller')
+const authenController = require('../authentication/controller')
 const { validate } = require('../validation')
 const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateUserImageSchema, updateStudentIdSchema, getStudentIdSchema } = require('./json_schema')
 
@@ -10,12 +11,13 @@ module.exports = {
 
   getUserDefaultInformation: async (req, res) => {
     try {
-      const { checkStatus, err } = validate(req.query, getUserIdSchema)
-      if (!checkStatus) return res.send(err)
-      const { user_role, id } = req.query
-      const userData = await userModel.getUserDefaultInformation(user_role, id)
-      if (user_role === 'student') {
-        const project = await getProjectByStudentId(id)
+      // const { checkStatus, err } = validate(req.query, getUserIdSchema)
+      // if (!checkStatus) return res.send(err)
+
+      const authen = await authenController.authorization(req.headers.authorization)
+      const userData = await userModel.getUserDefaultInformation(authen.role, authen.uid)
+      if (authen.role === 'student') {
+        const project = await getProjectByStudentId(authen.uid)
         userData.projects = project.project
         userData.totalProject = project.totalProject
       }
@@ -33,8 +35,9 @@ module.exports = {
       const { checkStatus, err } = validate(req.body, updateUserEmailSchema)
       if (!checkStatus) return res.send(err)
 
-      const { user_role, id, email } = req.body
-      const result = await userModel.updateUserEmail(user_role, id, email) === 1 ? 'Update Success' : 'Updatee Fail'
+      const { email } = req.body
+      const authen = authenController.authorization(req.headers.authorization)
+      const result = await userModel.updateUserEmail(authen.role, authen.uid, email) === 1 ? 'Update Success' : 'Updatee Fail'
       res.status(200).send({
         status: 200,
         message: result
@@ -48,8 +51,8 @@ module.exports = {
   },
 
   updateUserImage: async (req, res) => {
-    const { checkStatus, err } = validate(req.body, updateUserImageSchema)
-    if (!checkStatus) return res.send(err)
+    // const { checkStatus, err } = validate(req.body, updateUserImageSchema)
+    // if (!checkStatus) return res.send(err)
     try {
       const { file } = req
       if (file === undefined) {
@@ -58,13 +61,13 @@ module.exports = {
           message: 'Dose Not Exsit File'
         })
       }
-      const { user_role, id } = req.body
-      const imageOldLink = await userModel.getUserImage(user_role, id)
+      const authen = authenController.authorization(req.headers.authorization)
+      const imageOldLink = await userModel.getUserImage(authen.role, authen.uid)
       if (imageOldLink !== null) {
         await fileController.deleteObjectStorage(imageOldLink, 'image')
       }
-      const link = await fileController.uploadFileToStorage(file, 'image', id, true)
-      const result = await userModel.updateUserImage(user_role, id, link) === 1 ? 'Update Success' : 'Updatee Fail'
+      const link = await fileController.uploadFileToStorage(file, 'image', authen.uid, true)
+      const result = await userModel.updateUserImage(authen.role, authen.uid, link) === 1 ? 'Update Success' : 'Updatee Fail'
       res.status(200).send({
         status: 200,
         message: result
@@ -81,11 +84,11 @@ module.exports = {
     try {
       const { checkStatus, err } = validate(req.params, getStudentIdSchema)
       if (!checkStatus) return res.send(err)
+      const authen = await authenController.authorization(req.headers.authorization)
 
-      const { id } = req.params
-      const userData = await userModel.getStudentInformationById(id)
+      const userData = await userModel.getStudentInformationById(authen.uid)
       userData.profile.birthday = userData.profile.birthday === null ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
-      const project = await getProjectByStudentId(id)
+      const project = await getProjectByStudentId(authen.uid)
       userData.projects = project.project
 
       res.send(userData)
@@ -101,6 +104,8 @@ module.exports = {
     const { checkStatus, err } = validate(req.body, updateStudentIdSchema)
     if (!checkStatus) return res.send(err)
     try {
+      authenController.authorization(req.headers.authorization)
+      if (!checkStatus) return res.send(err)
       const { profile, address, languages, educations } = req.body
       const profileId = await userModel.updateStudentInformation(profile, address)
 
@@ -148,6 +153,18 @@ module.exports = {
 
       const code = req.params.code
       const list = await userModel.getListStudent(code)
+      res.send(list)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  getListLecturer: async (req, res) => {
+    try {
+      const list = await userModel.getListLecturer()
       res.send(list)
     } catch (err) {
       res.status(500).send({

@@ -41,7 +41,7 @@ module.exports = {
       return data[0]
     } catch (err) {
       throw new Error(err)
-    } 
+    }
   },
 
   deleteCourse: async (id) => {

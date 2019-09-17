@@ -5,7 +5,7 @@ const authenController = require('../authentication/controller')
 const userController = require('../users/controller')
 const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
-const notiController = require('../notificatioon/controller')
+const notiController = require('../notification/controller')
 
 const { validate } = require('../validation')
 const { projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateCountingSchema } = require('./json_schema')

@@ -189,6 +189,15 @@ module.exports = {
     }
   },
 
+  getListLecturer: async () => {
+    try {
+      const lecturers = await knex('lecturers').select(query.queryListLecturer)
+      return lecturers
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   addProjectOutsider: async (outsiders) => {
     try {
       await knex('project_outsiders').insert(outsiders)

@@ -64,6 +64,11 @@ module.exports = {
     'firstname',
     'lastname'
   ],
+  queryListLecturer: [
+    'firstname',
+    'lastname',
+    'position_name'
+  ],
 
   queryProjectOutsider: [
     'id',
