@@ -94,14 +94,6 @@ module.exports = {
     }
   },
 
-  addProjectAchievement: async (achievementData) => {
-    try {
-      await insertAchievement(achievementData)
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
   updateProjectDetail: async (id, projectDetail, achievementData) => {
     try {
       if (projectDetail.project_type_name) {
@@ -113,7 +105,7 @@ module.exports = {
     }
   },
 
-  updateProjectAchievement: async (projectId, achievementData) => {
+  manageProjectAchievement: async (projectId, achievementData) => {
     try {
       await knex('project_achievement').del().where('project_id', projectId)
       achievementData.forEach(achievement => {

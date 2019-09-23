@@ -33,12 +33,14 @@ module.exports = {
         })
       )
     }),
-    achievement: joi.object().keys({
-      achievement_name: joi.string().required().trim(),
-      achievement_detail: joi.string().trim().allow(null),
-      organize_by: joi.string().trim().allow(null),
-      date_of_event: joi.string().trim().allow(null)
-    })
+    achievements: joi.array().items(
+      joi.object().keys({
+        achievement_name: joi.string().required().trim(),
+        achievement_detail: joi.string().trim().allow(null),
+        organize_by: joi.string().trim().allow(null),
+        date_of_event: joi.string().trim().allow(null)
+      })
+    )
   }),
 
   updateProjectDetailSchema: joi.object().keys({
@@ -64,7 +66,7 @@ module.exports = {
     }).required(),
     students: joi.array().items(
       joi.object().keys({
-        student_id: joi.string().required().trim().length(11),
+        student_id: joi.string().required().trim(),
         firstname: joi.string().trim(),
         lastname: joi.string().trim(),
         email: joi.string().trim().email()

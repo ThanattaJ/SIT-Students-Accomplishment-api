@@ -15,6 +15,10 @@ exports.seed = function (knex, Promise) {
         {
           id: 3,
           status_name: 'Reject'
+        },
+        {
+          id: 4,
+          status_name: 'Request'
         }
       ]
       return knex('status_project').insert(data)

@@ -48,7 +48,7 @@ module.exports = {
 
     try {
       // eslint-disable-next-line camelcase
-      const { project_data, member, achievement } = req.body
+      const { project_data, member, achievements } = req.body
       const authen = await authenController.authorization(req.headers.authorization)
       project_data.start_year_th = project_data.start_year_en + 543
       project_data.end_year_th = project_data.end_year_en + 543
@@ -68,11 +68,8 @@ module.exports = {
         await manageOutsider(member.outsiders, projectId)
       }
 
-      if (achievement !== undefined) {
-        const date = achievement.date_of_event
-        achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
-        achievement.project_id = projectId
-        await projectModel.addProjectAchievement(achievement)
+      if (achievements !== undefined) {
+        await manageAchievement(projectId, achievements)
       }
       const page = await getProjectDetail(projectId)
       await notiController.sendEmail(authen.fullname, page, 'create')
@@ -99,14 +96,7 @@ module.exports = {
       const id = project_detail.id
       await projectModel.updateProjectDetail(id, project_detail)
 
-      if (achievements.length > 0) {
-        achievements.forEach(achievement => {
-          achievements.project_id = id
-          const date = achievement.date_of_event
-          achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
-        })
-        await projectModel.updateProjectAchievement(id, achievements)
-      }
+      await manageAchievement(id, achievements)
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
         await manageOutsider(outsiders, id)
       }
@@ -229,6 +219,20 @@ async function manageOutsider (outsiders, projectId) {
   }
 }
 
+async function manageAchievement (id, achievements) {
+  try {
+    if (achievements.length > 0) {
+      achievements.forEach(achievement => {
+        achievements.project_id = id
+        const date = achievement.date_of_event
+        achievement.date_of_event = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+      })
+      await projectModel.manageProjectAchievement(id, achievements)
+    }
+  } catch (err) {
+    throw new Error(err)
+  }
+}
 exports.getProjectsByStudentId = async function (userId) {
   try {
     const result = await projectModel.getProjectsByStudentId(userId)
