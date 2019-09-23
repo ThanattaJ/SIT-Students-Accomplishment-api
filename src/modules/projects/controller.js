@@ -26,8 +26,13 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     try {
+      const authen = req.headers.authorization ? await authenController.authorization(req.headers.authorization) : null
       const projectId = req.params.id
       const page = await getProjectDetail(projectId)
+      if (authen != null) {
+        const access = !!_.find(page.students, { 'student_id': authen.uid })
+        page.access = access
+      }
       res.send(page)
     } catch (err) {
       res.status(500).send({
@@ -44,11 +49,10 @@ module.exports = {
     try {
       // eslint-disable-next-line camelcase
       const { project_data, member, achievement } = req.body
-      const authen = authenController.authorization(req.headers.authorization)
+      const authen = await authenController.authorization(req.headers.authorization)
       project_data.start_year_th = project_data.start_year_en + 543
       project_data.end_year_th = project_data.end_year_en + 543
       const projectId = await projectModel.createProject(project_data)
-
       if (member.students !== undefined && member.students.length > 0) {
         const students = member.students
         students.push({
@@ -91,7 +95,7 @@ module.exports = {
     try {
     // eslint-disable-next-line camelcase
       const { project_detail, outsiders, achievements, tags, video } = req.body
-      const authen = authenController.authorization(req.headers.authorization)
+      const authen = await authenController.authorization(req.headers.authorization)
       const id = project_detail.id
       await projectModel.updateProjectDetail(id, project_detail)
 

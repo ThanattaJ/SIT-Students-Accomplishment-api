@@ -14,11 +14,6 @@ module.exports = {
     email: joi.string().required().trim()
   }),
 
-  updateUserImageSchema: joi.object().keys({
-    user_role: joi.string().required().trim(),
-    id: joi.string().required().trim()
-  }),
-
   updateStudentIdSchema: joi.object().keys({
     profile: joi.object().keys({
       id: joi.number().required(),

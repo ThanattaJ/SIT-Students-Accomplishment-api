@@ -5,19 +5,28 @@ const projectController = require('../projects/controller')
 const fileController = require('../files/controller')
 const authenController = require('../authentication/controller')
 const { validate } = require('../validation')
-const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateUserImageSchema, updateStudentIdSchema, getStudentIdSchema } = require('./json_schema')
+const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateStudentIdSchema, getStudentIdSchema } = require('./json_schema')
 
 module.exports = {
 
   getUserDefaultInformation: async (req, res) => {
     try {
-      // const { checkStatus, err } = validate(req.query, getUserIdSchema)
-      // if (!checkStatus) return res.send(err)
-
-      const authen = await authenController.authorization(req.headers.authorization)
-      const userData = await userModel.getUserDefaultInformation(authen.role, authen.uid)
-      if (authen.role === 'student') {
-        const project = await getProjectByStudentId(authen.uid)
+      const authen = req.headers.authorization ? await authenController.authorization(req.headers.authorization) : null
+      let userData = {}
+      let userRole
+      if (authen === null) {
+        const { checkStatus, err } = validate(req.query, getUserIdSchema)
+        if (!checkStatus) return res.send(err)
+        userRole = req.query.user_role
+        const { id } = req.query
+        userData = await userModel.getUserDefaultInformation(userRole, id)
+      } else {
+        userRole = authen.role
+        userData = await userModel.getUserDefaultInformation(userRole, authen.uid)
+        userData.access = true
+      }
+      if (userRole === 'student') {
+        const project = await getProjectByStudentId(userData.profile.student_id)
         userData.projects = project.project
         userData.totalProject = project.totalProject
       }
@@ -36,7 +45,7 @@ module.exports = {
       if (!checkStatus) return res.send(err)
 
       const { email } = req.body
-      const authen = authenController.authorization(req.headers.authorization)
+      const authen = await authenController.authorization(req.headers.authorization)
       const result = await userModel.updateUserEmail(authen.role, authen.uid, email) === 1 ? 'Update Success' : 'Updatee Fail'
       res.status(200).send({
         status: 200,
@@ -51,8 +60,6 @@ module.exports = {
   },
 
   updateUserImage: async (req, res) => {
-    // const { checkStatus, err } = validate(req.body, updateUserImageSchema)
-    // if (!checkStatus) return res.send(err)
     try {
       const { file } = req
       if (file === undefined) {
@@ -61,7 +68,7 @@ module.exports = {
           message: 'Dose Not Exsit File'
         })
       }
-      const authen = authenController.authorization(req.headers.authorization)
+      const authen = await authenController.authorization(req.headers.authorization)
       const imageOldLink = await userModel.getUserImage(authen.role, authen.uid)
       if (imageOldLink !== null) {
         await fileController.deleteObjectStorage(imageOldLink, 'image')
@@ -80,10 +87,12 @@ module.exports = {
     }
   },
 
-  getStudentInformation: async (req, res) => {
+  getStudentInformation: async (req, res, next) => {
     try {
       const { checkStatus, err } = validate(req.params, getStudentIdSchema)
       if (!checkStatus) return res.send(err)
+      const x = await authenController.login
+      x()
       const authen = await authenController.authorization(req.headers.authorization)
 
       const userData = await userModel.getStudentInformationById(authen.uid)
@@ -93,6 +102,7 @@ module.exports = {
 
       res.send(userData)
     } catch (err) {
+      console.log('err', err)
       res.status(500).send({
         status: 500,
         message: err.message
@@ -104,7 +114,7 @@ module.exports = {
     const { checkStatus, err } = validate(req.body, updateStudentIdSchema)
     if (!checkStatus) return res.send(err)
     try {
-      authenController.authorization(req.headers.authorization)
+      const authen = await authenController.authorization(req.headers.authorization)
       if (!checkStatus) return res.send(err)
       const { profile, address, languages, educations } = req.body
       const profileId = await userModel.updateStudentInformation(profile, address)
@@ -248,35 +258,7 @@ module.exports = {
         message: err.message
       })
     }
-  },
-
-  createUser: async (role, payload) => {
-    let data = {}
-    const name = payload.fullname.split(' ')
-    if (role === 'student') {
-      data = {
-        student_id: payload.uid,
-        firstname: name[0],
-        lastname: name[1],
-        email: payload.email
-      }
-    } else {
-      data = {
-        lecturer_id: payload.uid,
-        firstname: name[0],
-        lastname: name[1],
-        email: payload.email || null
-      }
-    }
-    console.log(data)
-    await userModel.createUser(role, data, payload.description)
-  },
-
-  checkUser: async (role, userId) => {
-    const exist = await userModel.checkUser(role, userId)
-    return exist
   }
-
 }
 
 async function getProjectByStudentId (userId) {

@@ -4,7 +4,7 @@ const Ldapstrategy = require('passport-ldapauth')
 const jwt = require('jwt-simple')
 const { validate } = require('../validation')
 const { authenSchema } = require('./json_schema')
-const userController = require('../users/controller')
+const userModel = require('../users/model')
 
 module.exports = {
   login: (req, res, next) => {
@@ -47,22 +47,39 @@ module.exports = {
           role: detail.role,
           iat: new Date().getTime()
         }
-        const exist = await userController.checkUser(detail.role, payload.uid)
+        const exist = await userModel.checkUser(detail.role, payload.uid)
         if (!exist) {
-          await userController.createUser(detail.role, payload)
+          let data = {}
+          const name = payload.fullname.split(' ')
+          if (detail.role === 'student') {
+            data = {
+              student_id: payload.uid,
+              firstname: name[0],
+              lastname: name[1],
+              email: payload.email
+            }
+          } else {
+            data = {
+              lecturer_id: payload.uid,
+              firstname: name[0],
+              lastname: name[1],
+              email: payload.email || null
+            }
+          }
+          await userModel.createUser(detail.role, data, payload.description)
         }
         const SECRET = process.env.AUTHEN_SECRET_KEY
         res.send(jwt.encode(payload, SECRET))
       }
     })(req, res, next)
-  }
-}
+  },
 
-exports.authorization = async (token) => {
-  const SECRET = process.env.AUTHEN_SECRET_KEY
-  try {
-    return jwt.decode(token, SECRET)
-  } catch (err) {
-    throw new Error(err)
+  authorization: async (token) => {
+    const SECRET = process.env.AUTHEN_SECRET_KEY
+    try {
+      return jwt.decode(token, SECRET)
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }
