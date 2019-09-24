@@ -6,6 +6,7 @@ exports.up = async function (knex) {
     table.string('course_name').notNullable()
     table.unique('course_code', 'course_name')
     table.string('course_detail')
+    table.boolean('isDelete').defaultTo(false)
 
     table
       .timestamp('created_at')
