@@ -91,8 +91,6 @@ module.exports = {
     try {
       const { checkStatus, err } = validate(req.params, getStudentIdSchema)
       if (!checkStatus) return res.send(err)
-      const x = await authenController.login
-      x()
       const authen = await authenController.authorization(req.headers.authorization)
 
       const userData = await userModel.getStudentInformationById(authen.uid)
