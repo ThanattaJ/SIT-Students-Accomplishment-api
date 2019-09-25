@@ -132,7 +132,6 @@ module.exports = {
     if (!checkStatus) return res.send(err)
     try {
       const { academic_term_id, course_id, lecturers } = req.body
-
       await manageCourseSemester(academic_term_id, course_id, lecturers)
       res.status(200).send({
         status: 200,
@@ -201,8 +200,7 @@ async function triggerTerm () {
   }
 }
 
-async function manageCourseSemester(academicTermId, courseId, lecturers) {
-
+async function manageCourseSemester (academicTermId, courseId, lecturers) {
   lecturers.forEach(lecturer => {
     lecturer.academic_term_id = academicTermId
     lecturer.courses_id = courseId

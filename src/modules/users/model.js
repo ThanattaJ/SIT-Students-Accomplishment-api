@@ -100,14 +100,14 @@ module.exports = {
     }
   },
 
-  updateStudentInformation: async (profile, address) => {
+  updateStudentInformation: async (uid, profile, address) => {
     try {
       const dataForStudentDB = {
         introduce_detail: profile.biology,
         university_gpa: profile.gpa,
         email: profile.email
       }
-      const a = await knex('students').where('student_id', profile.student_id).update(dataForStudentDB)
+      const a = await knex('students').where('student_id', uid).update(dataForStudentDB)
       console.log('a', a)
 
       const dataForStudentProfileDB = {
@@ -116,10 +116,10 @@ module.exports = {
         telephone_number: profile.telephone_number,
         gender: profile.gender
       }
-      const b = await knex('students_profile').where('student_id', profile.student_id).update(dataForStudentProfileDB)
+      const b = await knex('students_profile').where('student_id', uid).update(dataForStudentProfileDB)
       console.log('b', b)
 
-      const profileId = await knex('students_profile').select('id').where('student_id', profile.student_id)
+      const profileId = await knex('students_profile').select('id').where('student_id', uid)
       console.log('profileId', profileId[0].id)
       const c = await knex('student_address').where('id', profileId[0].id).update(address)
       console.log('c', c)

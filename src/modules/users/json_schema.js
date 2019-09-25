@@ -16,8 +16,6 @@ module.exports = {
 
   updateStudentIdSchema: joi.object().keys({
     profile: joi.object().keys({
-      id: joi.number().required(),
-      student_id: joi.string().required().trim().length(11),
       biology: joi.string().trim().allow(null),
       firstname: joi.string().required().trim(),
       lastname: joi.string().required().trim(),
