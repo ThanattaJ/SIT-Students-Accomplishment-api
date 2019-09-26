@@ -59,11 +59,30 @@ module.exports = {
     'education_level.level_name'
   ],
 
+  queryStudentSkill: [
+    'students_skill.skill_name',
+    'skill_level.level_name'
+  ],
+
+  queryStudentSocial: [
+    'students_social.Twitter',
+    'students_social.Facebook',
+    'students_social.Instagram',
+    'students_social.Linkedin',
+    'students_social.Github',
+    'students_social.Pinterest',
+    'students_social.Vimeo',
+    'students_social.Tumblr',
+    'students_social.Flickr',
+    'students_social.Link'
+  ],
+
   queryListStudent: [
     'student_id',
     'firstname',
     'lastname'
   ],
+
   queryListLecturer: [
     'lecturer_id',
     'firstname',

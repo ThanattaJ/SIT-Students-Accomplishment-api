@@ -193,7 +193,6 @@ async function triggerTerm () {
     } else if (moment(now).isBetween(`${year}-12-01`, `${year}-04-30`)) {
       term = 2
     }
-    console.log('term', term)
     return await courseModel.checkAcademicTerm(term, year)
   } catch (err) {
     throw new Error(err)

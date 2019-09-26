@@ -20,7 +20,6 @@ exports.up = async function (knex) {
       .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 
     table.unique('lecturer_id')
-    table.foreign('position_id').references('lecturer_position.id')
   })
 }
 

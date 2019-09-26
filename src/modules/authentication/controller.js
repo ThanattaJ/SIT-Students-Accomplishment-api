@@ -90,7 +90,7 @@ const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'].split(' ')[0]
   if (token === '') return res.status(403).send({ auth: false, message: 'No token provided.' })
 
-  req.body.auth = authorization(token)
+  req.auth = authorization(token)
   next()
 }
 

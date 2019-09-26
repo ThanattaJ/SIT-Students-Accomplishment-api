@@ -43,8 +43,8 @@ module.exports = {
     try {
       const { checkStatus, err } = validate(req.body, updateUserEmailSchema)
       if (!checkStatus) return res.send(err)
-
-      const { email, auth } = req.body
+      const { auth } = req
+      const { email } = req.body
       const result = await userModel.updateUserEmail(auth.role, auth.uid, email) === 1 ? 'Update Success' : 'Updatee Fail'
       res.status(200).send({
         status: 200,
@@ -67,7 +67,7 @@ module.exports = {
           message: 'Dose Not Exsit File'
         })
       }
-      const { auth } = req.body
+      const { auth } = req
       const imageOldLink = await userModel.getUserImage(auth.role, auth.uid)
       if (imageOldLink !== null) {
         await fileController.deleteObjectStorage(imageOldLink, 'image')
@@ -91,7 +91,7 @@ module.exports = {
       const { checkStatus, err } = validate(req.params, getStudentIdSchema)
       if (!checkStatus) return res.send(err)
 
-      const { auth } = req.body
+      const { auth } = req
 
       const userData = await userModel.getStudentInformationById(auth.uid)
       userData.profile.birthday = userData.profile.birthday === null ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
@@ -112,7 +112,7 @@ module.exports = {
     const { checkStatus, err } = validate(req.body, updateStudentIdSchema)
     if (!checkStatus) return res.send(err)
     try {
-      const { auth } = req.body
+      const { auth } = req
       if (!checkStatus) return res.send(err)
       const { profile, address, languages, educations } = req.body
       const profileId = await userModel.updateStudentInformation(auth.uid, profile, address)
@@ -202,6 +202,18 @@ module.exports = {
   getEducationLevel: async (req, res) => {
     try {
       const list = await userModel.getEducationLevel()
+      res.send(list)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  getSkillLevel: async (req, res) => {
+    try {
+      const list = await userModel.getSkillLevel()
       res.send(list)
     } catch (err) {
       res.status(500).send({

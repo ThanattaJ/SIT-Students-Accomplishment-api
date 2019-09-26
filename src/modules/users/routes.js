@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { getUserDefaultInformation, getStudentInformation, getListStudent, getListLecturer, deleteOutsider, updateStudentInformation, updateUserEmail, updateUserImage, getEducationLevel, getLanguages } = require('./controller')
+const { getUserDefaultInformation, getStudentInformation, getListStudent, getListLecturer, deleteOutsider, updateStudentInformation, updateUserEmail, updateUserImage, getEducationLevel, getSkillLevel, getLanguages } = require('./controller')
 const fileController = require('../files/controller')
 const { verifyToken } = require('../authentication/controller')
 
@@ -17,6 +17,7 @@ router.get('/list_student/:code', getListStudent)
 router.get('/list_lecturer', getListLecturer)
 router.get('/languages', getLanguages)
 router.get('/education-level', getEducationLevel)
+router.get('/skill-level', getSkillLevel)
 
 router.delete('/:outsider_id', deleteOutsider)
 

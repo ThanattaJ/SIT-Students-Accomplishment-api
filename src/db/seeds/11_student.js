@@ -28,6 +28,9 @@ exports.seed = function (knex, Promise) {
             id: i,
             students_profile_id: profileId[0]
           })
+          await knex('students_social').insert({
+            students_profile_id: profileId[0]
+          })
         }
       })()
     })

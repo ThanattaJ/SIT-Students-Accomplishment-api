@@ -1,26 +1,22 @@
 exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
-  return knex('languages_level')
+  return knex('skill_level')
     .del()
     .then(() => {
       const data = [
         {
           id: 1,
-          level_name: 'Elementary'
+          level_name: 'Beginner'
         },
         {
           id: 2,
-          level_name: 'Competent'
+          level_name: 'Intermediate'
         },
         {
           id: 3,
-          level_name: 'Proficient'
-        },
-        {
-          id: 4,
-          level_name: 'Native'
+          level_name: 'Expert'
         }
       ]
-      return knex('languages_level').insert(data)
+      return knex('skill_level').insert(data)
     })
 }

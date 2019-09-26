@@ -89,10 +89,17 @@ module.exports = {
       const education = await knex.select(query.queryStudentEducation).from('student_education').where('students_profile_id', profile[0].id)
         .join('education_level', 'student_education.education_level_id', 'education_level.id')
 
+      const skill = await knex.select(query.queryStudentSkill).from('students_skill').where('students_profile_id', profile[0].id)
+        .join('skill_level', 'students_skill.skill_level_id', 'skill_level.id')
+
+      const social = await knex.select(query.queryStudentSocial).from('students_social').where('students_profile_id', profile[0].id)
+
       result = {
         'profile': profile[0],
         'language': languages,
-        'education': education
+        'education': education,
+        'skill': skill,
+        'social': social[0]
       }
       return result
     } catch (err) {
@@ -181,6 +188,15 @@ module.exports = {
     }
   },
 
+  getSkillLevel: async () => {
+    try {
+      const list = await knex('skill_level').select('id', 'level_name')
+      return list
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   getListStudent: async (code) => {
     try {
       return await knex('students').select(query.queryListStudent).where('student_id', 'like', `${code}%`)
@@ -259,6 +275,7 @@ module.exports = {
         await knex('students').insert(data)
         const profileId = await knex('students_profile').insert({ student_id: data.student_id }).returning('id')
         await knex('student_address').insert({ students_profile_id: profileId[0] })
+        await knex('students_social').insert({ students_profile_id: profileId[0] })
       } else if (role === 'lecturer') {
 
       }

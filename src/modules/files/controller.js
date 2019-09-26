@@ -114,7 +114,7 @@ module.exports = {
       },
       storage: multer.memoryStorage(),
       limits: {
-        fileSize: 700000
+        fileSize: 35000000
       }
     })
     return uploadImg
@@ -215,7 +215,7 @@ module.exports = {
       },
       storage: multer.memoryStorage(),
       limit: {
-        fileSize: 10000000
+        fileSize: 5000000
       }
     })
     return uploadDoc
