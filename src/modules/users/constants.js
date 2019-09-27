@@ -54,6 +54,7 @@ module.exports = {
     'student_education.gpa',
     'student_education.start_year',
     'student_education.end_year',
+    'education_level.id as education_level_id',
     'education_level.level_name'
   ],
 
