@@ -2,9 +2,13 @@ require('dotenv').config()
 const nodemailer = require('nodemailer')
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  secureConnection: true,
   auth: {
     user: process.env.MAIL,
     pass: process.env.PASS_MAIL
+  },
+  tls: {
+    secureProtocol: 'TLSv1_method'
   }
 })
 
@@ -32,6 +36,7 @@ module.exports = {
       }
       await transporter.sendMail(content)
     } catch (err) {
+      console.log(err);
       throw new Error(err)
     }
   }
