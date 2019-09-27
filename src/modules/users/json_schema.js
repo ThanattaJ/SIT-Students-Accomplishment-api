@@ -54,12 +54,13 @@ module.exports = {
   updateStudentEducationSchema: joi.object().keys({
     educations: joi.array().items(
       joi.object().keys({
+        id: joi.number(),
         education_level_id: joi.number().required(),
         school_name: joi.string().trim().required(),
         program: joi.string().trim().allow(null),
         gpa: joi.number().allow(null),
-        start_year: joi.number().allow(null),
-        end_year: joi.number().allow(null)
+        start_year: joi.string().allow(null),
+        end_year: joi.string().allow(null)
       })
     )
   }),
