@@ -7,7 +7,6 @@ exports.up = async function (knex) {
     table.text('introduce_detail')
     table.string('firstname').notNullable()
     table.string('lastname').notNullable()
-    table.double('university_gpa', 3, 2)
     table.string('email')
     table.string('profile_picture')
     table.integer('viwer').defaultTo(0)

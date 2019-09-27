@@ -48,12 +48,14 @@ module.exports = {
 
     try {
       const { auth } = req
+      console.log(auth);
       // eslint-disable-next-line camelcase
       const { project_data, member, achievements } = req.body
       project_data.start_year_th = project_data.start_year_en + 543
       project_data.end_year_th = project_data.end_year_en + 543
       const projectId = await projectModel.createProject(project_data)
       if (auth && member.students.length >= 0) {
+        console.log('in if');
         const students = member.students || []
         students.push({
           student_id: auth.uid
@@ -72,12 +74,13 @@ module.exports = {
         await manageAchievement(projectId, achievements)
       }
       const page = await getProjectDetail(projectId)
-      notiController.sendEmail(auth.fullname, page, 'create')
+      await notiController.sendEmail(auth.fullname, page, 'create')
       res.status(200).send({
         status: 200,
         project_id: projectId
       })
     } catch (err) {
+      console.log(err);
       res.status(500).send({
         status: 500,
         message: err.message

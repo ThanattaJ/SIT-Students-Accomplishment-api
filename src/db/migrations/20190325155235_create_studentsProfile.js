@@ -6,7 +6,6 @@ exports.up = async function (knex) {
     table.string('nickname')
     table.date('birthday')
     table.string('telephone_number')
-    table.string('gender')
 
     table
       .timestamp('created_at')

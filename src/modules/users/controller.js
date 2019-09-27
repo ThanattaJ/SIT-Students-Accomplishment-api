@@ -5,7 +5,7 @@ const projectController = require('../projects/controller')
 const fileController = require('../files/controller')
 const authenController = require('../authentication/controller')
 const { validate } = require('../validation')
-const { getUserIdSchema, getListStudentSchema, updateUserEmailSchema, updateStudentIdSchema, getStudentIdSchema } = require('./json_schema')
+const json = require('./json_schema')
 
 module.exports = {
 
@@ -15,7 +15,7 @@ module.exports = {
       let userData = {}
       let userRole
       if (auth === null) {
-        const { checkStatus, err } = validate(req.query, getUserIdSchema)
+        const { checkStatus, err } = validate(req.query, json.getUserIdSchema)
         if (!checkStatus) return res.send(err)
         userRole = req.query.user_role
         const { id } = req.query
@@ -41,7 +41,7 @@ module.exports = {
 
   updateUserEmail: async (req, res, next) => {
     try {
-      const { checkStatus, err } = validate(req.body, updateUserEmailSchema)
+      const { checkStatus, err } = validate(req.body, json.updateUserEmailSchema)
       if (!checkStatus) return res.send(err)
       const { auth } = req
       const { email } = req.body
@@ -88,7 +88,7 @@ module.exports = {
 
   getStudentInformation: async (req, res, next) => {
     try {
-      const { checkStatus, err } = validate(req.params, getStudentIdSchema)
+      const { checkStatus, err } = validate(req.params, json.getStudentIdSchema)
       if (!checkStatus) return res.send(err)
 
       const { auth } = req
@@ -109,28 +109,65 @@ module.exports = {
   },
 
   updateStudentInformation: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.body, updateStudentIdSchema)
+    const { checkStatus, err } = validate(req.body, json.updateStudentIdSchema)
     if (!checkStatus) return res.send(err)
     try {
       const { auth } = req
       if (!checkStatus) return res.send(err)
-      const { profile, address, languages, educations } = req.body
-      const profileId = await userModel.updateStudentInformation(auth.uid, profile, address)
+      const { profile, address } = req.body
+      await userModel.updateStudentInformation(auth.uid, profile, address)
+      res.status(200).send({
+        status: 200,
+        message: 'Update Success'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
 
+  updateStudentLanguage: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.body, json.updateStudentLanguageSchema)
+    if (!checkStatus) return res.send(err)
+    try {
+      const { auth } = req
+      const { languages } = req.body
+      const profileId = await userModel.getProfileId(auth.uid)
       if (languages.length > 0) {
         console.log(languages)
-        await userModel.deleteUserLanguage(profileId)
+        await userModel.deleteUserLanguage(profileId[0].id)
         languages.forEach(async language => {
-          language.students_profile_id = profileId
+          language.students_profile_id = profileId[0].id
         })
+        console.log(languages);
         await userModel.addUserLanguage(languages)
       }
+      res.status(200).send({
+        status: 200,
+        message: 'Update Language'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
 
+  updateStudentEducation: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.body, json.updateStudentEducationSchema)
+    if (!checkStatus) return res.send(err)
+    try {
+      const { auth } = req
+      const { educations } = req.body
+      const profileId = await userModel.getProfileId(auth.uid)
       if (educations.length > 0) {
         const educationNotId = await educations.filter(education => education.id === undefined)
         if (educationNotId.length > 0) {
           educationNotId.forEach(education => {
-            education.students_profile_id = profileId
+            education.students_profile_id = profileId[0].id
           })
           await userModel.addUserEducation(educationNotId)
         }
@@ -144,7 +181,54 @@ module.exports = {
       }
       res.status(200).send({
         status: 200,
-        message: 'Update Success'
+        message: 'Update Education'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  updateStudentSkill: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.body, json.updateStudentSkillSchema)
+    if (!checkStatus) return res.send(err)
+    try {
+      const { auth } = req
+      const { skills } = req.body
+      const profileId = await userModel.getProfileId(auth.uid)
+
+      if (skills.length > 0) {
+        console.log(skills)
+        await userModel.deleteUserSkill(profileId[0].id)
+        skills.forEach(async skill => {
+          skill.students_profile_id = profileId[0].id
+        })
+        await userModel.addUserSkill(skills)
+      }
+      res.status(200).send({
+        status: 200,
+        message: 'Update Skill'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  updateStudentSocial: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.body, json.updateStudentSocialSchema)
+    if (!checkStatus) return res.send(err)
+    try {
+      const { auth } = req
+      const { social } = req.body
+      await userModel.updateUserSocial(auth.uid, social)
+      res.status(200).send({
+        status: 200,
+        message: 'Update Social'
       })
     } catch (err) {
       res.status(500).send({
@@ -156,7 +240,7 @@ module.exports = {
 
   getListStudent: async (req, res) => {
     try {
-      const { checkStatus, err } = validate(req.params, getListStudentSchema)
+      const { checkStatus, err } = validate(req.params, json.getListStudentSchema)
       if (!checkStatus) return res.send(err)
 
       const code = req.params.code

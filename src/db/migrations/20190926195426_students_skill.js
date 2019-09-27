@@ -16,6 +16,7 @@ exports.up = async function (knex) {
 
     table.foreign('students_profile_id').references('students_profile.id')
     table.foreign('skill_level_id').references('skill_level.id')
+    table.index(['students_profile_id', 'skill_name'], 'student_skill_index')
   })
 }
 

@@ -1,5 +1,14 @@
 const knex = require('../../db/knex')
 const query = require('./constants')
+
+const getProfileId = async (id) => {
+  try {
+    return await knex('students_profile').select('id').where('student_id', id)
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
 module.exports = {
 
   getUserDefaultInformation: async (userRole, id) => {
@@ -126,7 +135,7 @@ module.exports = {
       const b = await knex('students_profile').where('student_id', uid).update(dataForStudentProfileDB)
       console.log('b', b)
 
-      const profileId = await knex('students_profile').select('id').where('student_id', uid)
+      const profileId = await getProfileId(uid)
       console.log('profileId', profileId[0].id)
       const c = await knex('student_address').where('id', profileId[0].id).update(address)
       console.log('c', c)
@@ -145,6 +154,14 @@ module.exports = {
     }
   },
 
+  deleteUserLanguage: async (profileId) => {
+    try {
+      await knex('student_language').del().where('students_profile_id', profileId)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   addUserEducation: async (educations) => {
     try {
       await knex('student_education').insert(educations)
@@ -156,6 +173,30 @@ module.exports = {
   updateUserEducation: async (education) => {
     try {
       await knex('student_education').update(education).where('id', education.id)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateUserSocial: async (id, social) => {
+    try {
+      await knex('students_social').update(social).where('students_profile_id', id)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  addUserSkill: async (id, skills) => {
+    try {
+      await knex('students_skill').insert(skills)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  deleteUserSkill: async (profileId) => {
+    try {
+      await knex('students_skill').del().where('students_profile_id', profileId)
     } catch (err) {
       throw new Error(err)
     }
@@ -247,14 +288,6 @@ module.exports = {
     }
   },
 
-  deleteUserLanguage: async (profileId) => {
-    try {
-      await knex('student_language').del().where('students_profile_id', profileId)
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
   checkUser: async (role, userId) => {
     if (role === 'student') {
       const id = await knex('students').select('student_id').where('student_id', userId)
@@ -282,5 +315,6 @@ module.exports = {
     } catch (err) {
       throw new Error(err)
     }
-  }
+  },
+  getProfileId
 }

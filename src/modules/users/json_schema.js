@@ -17,14 +17,12 @@ module.exports = {
   updateStudentIdSchema: joi.object().keys({
     profile: joi.object().keys({
       biology: joi.string().trim().allow(null),
-      firstname: joi.string().required().trim(),
-      lastname: joi.string().required().trim(),
-      gpa: joi.number().allow(null),
+      firstname: joi.string().trim(),
+      lastname: joi.string().trim(),
       email: joi.string().trim().email(),
       nickname: joi.string().trim(),
       birthday: joi.date().allow(null),
-      telephone_number: joi.string().trim().allow(null),
-      gender: joi.string().trim().allow(null)
+      telephone_number: joi.string().trim().allow(null)
     }).required(),
     address: joi.object().keys({
       description: joi.string().trim().allow(null),
@@ -32,16 +30,30 @@ module.exports = {
       subdistrict: joi.string().trim().allow(null),
       province: joi.string().trim().allow(null),
       postcode: joi.string().trim().allow(null)
-    }).required(),
+    }).required()
+  }),
+
+  updateStudentLanguageSchema: joi.object().keys({
     languages: joi.array().items(
       joi.object().keys({
         language_id: joi.number().required(),
         level_id: joi.number().required()
       })
-    ),
+    )
+  }),
+
+  updateStudentSkillSchema: joi.object().keys({
+    skills: joi.array().items(
+      joi.object().keys({
+        skill_name: joi.string().required(),
+        skill_level_id: joi.number().required()
+      })
+    )
+  }),
+
+  updateStudentEducationSchema: joi.object().keys({
     educations: joi.array().items(
       joi.object().keys({
-        id: joi.number(),
         education_level_id: joi.number().required(),
         school_name: joi.string().trim().required(),
         program: joi.string().trim().allow(null),
@@ -50,6 +62,21 @@ module.exports = {
         end_year: joi.number().allow(null)
       })
     )
+  }),
+
+  updateStudentSocialSchema: joi.object().keys({
+    social: joi.object().keys({
+      Twitter: joi.string().allow(null),
+      Facebook: joi.string().allow(null),
+      Instagram: joi.string().allow(null),
+      Linkedin: joi.string().allow(null),
+      Github: joi.string().allow(null),
+      Pinterest: joi.string().allow(null),
+      Vimeo: joi.string().allow(null),
+      Tumblr: joi.string().allow(null),
+      Flickr: joi.string().allow(null),
+      Link: joi.string().allow(null)
+    })
   }),
 
   getListStudentSchema: joi.object().keys({
