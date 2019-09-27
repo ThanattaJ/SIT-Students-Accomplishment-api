@@ -60,6 +60,7 @@ module.exports = {
 
   queryStudentSkill: [
     'students_skill.skill_name',
+    'skill_level.id as skill_level_id',
     'skill_level.level_name'
   ],
 
