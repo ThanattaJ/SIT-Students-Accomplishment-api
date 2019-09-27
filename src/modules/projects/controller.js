@@ -72,7 +72,7 @@ module.exports = {
         await manageAchievement(projectId, achievements)
       }
       const page = await getProjectDetail(projectId)
-      await notiController.sendEmail(auth.fullname, page, 'create')
+      notiController.sendEmail(auth.fullname, page, 'create')
       res.status(200).send({
         status: 200,
         project_id: projectId
