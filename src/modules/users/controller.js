@@ -94,7 +94,8 @@ module.exports = {
       const { auth } = req
 
       const userData = await userModel.getStudentInformationById(auth.uid)
-      userData.profile.birthday = userData.profile.birthday === null ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
+      console.log(userData.profile.birthday);
+      userData.profile.birthday = userData.profile.birthday === '0000-00-00' ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
       const project = await getProjectByStudentId(auth.uid)
       userData.projects = project.project
 
@@ -141,7 +142,7 @@ module.exports = {
         languages.forEach(async language => {
           language.students_profile_id = profileId[0].id
         })
-        console.log(languages);
+        console.log(languages)
         await userModel.addUserLanguage(languages)
       }
       res.status(200).send({
