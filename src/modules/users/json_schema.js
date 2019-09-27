@@ -3,11 +3,11 @@ const joi = require('joi')
 module.exports = {
   getUserIdSchema: joi.object().keys({
     user_role: joi.string().required().trim(),
-    id: joi.string().required().trim().length(11)
+    id: joi.string().required().trim()
   }),
 
   getStudentIdSchema: joi.object().keys({
-    id: joi.string().required().trim().length(11)
+    id: joi.string().required().trim()
   }),
 
   updateUserEmailSchema: joi.object().keys({
@@ -53,7 +53,7 @@ module.exports = {
   }),
 
   getListStudentSchema: joi.object().keys({
-    code: joi.number().required().positive()
+    code: joi.string().required()
   }),
 
   deleteOutsiderSchema: joi.object().keys({

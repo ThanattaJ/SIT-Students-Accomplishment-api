@@ -53,8 +53,8 @@ module.exports = {
       project_data.start_year_th = project_data.start_year_en + 543
       project_data.end_year_th = project_data.end_year_en + 543
       const projectId = await projectModel.createProject(project_data)
-      if (member.students !== undefined && member.students.length > 0) {
-        const students = member.students
+      if (auth && member.students.length >= 0) {
+        const students = member.students || []
         students.push({
           student_id: auth.uid
         })

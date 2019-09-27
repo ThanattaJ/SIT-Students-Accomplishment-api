@@ -22,7 +22,7 @@ module.exports = {
     member: joi.object().keys({
       students: joi.array().required().items(
         joi.object().keys({
-          student_id: joi.string().required().trim().length(11)
+          student_id: joi.string().trim()
         })
       ),
       outsiders: joi.array().items(
