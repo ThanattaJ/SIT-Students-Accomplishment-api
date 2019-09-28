@@ -36,7 +36,6 @@ module.exports = {
       }
       await transporter.sendMail(content)
     } catch (err) {
-      console.log(err);
       throw new Error(err)
     }
   }

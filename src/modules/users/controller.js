@@ -100,7 +100,6 @@ module.exports = {
 
       res.send(userData)
     } catch (err) {
-      console.log('err', err)
       res.status(500).send({
         status: 500,
         message: err.message
@@ -136,12 +135,12 @@ module.exports = {
       const { languages } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
       if (languages.length > 0) {
-        console.log(languages)
         await userModel.deleteUserLanguage(profileId[0].id)
         languages.forEach(async language => {
+          delete language.language_name
+          delete language.levelname
           language.students_profile_id = profileId[0].id
         })
-        console.log(languages)
         await userModel.addUserLanguage(languages)
       }
       res.status(200).send({
@@ -202,9 +201,9 @@ module.exports = {
       const profileId = await userModel.getProfileId(auth.uid)
 
       if (skills.length > 0) {
-        console.log(skills)
         await userModel.deleteUserSkill(profileId[0].id)
         skills.forEach(async skill => {
+          delete skill.level_name
           skill.students_profile_id = profileId[0].id
         })
         await userModel.addUserSkill(skills)

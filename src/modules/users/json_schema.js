@@ -37,7 +37,9 @@ module.exports = {
     languages: joi.array().items(
       joi.object().keys({
         language_id: joi.number().required(),
-        level_id: joi.number().required()
+        level_id: joi.number().required(),
+        language_name: joi.string(),
+        level_name: joi.string()
       })
     )
   }),
@@ -46,7 +48,8 @@ module.exports = {
     skills: joi.array().items(
       joi.object().keys({
         skill_name: joi.string().required(),
-        skill_level_id: joi.number().required()
+        skill_level_id: joi.number().required(),
+        level_name: joi.string()
       })
     )
   }),

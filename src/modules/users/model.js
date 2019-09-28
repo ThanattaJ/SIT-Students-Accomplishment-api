@@ -123,22 +123,17 @@ module.exports = {
         university_gpa: profile.gpa,
         email: profile.email
       }
-      const a = await knex('students').where('student_id', uid).update(dataForStudentDB)
-      console.log('a', a)
-
+      await knex('students').where('student_id', uid).update(dataForStudentDB)
       const dataForStudentProfileDB = {
         nickname: profile.nickname,
         birthday: profile.birthday,
         telephone_number: profile.telephone_number,
         gender: profile.gender
       }
-      const b = await knex('students_profile').where('student_id', uid).update(dataForStudentProfileDB)
-      console.log('b', b)
+      await knex('students_profile').where('student_id', uid).update(dataForStudentProfileDB)
 
       const profileId = await getProfileId(uid)
-      console.log('profileId', profileId[0].id)
-      const c = await knex('student_address').where('id', profileId[0].id).update(address)
-      console.log('c', c)
+      await knex('student_address').where('id', profileId[0].id).update(address)
 
       return profileId[0].id
     } catch (err) {
