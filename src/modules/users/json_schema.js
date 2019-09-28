@@ -56,6 +56,7 @@ module.exports = {
       joi.object().keys({
         id: joi.number(),
         education_level_id: joi.number().required(),
+        level_name: joi.string().trim(),
         school_name: joi.string().trim().required(),
         program: joi.string().trim().allow(null),
         gpa: joi.number().allow(null),

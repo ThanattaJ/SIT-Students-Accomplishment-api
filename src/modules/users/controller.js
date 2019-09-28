@@ -167,6 +167,7 @@ module.exports = {
         const educationNotId = await educations.filter(education => education.id === undefined)
         if (educationNotId.length > 0) {
           educationNotId.forEach(education => {
+            delete education.level_name
             education.students_profile_id = profileId[0].id
           })
           await userModel.addUserEducation(educationNotId)
@@ -175,6 +176,7 @@ module.exports = {
         const educationHaveId = await educations.filter(education => education.id !== undefined)
         if (educationHaveId.length > 0) {
           educationHaveId.forEach(async education => {
+            delete education.level_name
             await userModel.updateUserEducation(education)
           })
         }

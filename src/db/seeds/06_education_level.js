@@ -34,7 +34,15 @@ exports.seed = function (knex, Promise) {
         },
         {
           id: 8,
-          level_name: 'etc.'
+          level_name: 'Bachelor’s degree'
+        },
+        {
+          id: 9,
+          level_name: 'Master’s degree'
+        },
+        {
+          id: 10,
+          level_name: 'Doctor’s degree'
         }
       ]
       return knex('education_level').insert(data)
