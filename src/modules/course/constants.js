@@ -9,8 +9,8 @@ module.exports = {
   ],
 
   querySemester: [
-    'academic_term.id',
-    knex.raw('CONCAT(academic_year.academic_year_en,\'/\',term.term_number) as semester')
+    'academic_term.id as academic_term_id',
+    knex.raw('CONCAT(academic_year.academic_year_en,\'/\',term.term_number) as academic_term')
   ],
 
   queryGetCourseSemester: [

@@ -86,7 +86,7 @@ module.exports = {
       return await knex('academic_term').select(querySemester)
         .join('term', 'academic_term.term_id', 'term.id')
         .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
-        .orderBy('id', 'asc')
+        .orderBy('academic_term_id', 'asc')
     } catch (err) {
       throw new Error(err)
     }

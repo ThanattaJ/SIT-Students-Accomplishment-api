@@ -99,8 +99,8 @@ module.exports = {
       const { semester_id } = req.query
       if (semester_id === undefined) {
         const semester = await triggerTerm()
-        courses = await courseModel.getCourseSemester(semester[semester.length - 1].id)
-        page.semesters = semester
+        courses = await courseModel.getCourseSemester(semester[semester.length - 1].academic_term_id)
+        page.academic_term = semester
       } else {
         courses = await courseModel.getCourseSemester(semester_id)
       }
