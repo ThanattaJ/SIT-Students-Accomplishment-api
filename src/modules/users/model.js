@@ -181,7 +181,7 @@ module.exports = {
     }
   },
 
-  addUserSkill: async (id, skills) => {
+  addUserSkill: async (skills) => {
     try {
       await knex('students_skill').insert(skills)
     } catch (err) {
