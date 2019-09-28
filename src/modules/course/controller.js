@@ -100,7 +100,7 @@ module.exports = {
       if (semester_id === undefined) {
         const semester = await triggerTerm()
         courses = await courseModel.getCourseSemester(semester[semester.length - 1].academic_term_id)
-        page.academic_term = semester
+        page.semester = semester
       } else {
         courses = await courseModel.getCourseSemester(semester_id)
       }
