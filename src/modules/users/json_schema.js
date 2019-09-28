@@ -57,7 +57,6 @@ module.exports = {
   updateStudentEducationSchema: joi.object().keys({
     educations: joi.array().items(
       joi.object().keys({
-        id: joi.number(),
         education_level_id: joi.number().required(),
         level_name: joi.string().trim(),
         school_name: joi.string().trim().required(),

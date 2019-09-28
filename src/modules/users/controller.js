@@ -135,7 +135,7 @@ module.exports = {
       const { languages } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
       if (languages.length > 0) {
-        await userModel.deleteUserLanguage(profileId[0].id)
+        await userModel.deleteUserProfileInformation('student_language', profileId[0].id)
         languages.forEach(async language => {
           delete language.language_name
           delete language.levelname
@@ -163,22 +163,12 @@ module.exports = {
       const { educations } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
       if (educations.length > 0) {
-        const educationNotId = await educations.filter(education => education.id === undefined)
-        if (educationNotId.length > 0) {
-          educationNotId.forEach(education => {
-            delete education.level_name
-            education.students_profile_id = profileId[0].id
-          })
-          await userModel.addUserEducation(educationNotId)
-        }
-
-        const educationHaveId = await educations.filter(education => education.id !== undefined)
-        if (educationHaveId.length > 0) {
-          educationHaveId.forEach(async education => {
-            delete education.level_name
-            await userModel.updateUserEducation(education)
-          })
-        }
+        await userModel.deleteUserProfileInformation('student_education', profileId[0].id)
+        educations.forEach(education => {
+          delete education.level_name
+          education.students_profile_id = profileId[0].id
+        })
+        await userModel.addUserEducation(educations)
       }
       res.status(200).send({
         status: 200,
@@ -201,7 +191,7 @@ module.exports = {
       const profileId = await userModel.getProfileId(auth.uid)
 
       if (skills.length > 0) {
-        await userModel.deleteUserSkill(profileId[0].id)
+        await userModel.deleteUserProfileInformation('students_skill', profileId[0].id)
         skills.forEach(async skill => {
           delete skill.level_name
           skill.students_profile_id = profileId[0].id

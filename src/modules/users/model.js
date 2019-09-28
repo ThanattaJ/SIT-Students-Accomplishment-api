@@ -149,17 +149,17 @@ module.exports = {
     }
   },
 
-  deleteUserLanguage: async (profileId) => {
+  addUserEducation: async (education) => {
     try {
-      await knex('student_language').del().where('students_profile_id', profileId)
+      await knex('student_education').insert(education)
     } catch (err) {
       throw new Error(err)
     }
   },
 
-  addUserEducation: async (educations) => {
+  deleteUserProfileInformation: async (topic, profileId) => {
     try {
-      await knex('student_education').insert(educations)
+      await knex(topic).del().where('students_profile_id', profileId)
     } catch (err) {
       throw new Error(err)
     }
@@ -184,14 +184,6 @@ module.exports = {
   addUserSkill: async (skills) => {
     try {
       await knex('students_skill').insert(skills)
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
-  deleteUserSkill: async (profileId) => {
-    try {
-      await knex('students_skill').del().where('students_profile_id', profileId)
     } catch (err) {
       throw new Error(err)
     }
