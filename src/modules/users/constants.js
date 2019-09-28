@@ -48,7 +48,6 @@ module.exports = {
   ],
 
   queryStudentEducation: [
-    'student_education.id',
     'student_education.school_name',
     'student_education.program',
     'student_education.gpa',
