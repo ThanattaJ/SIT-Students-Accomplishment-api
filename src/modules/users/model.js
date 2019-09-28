@@ -119,16 +119,16 @@ module.exports = {
   updateStudentInformation: async (uid, profile, address) => {
     try {
       const dataForStudentDB = {
+        firstname: profile.firstname,
+        lastname: profile.lastname,
         introduce_detail: profile.biology,
-        university_gpa: profile.gpa,
         email: profile.email
       }
       await knex('students').where('student_id', uid).update(dataForStudentDB)
       const dataForStudentProfileDB = {
         nickname: profile.nickname,
         birthday: profile.birthday,
-        telephone_number: profile.telephone_number,
-        gender: profile.gender
+        telephone_number: profile.telephone_number
       }
       await knex('students_profile').where('student_id', uid).update(dataForStudentProfileDB)
 
