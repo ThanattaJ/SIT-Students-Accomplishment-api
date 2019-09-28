@@ -189,7 +189,7 @@ module.exports = {
       const { auth } = req
       const { skills } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
-      
+
       if (skills.length > 0) {
         await userModel.deleteUserProfileInformation('students_skill', profileId[0].id)
         skills.forEach(async skill => {
@@ -209,7 +209,7 @@ module.exports = {
       })
     }
   },
-  
+
   updateStudentSocial: async (req, res, next) => {
     const { checkStatus, err } = validate(req.body, json.updateStudentSocialSchema)
     if (!checkStatus) return res.send(err)

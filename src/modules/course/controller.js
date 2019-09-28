@@ -138,10 +138,17 @@ module.exports = {
         message: 'Add course success.'
       })
     } catch (err) {
-      res.status(500).send({
-        status: 500,
-        message: err.message
-      })
+      if (err.message.search('Duplicate entry')) {
+        res.status(400).send({
+          status: 409,
+          message: 'This course is already exist in semester.'
+        })
+      } else {
+        res.status(500).send({
+          status: 500,
+          message: err.message
+        })
+      }
     }
   },
 
@@ -200,18 +207,21 @@ async function triggerTerm () {
 }
 
 async function manageCourseSemester (academicTermId, courseId, lecturers) {
-  lecturers.forEach(lecturer => {
-    lecturer.academic_term_id = academicTermId
-    lecturer.courses_id = courseId
-  })
-
-  const mapLecturerCourse = async _ => {
-    const promises = lecturers.map(async lecturer => {
-      const data = await courseModel.addCourseSemester(lecturer)
-      return data
+  try {
+    lecturers.forEach(lecturer => {
+      lecturer.academic_term_id = academicTermId
+      lecturer.courses_id = courseId
     })
-    const all = await Promise.all(promises)
-  }
 
-  mapLecturerCourse()
+    const mapLecturerCourse = async _ => {
+      const promises = lecturers.map(async lecturer => {
+        const data = await courseModel.addCourseSemester(lecturer)
+        return data
+      })
+      const all = await Promise.all(promises)
+    }
+    await mapLecturerCourse()
+  } catch (err) {
+    throw new Error(err)
+  }
 }
