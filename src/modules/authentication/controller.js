@@ -23,7 +23,6 @@ const login = (req, res, next) => {
       searchFilter: 'uid={{username}}'
     }
   }
-
   passport.use(new Ldapstrategy(OPTS))
   passport.authenticate('ldapauth', async (err, user, info) => {
     var error = err || info
@@ -40,9 +39,9 @@ const login = (req, res, next) => {
     } else {
       const payload = {
         uid: user.uid,
-        fullname: user.givenName,
-        email: user.mail || '',
-        description: user.description,
+        fullname: user.givenName || user.gecos,
+        email: user.mail.search('@') ? user.mail : '',
+        description: user.description.search('@') ? 'IT' : user.description,
         role: detail.role,
         iat: new Date().getTime()
       }
