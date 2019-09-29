@@ -162,8 +162,8 @@ module.exports = {
       const { auth } = req
       const { educations } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
+      await userModel.deleteUserProfileInformation('student_education', profileId[0].id)
       if (educations.length > 0) {
-        await userModel.deleteUserProfileInformation('student_education', profileId[0].id)
         educations.forEach(education => {
           delete education.level_name
           education.students_profile_id = profileId[0].id
