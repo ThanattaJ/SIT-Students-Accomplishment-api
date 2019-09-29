@@ -4,7 +4,7 @@
   "description": "(API)Senior Project of SIT at King Mongkut's University of Technology Thonburi.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
