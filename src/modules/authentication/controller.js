@@ -12,7 +12,7 @@ const login = (req, res, next) => {
   const { username, userType, password } = req.body
   const detail = {
     role: userType === process.env.at_sign ? 'student' : 'lecturer',
-    searchBase: userType === process.env.at_sign ? process.env.search_base_student : process.env.staff
+    searchBase: userType === process.env.at_sign ? process.env.search_base_student : process.env.search_base_staff
   }
   const OPTS = Ldapstrategy.Options = {
     server: {
@@ -37,13 +37,25 @@ const login = (req, res, next) => {
         data: 'User Not Found'
       })
     } else {
-      const payload = {
-        uid: user.uid,
-        fullname: user.givenName || user.gecos,
-        email: user.mail.search('@') ? user.mail : '',
-        description: user.description.search('@') ? 'IT' : user.description,
-        role: detail.role,
-        iat: new Date().getTime()
+      let payload = {}
+      if (detail.role === 'student') {
+        payload = {
+          uid: user.uid,
+          fullname: user.givenName || user.gecos,
+          email: user.mail.search('@') ? user.mail : '',
+          description: user.description.search('@') ? 'IT' : user.description,
+          role: detail.role,
+          iat: new Date().getTime()
+        }
+      } else {
+        payload = {
+          uid: user.uid,
+          fullname: user.givenName || user.gecos,
+          email: user.mail || '',
+          description: user.description,
+          role: detail.role,
+          iat: new Date().getTime()
+        }
       }
       const exist = await userModel.checkUser(detail.role, payload.uid)
       if (!exist) {
@@ -61,7 +73,8 @@ const login = (req, res, next) => {
             lecturer_id: payload.uid,
             firstname: name[0],
             lastname: name[1],
-            email: payload.email || null
+            email: payload.email || null,
+            position_name: payload.description
           }
         }
         await userModel.createUser(detail.role, data, payload.description)
@@ -89,8 +102,6 @@ const verifyToken = (req, res, next) => {
 
   const token = req.headers['authorization'].split(' ')[0]
   if (token === '') return res.status(403).send({ auth: false, message: 'No token provided.' })
-  console.log(req.body)
-  console.log(typeof req.body.achievements.id)
   req.auth = authorization(token)
   next()
 }

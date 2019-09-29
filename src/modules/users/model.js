@@ -297,7 +297,7 @@ module.exports = {
         await knex('student_address').insert({ students_profile_id: profileId[0] })
         await knex('students_social').insert({ students_profile_id: profileId[0] })
       } else if (role === 'lecturer') {
-
+        await knex('lecturers').insert(data)
       }
     } catch (err) {
       throw new Error(err)
