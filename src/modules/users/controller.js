@@ -134,8 +134,8 @@ module.exports = {
       const { auth } = req
       const { languages } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
+      await userModel.deleteUserProfileInformation('student_language', profileId[0].id)
       if (languages.length > 0) {
-        await userModel.deleteUserProfileInformation('student_language', profileId[0].id)
         languages.forEach(async language => {
           delete language.language_name
           delete language.levelname
@@ -190,8 +190,8 @@ module.exports = {
       const { skills } = req.body
       const profileId = await userModel.getProfileId(auth.uid)
 
+      await userModel.deleteUserProfileInformation('students_skill', profileId[0].id)
       if (skills.length > 0) {
-        await userModel.deleteUserProfileInformation('students_skill', profileId[0].id)
         skills.forEach(async skill => {
           delete skill.level_name
           skill.students_profile_id = profileId[0].id
