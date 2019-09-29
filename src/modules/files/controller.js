@@ -173,7 +173,7 @@ module.exports = {
       }
       const coverExist = await checkCoverExist(projectId)
       if (isCover && coverExist !== undefined) {
-        await deleteObjectStorage(coverExist, false)
+        await deleteObjectStorage(coverExist, 'image')
       }
       await filesModel.createProjectImage(image)
       res.status(200).send({
