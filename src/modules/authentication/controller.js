@@ -89,6 +89,7 @@ const verifyToken = (req, res, next) => {
 
   const token = req.headers['authorization'].split(' ')[0]
   if (token === '') return res.status(403).send({ auth: false, message: 'No token provided.' })
+  console.log(req.body.achievements)
   console.log(typeof req.body.achievements.id)
   req.auth = authorization(token)
   next()
