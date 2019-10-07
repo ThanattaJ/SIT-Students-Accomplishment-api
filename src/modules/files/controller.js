@@ -24,7 +24,7 @@ fbAdmin.initializeApp({
 })
 const bucket = fbAdmin.storage().bucket()
 
-const uploadFileToStorage = function (file, fileType, id, isProfile) {
+const uploadFileToStorage = function (file, fileType, id, isProfile, isResume) {
   let prom = new Promise((resolve, reject) => {
     let newFileName = file.originalname
     let fileUpload
@@ -32,8 +32,10 @@ const uploadFileToStorage = function (file, fileType, id, isProfile) {
       newFileName = `${Date.now()}_${file.originalname}`
       if (isProfile === false) {
         fileUpload = bucket.file(`Images/${id}/${newFileName}`)
-      } else if (isProfile === true) {
+      } else if (isProfile && !isResume) {
         fileUpload = bucket.file(`ProfileImage/${id}/${newFileName}`)
+      } else if (!isProfile && isResume) {
+        fileUpload = bucket.file(`ResumeImage/${id}/${newFileName}`)
       }
     }
 
@@ -126,7 +128,7 @@ module.exports = {
       const projectId = req.body.project_id
       const images = []
       const promise = files.map(async file => {
-        const link = await uploadFileToStorage(file, 'image', projectId, false)
+        const link = await uploadFileToStorage(file, 'image', projectId, false, false)
         const image = {
           project_id: projectId,
           path_name: link
@@ -166,7 +168,7 @@ module.exports = {
     }
 
     try {
-      const link = await uploadFileToStorage(file, 'image', projectId, false)
+      const link = await uploadFileToStorage(file, 'image', projectId, false, false)
       const image = {
         project_id: projectId,
         path_name: link
@@ -235,7 +237,7 @@ module.exports = {
     const projectId = req.body.project_id
 
     try {
-      const link = await uploadFileToStorage(file, 'document', projectId, false)
+      const link = await uploadFileToStorage(file, 'document', projectId, false, false)
       const doc = {
         project_id: projectId,
         path_name: link

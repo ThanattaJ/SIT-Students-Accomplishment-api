@@ -9,6 +9,7 @@ exports.up = async function (knex) {
     table.string('lastname').notNullable()
     table.string('email')
     table.string('profile_picture')
+    table.string('resume_picture')
     table.integer('viwer').defaultTo(0)
     table.integer('resume_gen_count').defaultTo(0)
 

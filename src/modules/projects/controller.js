@@ -250,3 +250,16 @@ exports.getAmountProjectUser = async function (userId) {
     throw new Error(err)
   }
 }
+
+exports.getAmountProjectTag = async function (projects) {
+  try {
+    let allProjectId = []
+    projects.forEach(project => {
+      allProjectId.push(project.id)
+    })
+    const result = await projectModel.countTagForAllProject(allProjectId)
+    return result
+  } catch (err) {
+    throw new Error(err)
+  }
+}

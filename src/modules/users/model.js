@@ -51,11 +51,11 @@ module.exports = {
     }
   },
 
-  updateUserImage: async (userRole, id, link) => {
+  updateUserImage: async (userRole, id, link, method) => {
     try {
       let result
       if (userRole === 'student') {
-        result = await knex('students').where('student_id', id).update('profile_picture', link)
+        result = await knex('students').where('student_id', id).update(`${method}_picture`, link)
       } else if (userRole === 'lecturer') {
         result = await knex('lecturers').where('lecturer_id', id).update('profile_picture', link)
       } else {
@@ -67,17 +67,17 @@ module.exports = {
     }
   },
 
-  getUserImage: async (userRole, id) => {
+  getUserImage: async (userRole, id, method) => {
     try {
       let result
       if (userRole === 'student') {
-        result = await knex('students').select('profile_picture').where('student_id', id)
+        result = await knex('students').select(`${method}_picture`).where('student_id', id)
       } else if (userRole === 'lecturer') {
         result = await knex('lecturers').select('profile_picture').where('lecturer_id', id)
       } else {
         throw new Error('Incorrect users role')
       }
-      return result[0].profile_picture
+      return result[0][`${method}_picture`]
     } catch (err) {
       throw new Error(err)
     }

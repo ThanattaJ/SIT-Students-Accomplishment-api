@@ -29,6 +29,7 @@ module.exports = {
     'students.lastname',
     'students.email',
     'students.profile_picture',
+    'students.resume_picture',
     'curriculum.curriculum_name',
     'students_profile.nickname',
     'students_profile.birthday',

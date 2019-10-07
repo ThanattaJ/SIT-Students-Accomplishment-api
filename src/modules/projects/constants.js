@@ -15,8 +15,7 @@ module.exports = {
     'projects.project_detail',
     'projects.project_abstract',
     'projects.count_viewer',
-    'projects.count_clap',
-    'projects.start_year_en'
+    'projects.count_clap'
   ],
 
   queryProjectsDetailById: [

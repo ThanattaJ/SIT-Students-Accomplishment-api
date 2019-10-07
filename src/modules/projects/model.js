@@ -22,11 +22,18 @@ module.exports = {
       const projects = await knex('projects').select(query.queryProjectsByStudentId)
         .join('project_member', 'projects.id', 'project_member.project_id')
         .where('project_member.student_id', id)
+        .orderBy('projects.count_viewer', 'desc')
 
-      projects.forEach(async project => {
-        const cover = await filesModel.getCoverImage(project.id)
-        project.cover_path = cover
-      })
+      const getCover = async _ => {
+        const promises = projects.map(async project => {
+          const cover = await filesModel.getCoverImage(project.id)
+          project.cover_path = cover[0] ? cover[0].path_name : null
+          const achievement = await getAchievement(project.id)
+          project.achievement = !!achievement[0]
+        })
+        await Promise.all(promises)
+      }
+      await getCover()
       return projects
     } catch (err) {
       throw new Error(err)
@@ -40,6 +47,19 @@ module.exports = {
         .where('project_member.student_id', id)
         .groupBy('projects.start_year_en')
       return total
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  countTagForAllProject: async (allProjectId) => {
+    try {
+      const allTag = await knex('project_tags').select('tags.tag_name').count('project_tags.tag_id as total_tag')
+        .join('tags', 'tag_id', 'tags.id')
+        .whereIn('project_tags.project_id', allProjectId)
+        .groupBy('tags.tag_name')
+        .orderBy('tags.tag_name')
+      return allTag
     } catch (err) {
       throw new Error(err)
     }

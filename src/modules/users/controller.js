@@ -29,6 +29,7 @@ module.exports = {
         const project = await getProjectByStudentId(userData.profile.student_id)
         userData.projects = project.project
         userData.totalProject = project.totalProject
+        userData.allTag = project.allTag
       }
       res.send(userData)
     } catch (err) {
@@ -61,6 +62,7 @@ module.exports = {
   updateUserImage: async (req, res, next) => {
     try {
       const { file } = req
+      const { method } = req.body
       if (file === undefined) {
         return res.status(500).send({
           status: 500,
@@ -68,12 +70,21 @@ module.exports = {
         })
       }
       const { auth } = req
-      const imageOldLink = await userModel.getUserImage(auth.role, auth.uid)
+      const imageOldLink = await userModel.getUserImage(auth.role, auth.uid, method)
       if (imageOldLink !== null) {
         await fileController.deleteObjectStorage(imageOldLink, 'image')
       }
-      const link = await fileController.uploadFileToStorage(file, 'image', auth.uid, true)
-      const result = await userModel.updateUserImage(auth.role, auth.uid, link) === 1 ? 'Update Success' : 'Updatee Fail'
+      let isProfile
+      let isResume
+      if (method === 'profile') {
+        isProfile = true
+        isResume = false
+      } else {
+        isProfile = false
+        isResume = true
+      }
+      const link = await fileController.uploadFileToStorage(file, 'image', auth.uid, isProfile, isResume)
+      const result = await userModel.updateUserImage(auth.role, auth.uid, link, method) === 1 ? 'Update Success' : 'Updatee Fail'
       res.status(200).send({
         status: 200,
         message: result
@@ -351,6 +362,7 @@ async function getProjectByStudentId (userId) {
   const result = {}
   result.project = await projectController.getProjectsByStudentId(userId)
   result.totalProject = await projectController.getAmountProjectUser(userId)
+  result.allTag = await projectController.getAmountProjectTag(result.project)
 
   return result
 }
