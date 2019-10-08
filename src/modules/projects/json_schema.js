@@ -110,8 +110,7 @@ module.exports = {
     })
   }),
 
-  updateCountingSchema: joi.object().keys({
-    action: joi.string().required().trim(),
+  updateClapSchema: joi.object().keys({
     project_id: joi.number().required()
   })
 }

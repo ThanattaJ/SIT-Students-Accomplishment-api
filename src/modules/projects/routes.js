@@ -9,7 +9,7 @@ router.post('/external', verifyToken, controller.createProject)
 
 router.patch('/', verifyToken, controller.updateProjectDetail)
 
-router.patch('/counting', controller.updateProjectCount)
+router.patch('/claping', controller.updateProjectClap)
 
 router.delete('/:id', controller.deleteProject)
 

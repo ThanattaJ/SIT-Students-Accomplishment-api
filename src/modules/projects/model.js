@@ -137,20 +137,11 @@ module.exports = {
     }
   },
 
-  updateProjectCount: async (action, projectId) => {
+  updateProjectCouting: async (action, projectId) => {
     try {
-      let count = {}
-      if (action === 'viewer') {
-        count = await knex('projects').select('count_viewer').where('id', projectId)
-        count[0].count_viewer++
-        await knex('projects').update(count[0]).where('id', projectId)
-      }
-
-      if (action === 'clap') {
-        count = await knex('projects').select('count_clap').where('id', projectId)
-        count[0].count_clap++
-        await knex('projects').update(count[0]).where('id', projectId)
-      }
+      const count = await knex('projects').select(`count_${action}`).where('id', projectId)
+      count[0][`count_${action}`]++
+      await knex('projects').update(count[0]).where('id', projectId)
       return count[0]
     } catch (err) {
       throw new Error(err)

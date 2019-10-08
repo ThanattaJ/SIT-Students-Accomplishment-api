@@ -8,7 +8,7 @@ const filesController = require('../files/controller')
 const notiController = require('../notification/controller')
 
 const { validate } = require('../validation')
-const { projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateCountingSchema } = require('./json_schema')
+const { projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema } = require('./json_schema')
 
 module.exports = {
 
@@ -29,9 +29,14 @@ module.exports = {
       const auth = req.headers.authorization ? await authenController.authorization(req.headers.authorization) : null
       const projectId = req.params.id
       const page = await getProjectDetail(projectId)
+      page.access = false
       if (auth != null) {
         const access = !!_.find(page.students, { 'student_id': auth.uid })
         page.access = access
+      }
+      if (!page.access) {
+        await projectModel.updateProjectCouting('viewer', projectId)
+        page.project_detail.count_viewer++
       }
       res.send(page)
     } catch (err) {
@@ -120,14 +125,13 @@ module.exports = {
     }
   },
 
-  updateProjectCount: async (req, res) => {
-    const { checkStatus, err } = validate(req.body, updateCountingSchema)
+  updateProjectClap: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, updateClapSchema)
     if (!checkStatus) return res.send(err)
 
     try {
-      const { action } = req.body
       const projectId = req.body.project_id
-      const result = await projectModel.updateProjectCount(action, projectId)
+      const result = await projectModel.updateProjectCouting('clap', projectId)
       res.send(result)
     } catch (err) {
       res.status(500).send({
