@@ -19,10 +19,18 @@ module.exports = {
 
   getProjectsByStudentId: async (id) => {
     try {
-      const projects = await knex('projects').select(query.queryProjectsByStudentId)
+      let projects = await knex('projects').select(query.queryProjectsByStudentId)
         .join('project_member', 'projects.id', 'project_member.project_id')
         .where('project_member.student_id', id)
         .orderBy('projects.count_viewer', 'desc')
+        .limit(3)
+      const topProjectId = projects.map(project => project.id)
+      const unTopProject = await knex('projects').select(query.queryProjectsByStudentId)
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .whereNotIn('id', topProjectId)
+        .andWhere('project_member.student_id', id)
+        .orderBy('projects.created_at', 'desc')
+      projects = projects.concat(unTopProject)
 
       const getCover = async _ => {
         const promises = projects.map(async project => {

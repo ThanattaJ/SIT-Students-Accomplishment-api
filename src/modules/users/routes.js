@@ -11,6 +11,7 @@ router.patch('/image', verifyToken, uploadImg.single('file'), controller.updateU
 
 router.get('/generate-resume/:id', verifyToken, controller.getStudentInformation)
 router.patch('/generate-resume/:id', verifyToken, controller.updateStudentInformation)
+router.patch('/count-generate-resume', verifyToken, controller.updateResemeCounting)
 router.patch('/email', verifyToken, controller.updateUserEmail)
 router.patch('/languages', verifyToken, controller.updateStudentLanguage)
 router.patch('/educations', verifyToken, controller.updateStudentEducation)

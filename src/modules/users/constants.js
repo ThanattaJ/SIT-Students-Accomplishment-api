@@ -6,7 +6,7 @@ module.exports = {
     'students.lastname',
     'students.email',
     'students.profile_picture',
-    'students.viwer',
+    'students.viewer',
     'students.resume_gen_count',
     'curriculum.curriculum_name',
     'students_profile.nickname'

@@ -10,7 +10,7 @@ exports.up = async function (knex) {
     table.string('email')
     table.string('profile_picture')
     table.string('resume_picture')
-    table.integer('viwer').defaultTo(0)
+    table.integer('viewer').defaultTo(0)
     table.integer('resume_gen_count').defaultTo(0)
 
     table

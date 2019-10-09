@@ -20,6 +20,7 @@ module.exports = {
         userRole = req.query.user_role
         const { id } = req.query
         userData = await userModel.getUserDefaultInformation(userRole, id)
+        userData.access = false
       } else {
         userRole = auth.role
         userData = await userModel.getUserDefaultInformation(userRole, auth.uid)
@@ -30,6 +31,10 @@ module.exports = {
         userData.projects = project.project
         userData.totalProject = project.totalProject
         userData.allTag = project.allTag
+      }
+      if (!userData.access) {
+        await userModel.updateProfileCounting('viewer', userData.profile.student_id)
+        userData.profile.viewer++
       }
       res.send(userData)
     } catch (err) {
@@ -232,6 +237,22 @@ module.exports = {
       res.status(200).send({
         status: 200,
         message: 'Update Social'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  updateResemeCounting: async (req, res) => {
+    try {
+      const { auth } = req
+      await userModel.updateProfileCounting('resume_gen_count', auth.uid)
+      res.status(200).send({
+        status: 200,
+        message: 'Count Success'
       })
     } catch (err) {
       res.status(500).send({

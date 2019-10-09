@@ -83,6 +83,17 @@ module.exports = {
     }
   },
 
+  updateProfileCounting: async (action, stundetId) => {
+    try {
+      const count = await knex('students').select(action).where('student_id', stundetId)
+      count[0][`${action}`]++
+      await knex('students').update(count[0]).where('student_id', stundetId)
+      return count[0]
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   getStudentInformationById: async (id) => {
     try {
       let result = {}
