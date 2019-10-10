@@ -30,6 +30,8 @@ module.exports = {
 
   getProjectsByStudentId: async (access, id) => {
     try {
+      console.log(access);
+      console.log(id);
       let projects
       if (access === true) {
         projects = await knex('projects').select(query.queryProjectsByStudentId)

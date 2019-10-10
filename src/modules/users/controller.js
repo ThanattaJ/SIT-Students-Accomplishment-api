@@ -115,13 +115,20 @@ module.exports = {
       if (!checkStatus) return res.send(err)
 
       const { auth } = req
+      const access = auth.uid === req.params.id
+      if (access === false) {
+        res.status(403).send({
+          status: 403,
+          message: 'Permission Denied'
+        })
+      } else {
+        const userData = await userModel.getStudentInformationById(auth.uid)
+        userData.profile.birthday = userData.profile.birthday === '0000-00-00' ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
+        const project = await getProjectByStudentId(access, auth.uid)
+        userData.projects = project.project
 
-      const userData = await userModel.getStudentInformationById(auth.uid)
-      userData.profile.birthday = userData.profile.birthday === '0000-00-00' ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
-      const project = await getProjectByStudentId(auth.uid)
-      userData.projects = project.project
-
-      res.send(userData)
+        res.send(userData)
+      }
     } catch (err) {
       res.status(500).send({
         status: 500,
