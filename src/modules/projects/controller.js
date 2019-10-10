@@ -18,15 +18,21 @@ module.exports = {
       const { checkStatus, err } = validate(req.params, pageDefaultSchema)
       if (!checkStatus) return res.send(err)
       const { page, year } = req.params
-      if (page === 'all') {
+
+      let getYear = year
+      if (year === 'present') {
         const years = await projectModel.getAllYearProject(year)
-        if (year === 'present') {
-          result.years = years
-        }
-        const getYear = year === 'present' ? years[0].year : year
-        result.projects = await projectModel.getAllProjects(getYear)
-        res.send(result)
+        result.years = years
+        getYear = year === 'present' ? years[0].year : year
       }
+
+      if (page === 'all') {
+        result.projects = await projectModel.getAllProjects(getYear)
+      } else if (page === 'achievement') {
+        result.projects = await projectModel.getAllProjects(getYear)
+        result.projects = _.filter(result.projects, 'achievement')
+      }
+      res.send(result)
     } catch (err) {
       console.log(err)
     }
