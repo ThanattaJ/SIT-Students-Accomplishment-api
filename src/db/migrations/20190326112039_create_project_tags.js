@@ -15,6 +15,7 @@ exports.up = async function (knex) {
       .timestamp('updated_at')
       .notNullable()
       .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+    table.unique(['project_id', 'tag_id'])
   })
 }
 

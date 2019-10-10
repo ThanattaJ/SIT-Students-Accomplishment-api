@@ -18,16 +18,23 @@ module.exports = {
         const { checkStatus, err } = validate(req.query, json.getUserIdSchema)
         if (!checkStatus) return res.send(err)
         userRole = req.query.user_role
-        const { id } = req.query
-        userData = await userModel.getUserDefaultInformation(userRole, id)
+        const userId = req.query.user_id
+        userData = await userModel.getUserDefaultInformation(userRole, userId)
         userData.access = false
-      } else {
-        userRole = auth.role
-        userData = await userModel.getUserDefaultInformation(userRole, auth.uid)
-        userData.access = true
+      } else if (auth !== null) {
+        userRole = req.query.user_role || null
+        const userId = req.query.user_id || null
+        if ((userId !== null && userId !== auth.uid) && userRole !== null) {
+          userData = await userModel.getUserDefaultInformation(userRole, userId)
+          userData.access = false
+        } else {
+          userRole = auth.role
+          userData = await userModel.getUserDefaultInformation(userRole, auth.uid)
+          userData.access = true
+        }
       }
       if (userRole === 'student') {
-        const project = await getProjectByStudentId(userData.profile.student_id)
+        const project = await getProjectByStudentId(userData.access, userData.profile.student_id)
         userData.projects = project.project
         userData.totalProject = project.totalProject
         userData.allTag = project.allTag
@@ -379,9 +386,9 @@ module.exports = {
   }
 }
 
-async function getProjectByStudentId (userId) {
+async function getProjectByStudentId (access, userId) {
   const result = {}
-  result.project = await projectController.getProjectsByStudentId(userId)
+  result.project = await projectController.getProjectsByStudentId(access, userId)
   result.totalProject = await projectController.getAmountProjectUser(userId)
   result.allTag = await projectController.getAmountProjectTag(result.project)
 

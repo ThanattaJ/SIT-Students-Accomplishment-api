@@ -3,7 +3,7 @@ const joi = require('joi')
 module.exports = {
   getUserIdSchema: joi.object().keys({
     user_role: joi.string().required().trim(),
-    id: joi.string().required().trim()
+    user_id: joi.string().required().trim()
   }),
 
   getStudentIdSchema: joi.object().keys({

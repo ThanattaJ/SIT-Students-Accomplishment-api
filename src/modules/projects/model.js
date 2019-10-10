@@ -2,46 +2,57 @@ const knex = require('../../db/knex')
 const filesModel = require('../files/model')
 const query = require('./constants')
 module.exports = {
+  getAllYearProject: async () => {
+    const year = await knex.raw('SELECT DISTINCT YEAR (created_at) year FROM projects ORDER BY year DESC')
+    return year[0]
+  },
 
-  getAllProjects: async () => {
+  getAllProjects: async (year) => {
     try {
-      const result = await knex.select(query.queryAllProjects).from('projects').where('isShow', true)
-      result.forEach(async project => {
-        const cover = await filesModel.getCoverImage(project.id)
-        project.cover_path = cover
-      })
-
-      return result
+      let projects = await knex.select(query.queryAllProjects).from('projects')
+        .where('isShow', true)
+        .andWhere('created_at', 'like', `${year}%`)
+        .orderBy('projects.count_viewer', 'desc')
+        .limit(4)
+      const topProjectId = projects.map(project => project.id)
+      const unTopProject = await knex('projects').select(query.queryAllProjects)
+        .whereNotIn('id', topProjectId)
+        .andWhere('isShow', true)
+        .andWhere('created_at', 'like', `${year}%`)
+        .orderBy('projects.created_at', 'desc')
+      projects = projects.concat(unTopProject)
+      projects = await getProjectsCoverAndIsAchievement(projects)
+      return projects
     } catch (err) {
       throw new Error(err)
     }
   },
 
-  getProjectsByStudentId: async (id) => {
+  getProjectsByStudentId: async (access, id) => {
     try {
-      let projects = await knex('projects').select(query.queryProjectsByStudentId)
-        .join('project_member', 'projects.id', 'project_member.project_id')
-        .where('project_member.student_id', id)
-        .orderBy('projects.count_viewer', 'desc')
-        .limit(3)
-      const topProjectId = projects.map(project => project.id)
-      const unTopProject = await knex('projects').select(query.queryProjectsByStudentId)
-        .join('project_member', 'projects.id', 'project_member.project_id')
-        .whereNotIn('id', topProjectId)
-        .andWhere('project_member.student_id', id)
-        .orderBy('projects.created_at', 'desc')
-      projects = projects.concat(unTopProject)
-
-      const getCover = async _ => {
-        const promises = projects.map(async project => {
-          const cover = await filesModel.getCoverImage(project.id)
-          project.cover_path = cover[0] ? cover[0].path_name : null
-          const achievement = await getAchievement(project.id)
-          project.achievement = !!achievement[0]
-        })
-        await Promise.all(promises)
+      let projects
+      if (access === true) {
+        projects = await knex('projects').select(query.queryProjectsByStudentId)
+          .join('project_member', 'projects.id', 'project_member.project_id')
+          .where('project_member.student_id', id)
+          .orderBy('projects.created_at', 'desc')
+      } else {
+        projects = await knex('projects').select(query.queryProjectsByStudentId)
+          .join('project_member', 'projects.id', 'project_member.project_id')
+          .where('project_member.student_id', id)
+          .andWhere('isShow', true)
+          .orderBy('projects.count_viewer', 'desc')
+          .limit(4)
+        const topProjectId = projects.map(project => project.id)
+        const unTopProject = await knex('projects').select(query.queryProjectsByStudentId)
+          .join('project_member', 'projects.id', 'project_member.project_id')
+          .whereNotIn('id', topProjectId)
+          .andWhere('project_member.student_id', id)
+          .andWhere('isShow', true)
+          .orderBy('projects.created_at', 'desc')
+        projects = projects.concat(unTopProject)
       }
-      await getCover()
+      projects = await getProjectsCoverAndIsAchievement(projects)
       return projects
     } catch (err) {
       throw new Error(err)
@@ -209,4 +220,17 @@ async function getAchievement (projectId) {
   } catch (err) {
     throw new Error(err)
   }
+}
+async function getProjectsCoverAndIsAchievement (projects) {
+  const getProjects = async _ => {
+    const promises = projects.map(async project => {
+      const cover = await filesModel.getCoverImage(project.id)
+      project.cover_path = cover[0] ? cover[0].path_name : null
+      const achievement = await getAchievement(project.id)
+      project.achievement = !!achievement[0]
+    })
+    await Promise.all(promises)
+  }
+  await getProjects()
+  return projects
 }

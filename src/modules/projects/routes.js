@@ -3,7 +3,8 @@ const router = express.Router()
 const controller = require('./controller')
 const { verifyToken } = require('../authentication/controller')
 
-router.get('/:id', controller.getProjectPage)
+router.get('/', controller.getProjectPage)
+router.get('/:page/:year', controller.getAllProjects)
 
 router.post('/external', verifyToken, controller.createProject)
 

@@ -4,6 +4,7 @@ module.exports = {
     'project_name_th',
     'project_name_en',
     'projects.project_detail',
+    'isShow',
     'count_viewer',
     'count_clap'
   ],
@@ -15,7 +16,8 @@ module.exports = {
     'projects.project_detail',
     'projects.project_abstract',
     'projects.count_viewer',
-    'projects.count_clap'
+    'projects.count_clap',
+    'isShow'
   ],
 
   queryProjectsDetailById: [

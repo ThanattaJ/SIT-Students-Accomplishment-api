@@ -8,26 +8,34 @@ const filesController = require('../files/controller')
 const notiController = require('../notification/controller')
 
 const { validate } = require('../validation')
-const { projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema } = require('./json_schema')
+const { pageDefaultSchema, projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema } = require('./json_schema')
 
 module.exports = {
 
-  getAllProjects: async () => {
+  getAllProjects: async (req, res) => {
     try {
-      const result = await projectModel.getAllProjects()
-      return result
+      const { checkStatus, err } = validate(req.params, pageDefaultSchema)
+      if (!checkStatus) return res.send(err)
+      const { page, year } = req.params
+      if (page === 'all') {
+        const years = await projectModel.getAllYearProject(year)
+        console.log(years)
+        const getYear = year === 'present' ? years[0].year : year
+        const result = await projectModel.getAllProjects(getYear)
+        res.send(result)
+      }
     } catch (err) {
       console.log(err)
     }
   },
 
   getProjectPage: async (req, res) => {
-    const { checkStatus, err } = validate(req.params, projectPageSchema)
+    const { checkStatus, err } = validate(req.query, projectPageSchema)
     if (!checkStatus) return res.send(err)
 
     try {
       const auth = req.headers.authorization ? await authenController.authorization(req.headers.authorization) : null
-      const projectId = req.params.id
+      const projectId = req.query.project_id
       const page = await getProjectDetail(projectId)
       page.access = false
       if (auth != null) {
@@ -237,9 +245,9 @@ async function manageAchievement (id, achievements) {
     throw new Error(err)
   }
 }
-exports.getProjectsByStudentId = async function (userId) {
+exports.getProjectsByStudentId = async function (access, userId) {
   try {
-    const result = await projectModel.getProjectsByStudentId(userId)
+    let result = await projectModel.getProjectsByStudentId(access, userId)
     return result
   } catch (err) {
     throw new Error(err)

@@ -4,8 +4,8 @@ exports.up = async function (knex) {
     table.increments('id').primary()
     table.string('project_name_th').notNullable()
     table.string('project_name_en').notNullable()
-    table.string('project_detail')
-    table.string('project_abstract')
+    table.text('project_detail')
+    table.text('project_abstract')
     table.integer('project_type_id').unsigned().notNullable()
     table.boolean('haveOutsider').defaultTo(false).notNullable()
     table.boolean('isShow').defaultTo(false).notNullable()
@@ -30,6 +30,8 @@ exports.up = async function (knex) {
       .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 
     table.foreign('project_type_id').references('project_type.id')
+    table.index('count_viewer')
+    table.index('created_at')
   })
 }
 
