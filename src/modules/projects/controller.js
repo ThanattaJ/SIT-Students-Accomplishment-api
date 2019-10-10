@@ -14,14 +14,17 @@ module.exports = {
 
   getAllProjects: async (req, res) => {
     try {
+      let result = {}
       const { checkStatus, err } = validate(req.params, pageDefaultSchema)
       if (!checkStatus) return res.send(err)
       const { page, year } = req.params
       if (page === 'all') {
         const years = await projectModel.getAllYearProject(year)
-        console.log(years)
+        if (year === 'present') {
+          result.years = years
+        }
         const getYear = year === 'present' ? years[0].year : year
-        const result = await projectModel.getAllProjects(getYear)
+        result.projects = await projectModel.getAllProjects(getYear)
         res.send(result)
       }
     } catch (err) {
