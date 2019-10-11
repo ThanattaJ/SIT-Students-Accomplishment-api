@@ -1,12 +1,12 @@
 module.exports = {
   queryAllProjects: [
-    'id',
-    'project_name_th',
-    'project_name_en',
+    'projects.id',
+    'projects.project_name_th',
+    'projects.project_name_en',
     'projects.project_detail',
-    'isShow',
-    'count_viewer',
-    'count_clap'
+    'projects.isShow',
+    'projects.count_viewer',
+    'projects.count_clap'
   ],
 
   queryProjectsByStudentId: [
@@ -17,7 +17,7 @@ module.exports = {
     'projects.project_abstract',
     'projects.count_viewer',
     'projects.count_clap',
-    'isShow'
+    'projects.isShow'
   ],
 
   queryProjectsDetailById: [

@@ -2,8 +2,7 @@ const joi = require('joi')
 
 module.exports = {
   pageDefaultSchema: joi.object().keys({
-    page: joi.string().required().trim(),
-    year: joi.string().required().trim()
+    page: joi.string().required().trim()
   }),
 
   projectPageSchema: joi.object().keys({

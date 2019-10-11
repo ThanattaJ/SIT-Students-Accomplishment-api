@@ -17,8 +17,8 @@ module.exports = {
       let result = {}
       const { checkStatus, err } = validate(req.params, pageDefaultSchema)
       if (!checkStatus) return res.send(err)
-      const { page, year } = req.params
-
+      const { page } = req.params
+      const { year, by, search } = req.query || ''
       let getYear = year
       if (year === 'present') {
         const years = await projectModel.getAllYearProject(year)
@@ -31,6 +31,12 @@ module.exports = {
       } else if (page === 'achievement') {
         result.projects = await projectModel.getAllProjects(getYear)
         result.projects = _.filter(result.projects, 'achievement')
+      } else if (page === 'search') {
+        if (by === 'tags') {
+          result.projects = await projectModel.getProjectByTag(search)
+        } else if (by === 'projects') {
+          result.projects = await projectModel.getProjectByName(search)
+        }
       }
       res.send(result)
     } catch (err) {

@@ -28,6 +28,33 @@ module.exports = {
     }
   },
 
+  getProjectByTag: async (tagCharacter) => {
+    try {
+      let projects = await knex.select(query.queryAllProjects).from('projects')
+        .join('project_tags', 'projects.id', 'project_tags.project_id')
+        .join('tags', 'project_tags.tag_id', 'tags.id')
+        .where('tags.tag_name', 'like', `%${tagCharacter}%`)
+        .andWhere('projects.isShow', true)
+      projects = await getProjectsCoverAndIsAchievement(projects)
+      return projects
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getProjectByName: async (nameCharacter) => {
+    try {
+      let projects = await knex.select(query.queryAllProjects).from('projects')
+        .where('projects.project_name_th', 'like', `%${nameCharacter}%`)
+        .orWhere('projects.project_name_en', 'like', `%${nameCharacter}%`)
+        .andWhere('projects.isShow', true)
+      projects = await getProjectsCoverAndIsAchievement(projects)
+      return projects
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   getProjectsByStudentId: async (access, id) => {
     try {
       console.log(access);
