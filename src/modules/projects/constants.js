@@ -15,6 +15,10 @@ module.exports = {
     'projects.project_name_en',
     'projects.project_detail',
     'projects.project_abstract',
+    'projects.start_month',
+    'projects.start_year_en',
+    'projects.end_month',
+    'projects.end_year_en',
     'projects.count_viewer',
     'projects.count_clap',
     'projects.isShow'
