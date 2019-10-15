@@ -4,6 +4,7 @@ const moment = require('moment')
 const projectController = require('../projects/controller')
 const fileController = require('../files/controller')
 const authenController = require('../authentication/controller')
+const courseController = require('../course/controller')
 const { validate } = require('../validation')
 const json = require('./json_schema')
 
@@ -38,6 +39,9 @@ module.exports = {
         userData.projects = project.project
         userData.totalProject = project.totalProject
         userData.allTag = project.allTag
+      } else if (userRole === 'lecturer') {
+        const courses = await courseController.getCourseLecturer(userData.profile.lecturer_id)
+        userData.courses = courses
       }
       if (!userData.access) {
         await userModel.updateProfileCounting('viewer', userData.profile.student_id)
@@ -123,7 +127,7 @@ module.exports = {
         })
       } else {
         const userData = await userModel.getStudentInformationById(auth.uid)
-        userData.profile.birthday = userData.profile.birthday === '0000-00-00' ? null : moment(userData.profile.birthday).format('YYYY-MM-DD')
+        userData.profile.birthday = userData.profile.birthday === '0000-00-00' ? null : moment(userData.profile.birthday).format('DD-MM-YYYY')
         const project = await getProjectByStudentId(access, auth.uid)
         userData.projects = project.project
 
@@ -144,6 +148,8 @@ module.exports = {
       const { auth } = req
       if (!checkStatus) return res.send(err)
       const { profile, address } = req.body
+      const date = profile.birthday
+      profile.birthday = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
       await userModel.updateStudentInformation(auth.uid, profile, address)
       res.status(200).send({
         status: 200,

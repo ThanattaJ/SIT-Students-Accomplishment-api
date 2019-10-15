@@ -18,7 +18,7 @@ module.exports = {
     'lecturers.lastname',
     'lecturers.email',
     'lecturers.profile_picture',
-    'lecturers_position.position_name'
+    'lecturers.position_name'
   ],
 
   queryStudentInformation: [

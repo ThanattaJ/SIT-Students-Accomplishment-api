@@ -22,19 +22,23 @@ module.exports = {
         result = {
           'profile': profile[0]
         }
-
-        return result
       } else {
-        result = await knex.select(query.queryLecturerDefaultInformation).from('lecturers')
-          .join('lecturers_position', 'lecturers.position_id', 'lecturers_position.id')
+        const profile = await knex.select(query.queryLecturerDefaultInformation).from('lecturers')
           .where('lecturer_id', id)
-        return result[0]
+        result = {
+          'profile': profile[0]
+        }
       }
+      return result
     } catch (err) {
       throw new Error(err)
     }
   },
 
+  getLecturerIsAdmin: async (lecturerId) => {
+    const isAdmin = await knex('lecturers').select('isAdmin').where('lecturer_id', lecturerId)
+    return isAdmin[0].isAdmin === 1
+  },
   updateUserEmail: async (userRole, id, email) => {
     try {
       let result

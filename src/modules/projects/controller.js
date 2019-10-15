@@ -100,7 +100,7 @@ module.exports = {
         await manageAchievement(projectId, achievements)
       }
       const page = await getProjectDetail(projectId)
-      await notiController.sendEmail(auth.fullname, page, 'create')
+      await notiController.sendEmail(projectId, auth.fullname, page, 'create')
       res.status(200).send({
         status: 200,
         project_id: projectId
@@ -137,7 +137,7 @@ module.exports = {
       }
       await filesController.updateVideo(video, id)
       const newDetail = await getProjectDetail(id)
-      notiController.sendEmail(auth.fullname, newDetail, 'Update')
+      await notiController.sendEmail(id, auth.fullname, newDetail, 'Update')
 
       res.send(newDetail)
     } catch (err) {

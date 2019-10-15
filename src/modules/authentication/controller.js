@@ -80,7 +80,18 @@ const login = (req, res, next) => {
         await userModel.createUser(detail.role, data, payload.description)
       }
       const SECRET = process.env.AUTHEN_SECRET_KEY
-      res.send(jwt.encode(payload, SECRET))
+      if (payload.role === 'lecturer') {
+        const isAdmin = await userModel.getLecturerIsAdmin(payload.uid)
+        res.status(200).send({
+          status: 200,
+          token: jwt.encode(payload, SECRET),
+          isAdmin: isAdmin
+        })
+      }
+      res.status(200).send({
+        status: 200,
+        token: jwt.encode(payload, SECRET)
+      })
     }
   })(req, res, next)
 }

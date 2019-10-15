@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 module.exports = {
 
-  sendEmail: async (user, data, status) => {
+  sendEmail: async (projectId, user, data, status) => {
     try {
       const email = []
       const { students } = data
@@ -29,7 +29,7 @@ module.exports = {
               Hello, \n
               <p>${user} ${status} the project's detail</p> \n\n
               <p>Can see more detail in link at below. \n
-              <b><u>Link:</u></b>: https://www.w3schools.com/tags/tag_noscript.asp </p> \n\n
+              <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
               <b>Best Regard</b>, \n
               SIT Student Accomplishment
               `

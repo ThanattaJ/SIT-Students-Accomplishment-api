@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
 const { validate } = require('../validation')
-const { createCourseSchema, updateCourseSchema, deleteCourseSchema, getCourseSemester, addCourseSemesterSchema, deleteCourseSemesterSchema } = require('./json_schema')
+const { createCourseSchema, updateCourseSchema, deleteCourseSchema, getCourseSemester, addCourseSemesterSchema, deleteCourseSemesterSchema, queryCourseNotHaveAssignmentSchema } = require('./json_schema')
 const courseModel = require('./model')
+const assignmentModel = require('../assignment/model')
 // const authenController = require('../authentication/controller')
 const moment = require('moment')
 const _ = require('lodash')
@@ -187,6 +188,77 @@ module.exports = {
         message: err.message
       })
     }
+  },
+
+  getCourseLecturer: async (lecturerId) => {
+    try {
+      const courses = await courseModel.getLecturerCourse(lecturerId)
+      courses.forEach(course => {
+        const tmpCourses = []
+        const lecturerCourseId = _.split(course.lecturer_course_id, ',')
+        const courseId = _.split(course.course_id, ',')
+        const courseName = _.split(course.courses, ',')
+
+        for (let i = 0; i < courseName.length; i++) {
+          tmpCourses.push({
+            lecturer_course_id: lecturerCourseId[i],
+            course_id: courseId[i],
+            course_name: courseName[i]
+          })
+        }
+        course.courses = tmpCourses
+        delete course.course_id
+        delete course.lecturer_course_id
+      })
+
+      const manageCourses = async _ => {
+        const promises = courses.map(async course => {
+          const coursesAssignment = async _ => {
+            const promises = course.courses.map(async c => {
+              const assignmentExist = await assignmentModel.checkAssignment(c.lecturer_course_id)
+              c.assignment = assignmentExist
+              delete c.lecturer_course_id
+            })
+            await Promise.all(promises)
+          }
+          await coursesAssignment()
+        })
+        await Promise.all(promises)
+      }
+      await manageCourses()
+
+      return courses
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getCourseHaveNotAssignment: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.query, queryCourseNotHaveAssignmentSchema)
+    if (!checkStatus) return res.send(err)
+
+    try {
+      const { auth } = req
+      const { checkAssignment } = req.query
+      let assignment
+      if (checkAssignment === 'false') {
+        assignment = await courseModel.getCourseHaveNotAssignment(auth.uid)
+      }
+      res.send(assignment)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  getCourseSpecifySemester: async (academicTermId, courseId) => {
+    try {
+      return await courseModel.getCourseSpecifySemester(academicTermId, courseId)
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }
 
@@ -218,7 +290,7 @@ async function manageCourseSemester (academicTermId, courseId, lecturers) {
         const data = await courseModel.addCourseSemester(lecturer)
         return data
       })
-      const all = await Promise.all(promises)
+      await Promise.all(promises)
     }
     await mapLecturerCourse()
   } catch (err) {
