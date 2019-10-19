@@ -6,7 +6,8 @@ const { verifyToken } = require('../authentication/controller')
 router.get('/', controller.getProjectPage)
 router.get('/:page', controller.getAllProjects)
 
-router.post('/external', verifyToken, controller.createProject)
+router.post('/', verifyToken, controller.createProject)
+router.post('/add-external-to-assignment', verifyToken, controller.addProjectExternalToAssignment)
 
 router.patch('/', verifyToken, controller.updateProjectDetail)
 

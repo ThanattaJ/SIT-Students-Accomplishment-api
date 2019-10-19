@@ -61,11 +61,17 @@ module.exports = {
       if (access === true) {
         projects = await knex('projects').select(query.queryProjectsByStudentId)
           .join('project_member', 'projects.id', 'project_member.project_id')
+          .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
+          .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')
+          .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
           .where('project_member.student_id', id)
           .orderBy('projects.created_at', 'desc')
       } else {
         projects = await knex('projects').select(query.queryProjectsByStudentId)
           .join('project_member', 'projects.id', 'project_member.project_id')
+          .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
+          .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')
+          .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
           .where('project_member.student_id', id)
           .andWhere('isShow', true)
           .orderBy('projects.count_viewer', 'desc')
@@ -73,6 +79,9 @@ module.exports = {
         const topProjectId = projects.map(project => project.id)
         const unTopProject = await knex('projects').select(query.queryProjectsByStudentId)
           .join('project_member', 'projects.id', 'project_member.project_id')
+          .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
+          .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')
+          .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
           .whereNotIn('id', topProjectId)
           .andWhere('project_member.student_id', id)
           .andWhere('isShow', true)
@@ -115,6 +124,8 @@ module.exports = {
     try {
       const detail = await knex.select(query.queryProjectsDetailById).from('projects').where('projects.id', id)
         .join('project_type', 'projects.project_type_id', 'project_type.id')
+        .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
+        .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
       const students = await knex('project_member').select(query.queryProjectStudentsMember)
         .join('students', 'project_member.student_id', 'students.student_id')
         .where('project_member.project_id', id)
@@ -141,12 +152,52 @@ module.exports = {
     }
   },
 
+  getShortProjectDetailById: async (id) => {
+    const detail = await knex.select(query.queryProjectsDetailById).from('projects').where('projects.id', id)
+      .join('project_type', 'projects.project_type_id', 'project_type.id')
+      .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
+      .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
+    const students = await knex('project_member').select(query.queryProjectStudentsMember)
+      .join('students', 'project_member.student_id', 'students.student_id')
+      .where('project_member.project_id', id)
+    const result = {
+      'project_detail': detail[0],
+      'students': students
+    }
+    return result
+  },
+
   createProject: async (projectData) => {
     try {
       const projectDataNew = await getProjectTypeId(projectData)
       const projectId = await knex('projects').insert(projectDataNew)
       await filesModel.createVideo(projectId)
       return projectId[0]
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  mapProjectAndAssignment: async (projectId, assignmentId, status) => {
+    try {
+      let id
+      const statusId = await knex('status_project').select('id').where('status_name', 'Wating')
+      if (status === 'create') {
+        const data = {
+          project_id: projectId,
+          assignment_id: assignmentId,
+          status_id: statusId[0].id
+        }
+        console.log(data)
+        id = await knex('project_assignment').insert(data).returning('id')
+      } else if (status === 'update') {
+        const statusId = await knex('status_project').select('id').where('status_name', 'Wating')
+        id = await knex('project_assignment').update('status_id', statusId[0].id)
+          .where('project_id', projectId)
+          .andWhere('assignment_id', assignmentId)
+          .returning('id')
+      }
+      return id
     } catch (err) {
       throw new Error(err)
     }

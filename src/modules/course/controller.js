@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 const { validate } = require('../validation')
-const { createCourseSchema, updateCourseSchema, deleteCourseSchema, getCourseSemester, addCourseSemesterSchema, deleteCourseSemesterSchema, queryCourseNotHaveAssignmentSchema } = require('./json_schema')
+const { createCourseSchema, updateCourseSchema, deleteCourseSchema, getCourseSemester, updateCourseSemesterSchema, addCourseSemesterSchema, deleteCourseSemesterSchema, queryCourseNotHaveAssignmentSchema } = require('./json_schema')
 const courseModel = require('./model')
 const assignmentModel = require('../assignment/model')
 // const authenController = require('../authentication/controller')
@@ -107,16 +107,19 @@ module.exports = {
       }
       courses.forEach(course => {
         const lecturers = []
+        const courseMapLecturer = _.split(course.course_map_lecturer, ',')
         const lectuerId = _.split(course.lecturers_id, ',')
         const lecturerName = _.split(course.lecturers, ',')
         for (let i = 0; i < lecturerName.length; i++) {
           lecturers.push({
+            course_map_lecturer: courseMapLecturer[i],
             lecturer_id: lectuerId[i],
             lecturer_name: lecturerName[i]
           })
         }
         course.lecturers = lecturers
         delete course.lecturers_id
+        delete course.course_map_lecturer
       })
       page.course = courses
       res.send(page)
@@ -154,12 +157,13 @@ module.exports = {
   },
 
   updateCourseSemester: async (req, res) => {
-    const { checkStatus, err } = validate(req.body, addCourseSemesterSchema)
+    const { checkStatus, err } = validate(req.body, updateCourseSemesterSchema)
     if (!checkStatus) return res.send(err)
     try {
       const { academic_term_id, course_id, lecturers } = req.body
-      await courseModel.deleteCourseSemester(academic_term_id, course_id)
-      await manageCourseSemester(academic_term_id, course_id, lecturers)
+      const lecturerNotHaveCourseMapLecturerId = lecturers.filter(lecturer => lecturer.course_map_lecturer === undefined)
+
+      await manageCourseSemester(academic_term_id, course_id, lecturerNotHaveCourseMapLecturerId)
       res.status(200).send({
         status: 200,
         message: 'Update course success.'
@@ -215,8 +219,8 @@ module.exports = {
         const promises = courses.map(async course => {
           const coursesAssignment = async _ => {
             const promises = course.courses.map(async c => {
-              const assignmentExist = await assignmentModel.checkAssignment(c.lecturer_course_id)
-              c.assignment = assignmentExist
+              const countAssignment = await assignmentModel.countAssignment(c.lecturer_course_id)
+              c.assignment_counting = countAssignment === undefined ? 0 : countAssignment.assignment_counting
               delete c.lecturer_course_id
             })
             await Promise.all(promises)

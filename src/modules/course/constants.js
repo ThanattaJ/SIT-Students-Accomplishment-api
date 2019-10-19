@@ -17,6 +17,7 @@ module.exports = {
     'lecturer_course.academic_term_id',
     'courses.id as course_id',
     knex.raw('CONCAT(courses.course_code,\' \',courses.course_name) as course'),
+    knex.raw('GROUP_CONCAT(lecturer_course.id) as course_map_lecturer'),
     knex.raw('GROUP_CONCAT(lecturer_course.lecturer_id) as lecturers_id'),
     knex.raw('GROUP_CONCAT(CONCAT(lecturers.firstname,\' \',lecturers.lastname)) as lecturers')
   ],

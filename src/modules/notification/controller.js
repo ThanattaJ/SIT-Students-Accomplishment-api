@@ -14,25 +14,46 @@ const transporter = nodemailer.createTransport({
 
 module.exports = {
 
-  sendEmail: async (projectId, user, data, status) => {
+  sendEmail: async (projectId, user, data, status, assignment, projectAssignmentStatus) => {
     try {
       const email = []
       const { students } = data
       students.map(student => {
         email.push(student.email)
       })
+      let text = `
+      Hello, \n
+      <p>${user} ${status} the ${data.project_detail.project_name_en} project</p> \n\n
+      <p>Can see more detail in link at below. \n
+      <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
+      <b>Best Regard</b>, \n
+      SIT Student Accomplishment
+      `
+      if (assignment !== null) {
+        if (projectAssignmentStatus === 'Wating') {
+          projectAssignmentStatus = '<b>Waiting</b> the lecturer approve the project'
+        } else if (projectAssignmentStatus === 'Approve') {
+          projectAssignmentStatus = 'Lecturer <b>approve</b> the project'
+        } else if (projectAssignmentStatus === 'Reject') {
+          projectAssignmentStatus = `Lecturer <b>reject</b> the project and comment is ${data.project_detail.comment}`
+        }
+
+        text = `
+        Hello, \n
+        <p>${user} ${status} the ${data.project_detail.project_name_en} project in the ${assignment.course_name} subject</p> \n
+        <p>Status: ${projectAssignmentStatus}</p>\n\n
+        <p>Can see more detail in link at below. \n
+        <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
+        <b>Best Regard</b>, \n
+        SIT Student Accomplishment
+        `
+      }
+
       let content = {
         from: 'admin.sit.student.accomplishment@gmail.com',
         to: email,
         subject: `"SIT Student Accomlishment: The ${data.project_detail.project_name_en} project is ${status}!"`,
-        html: `
-              Hello, \n
-              <p>${user} ${status} the project's detail</p> \n\n
-              <p>Can see more detail in link at below. \n
-              <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
-              <b>Best Regard</b>, \n
-              SIT Student Accomplishment
-              `
+        html: text
       }
       await transporter.sendMail(content)
     } catch (err) {

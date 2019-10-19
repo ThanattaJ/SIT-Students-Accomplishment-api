@@ -3,6 +3,7 @@ exports.up = async function (knex) {
   await knex.schema.createTable('assignments', function (table) {
     table.increments('id').primary()
     table.string('assignment_name').notNullable()
+    table.string('assignment_detail')
     table.string('join_code').notNullable()
 
     table

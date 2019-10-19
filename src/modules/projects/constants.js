@@ -1,3 +1,5 @@
+const knex = require('../../db/knex')
+
 module.exports = {
   queryAllProjects: [
     'projects.id',
@@ -21,7 +23,9 @@ module.exports = {
     'projects.end_year_en',
     'projects.count_viewer',
     'projects.count_clap',
-    'projects.isShow'
+    'projects.isShow',
+    'assignments.assignment_name',
+    'status_project.status_name'
   ],
 
   queryProjectsDetailById: [
@@ -44,7 +48,10 @@ module.exports = {
     'projects.end_year_en',
     'projects.created_at',
     'projects.updated_at',
-    'project_type.project_type_name'
+    'project_type.project_type_name',
+    'project_assignment.assignment_id',
+    'status_project.status_name',
+    knex.raw('CONCAT(project_assignment.comment) as comment')
   ],
 
   queryProjectStudentsMember: [
