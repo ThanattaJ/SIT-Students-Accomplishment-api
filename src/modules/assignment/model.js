@@ -128,7 +128,7 @@ module.exports = {
         .join('status_project', 'project_assignment.status_id', 'status_project.id')
         .groupBy('project_assignment.status_id')
         .where('project_assignment.assignment_id', assignmentsId)
-      assignments[0].poject = count
+      assignments[0].project = count
       return assignments[0]
     } catch (err) {
       throw new Error(err)
