@@ -111,17 +111,15 @@ module.exports = {
     try {
       const { assignment_id } = req.params
       const assignment = await assignmentModel.getAssignmentsDetailById(assignment_id)
-      assignment.created_at = moment(assignment.created_at).format('LLL')
-      assignment.updated_at = moment(assignment.updated_a).format('LLL')
-      assignment.lecturers = await modifyLecturerMember(assignment.lecturer_course_id, assignment.lecturers_id, assignment.lecturers_name, assignment.isCreator, assignment.isApprover)
-      assignment.students = await modifyStudentMember(assignment.students_id, assignment.students_name)
-      delete assignment.lecturer_course_id
-      delete assignment.lecturers_id
-      delete assignment.lecturers_name
-      delete assignment.isCreator
-      delete assignment.isApprover
-      delete assignment.students_id
-      delete assignment.students_name
+      assignment.created_at = moment(assignment.created_at).format('MMM Do YYYY, h:mm:ss a')
+      assignment.updated_at = moment(assignment.updated_at).format('MMM Do YYYY, h:mm:ss a')
+      const newLecturers = assignment.lecturers
+      newLecturers.map(newLecturer => {
+        newLecturer.isCreator = newLecturer.isCreator === 1
+        newLecturer.isApprover = newLecturer.isApprover === 1
+      })
+      assignment.lecturers = newLecturers
+
       res.send(assignment)
     } catch (err) {
       res.status(500).send({
@@ -234,37 +232,4 @@ module.exports = {
       })
     }
   }
-}
-
-async function modifyLecturerMember (lecturerCourseId, lecturersId, lecturersName, isCreator, isApprover) {
-  const lecturers = []
-  lecturerCourseId = _.split(lecturerCourseId, ',')
-  lecturersId = _.split(lecturersId, ',')
-  lecturersName = _.split(lecturersName, ',')
-  isCreator = _.split(isCreator, ',')
-  isApprover = _.split(isApprover, ',')
-
-  for (let i = 0; i < lecturerCourseId.length; i++) {
-    lecturers.push({
-      lecturer_course_id: lecturerCourseId[i],
-      lecturer_id: lecturersId[i],
-      lecturer_name: lecturersName[i],
-      isCreator: isCreator[i] === '1',
-      isApprover: isApprover[i] === '1'
-    })
-  }
-  return lecturers
-}
-
-async function modifyStudentMember (studentsId, studentsName) {
-  const students = []
-  studentsId = _.split(studentsId, ',')
-  studentsName = _.split(studentsName, ',')
-  for (let i = 0; i < studentsId.length; i++) {
-    students.push({
-      student_id: studentsId[i],
-      student_name: studentsName[i]
-    })
-  }
-  return students
 }

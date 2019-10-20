@@ -32,7 +32,7 @@ module.exports = {
   }),
 
   getProjectRequestSchema: joi.object().keys({
-    assignment_id: joi.number().required(),
+    assignment_id: joi.number(),
     status: joi.string().trim()
   }),
 

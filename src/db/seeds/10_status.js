@@ -6,7 +6,7 @@ exports.seed = function (knex, Promise) {
       const data = [
         {
           id: 1,
-          status_name: 'Wating'
+          status_name: 'Waiting'
         },
         {
           id: 2,

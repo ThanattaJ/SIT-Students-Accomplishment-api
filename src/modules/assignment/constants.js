@@ -31,14 +31,19 @@ module.exports = {
     'courses.id as course_id',
     knex.raw('CONCAT(courses.course_code,\' \',courses.course_name) as course_name'),
     'assignments.created_at',
-    'assignments.updated_at',
-    knex.raw('GROUP_CONCAT(lecturer_assignment.lecturer_course_id) as lecturer_course_id'),
-    knex.raw('GROUP_CONCAT(lecturers.lecturer_id) as lecturers_id'),
-    knex.raw('GROUP_CONCAT(CONCAT(lecturers.firstname,\' \',lecturers.lastname)) as lecturers_name'),
-    knex.raw('GROUP_CONCAT(lecturer_assignment.isCreator) as isCreator'),
-    knex.raw('GROUP_CONCAT(lecturer_assignment.isApprover) as isApprover'),
-    knex.raw('GROUP_CONCAT(students.student_id) as students_id'),
-    knex.raw('GROUP_CONCAT(CONCAT(students.firstname,\' \',students.lastname)) as students_name')
+    'assignments.updated_at'
+  ],
+
+  queryGetAssignmentsDetailOnlyLecturer: [
+    'lecturer_assignment.lecturer_course_id',
+    'lecturers.lecturer_id',
+    knex.raw('CONCAT(lecturers.firstname,\' \',lecturers.lastname) as lecturers_name'),
+    'lecturer_assignment.isCreator',
+    'lecturer_assignment.isApprover'
+  ],
+  queryGetAssignmentsDetailOnlyStudent: [
+    'students.student_id',
+    knex.raw('CONCAT(students.firstname,\' \',students.lastname) as students_name')
   ],
 
   queryGetAllStudentAssignments: [
@@ -58,6 +63,7 @@ module.exports = {
   ],
 
   queryGetProjectRequest: [
+    'project_assignment.assignment_id',
     'projects.id',
     'projects.project_name_en',
     'projects.project_name_th',

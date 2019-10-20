@@ -114,7 +114,6 @@ module.exports = {
 
       let assignment = null
       if (typeProject === 'assignment') {
-        console.log(assignmentId)
         await projectModel.mapProjectAndAssignment(projectId, assignmentId, 'create')
         await checkMemberJoinAssignment(auth.uid, projectId, assignmentId)
         assignment = assignmentModel.getAssignmentsDetailById(assignmentId)
@@ -283,7 +282,12 @@ async function getProjectDetail (projectId) {
     let assignment = {}
     if (assignmentId !== null) {
       assignment = await assignmentModel.getAssignmentsDetailById(assignmentId)
-      assignment.lecturers = await modifyLecturerMember(assignment.lecturers_id, assignment.lecturers_name)
+      const newLecturers = assignment.lecturers
+      newLecturers.map(newLecturer => {
+        delete newLecturer.isCreator
+        delete newLecturer.isApprover
+      })
+      assignment.lecturers = newLecturers
     }
     result.project_detail.assignment_detail = {
       assignment_id: assignmentId || null,
@@ -306,27 +310,13 @@ async function getProjectDetail (projectId) {
       })
     }
 
-    result.project_detail.created_at = moment(result.project_detail.created_at).format('LLL')
-    result.project_detail.updated_at = moment(result.project_detail.updated_at).format('LLL')
+    result.project_detail.created_at = moment(result.project_detail.created_at).format('MMM Do YYYY, h:mm:ss a')
+    result.project_detail.updated_at = moment(result.project_detail.updated_at).format('MMM Do YYYY, h:mm:ss a')
 
     return result
   } catch (err) {
     throw new Error(err)
   }
-}
-
-async function modifyLecturerMember (lecturersId, lecturersName) {
-  const lecturers = []
-  lecturersId = _.split(lecturersId, ',')
-  lecturersName = _.split(lecturersName, ',')
-
-  for (let i = 0; i < lecturersId.length; i++) {
-    lecturers.push({
-      lecturer_id: lecturersId[i],
-      lecturer_name: lecturersName[i]
-    })
-  }
-  return lecturers
 }
 
 async function manageOutsider (outsiders, projectId) {
