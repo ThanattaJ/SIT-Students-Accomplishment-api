@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { verifyToken } = require('../authentication/controller')
-const { getCourse, createCourse, updateCourse, deleteCourse, getCourseSemester, addCourseSemester, updateCourseSemester, deleteCourseSemester, getCourseHaveNotAssignment } = require('./controller')
+const { getCourse, createCourse, updateCourse, deleteCourse, getCourseSemester, addCourseSemester, updateCourseSemester, deleteCourseSemester } = require('./controller')
 
 router.get('/', getCourse)
 router.post('/', createCourse)
@@ -11,5 +10,4 @@ router.get('/courseSemester', getCourseSemester)
 router.post('/courseSemester', addCourseSemester)
 router.patch('/courseSemester', updateCourseSemester)
 router.delete('/courseSemester', deleteCourseSemester)
-router.get('/assignment', verifyToken, getCourseHaveNotAssignment)
 module.exports = router

@@ -61,7 +61,7 @@ module.exports = {
     try {
       const { auth } = req
       if (auth.role !== 'student') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
-      const assignments = await assignmentModel.getStudentAssignments(auth.uid)
+      let assignments = await assignmentModel.getStudentAssignments(auth.uid)
       res.send(assignments)
     } catch (err) {
       res.status(500).send({

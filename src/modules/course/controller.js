@@ -237,26 +237,6 @@ module.exports = {
     }
   },
 
-  getCourseHaveNotAssignment: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, queryCourseNotHaveAssignmentSchema)
-    if (!checkStatus) return res.send(err)
-
-    try {
-      const { auth } = req
-      const { checkAssignment } = req.query
-      let assignment
-      if (checkAssignment === 'false') {
-        assignment = await courseModel.getCourseHaveNotAssignment(auth.uid)
-      }
-      res.send(assignment)
-    } catch (err) {
-      res.status(500).send({
-        status: 500,
-        message: err.message
-      })
-    }
-  },
-
   getCourseSpecifySemester: async (academicTermId, courseId) => {
     try {
       return await courseModel.getCourseSpecifySemester(academicTermId, courseId)

@@ -45,9 +45,5 @@ module.exports = {
   deleteCourseSemesterSchema: joi.object().keys({
     academic_term_id: joi.number().required(),
     course_id: joi.number().required()
-  }),
-
-  queryCourseNotHaveAssignmentSchema: joi.object().keys({
-    checkAssignment: joi.string().required().trim()
   })
 }

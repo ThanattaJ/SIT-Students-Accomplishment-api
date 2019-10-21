@@ -2,7 +2,6 @@ const joi = require('joi')
 
 module.exports = {
   createAssignmentSchema: joi.object().keys({
-    lecturer_course_id: joi.number().required(),
     academic_term_id: joi.number().required(),
     course_id: joi.number().required(),
     assignment_name: joi.string().required().trim(),

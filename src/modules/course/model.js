@@ -1,5 +1,5 @@
 const knex = require('../../db/knex')
-const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseHaveNotAssignment } = require('./constants')
+const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse } = require('./constants')
 module.exports = {
 
   getCourse: async () => {
@@ -135,24 +135,6 @@ module.exports = {
         .leftJoin('courses', 'lecturer_course.courses_id', 'courses.id')
         .where('lecturer_course.lecturer_id', lecturerId)
         .groupBy('academic_term')
-        .orderBy('academic_term_id', 'desc')
-      return data
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
-  getCourseHaveNotAssignment: async (lecturerId) => {
-    try {
-      const data = await knex('lecturer_course')
-        .select(queryGetCourseHaveNotAssignment)
-        .leftJoin('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
-        .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
-        .join('term', 'academic_term.term_id', 'term.id')
-        .join('courses', 'lecturer_course.courses_id', 'courses.id')
-        .leftJoin('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
-        .where('lecturer_course.lecturer_id', lecturerId)
-        .andWhere('assignment_id', null)
         .orderBy('academic_term_id', 'desc')
       return data
     } catch (err) {

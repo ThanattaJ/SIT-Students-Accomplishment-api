@@ -49,17 +49,21 @@ module.exports = {
 
   getStudentAssignments: async (studentId) => {
     try {
-      const assignments = await knex('lecturer_course')
-        .select(query.queryGetAllStudentAssignments)
-        .leftJoin('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
+      const assignments = await knex('student_assignment')
+        .select(query.queryGetAllStudentAssignments).distinct('student_assignment.assignment_id')
+        .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
+        .join('lecturer_assignment', 'assignments.id', 'lecturer_assignment.assignment_id')
+        .join('lecturer_course', 'lecturer_assignment.lecturer_course_id', 'lecturer_course.id')
+        .join('courses', 'lecturer_course.courses_id', 'courses.id')
+        .join('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
         .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
         .join('term', 'academic_term.term_id', 'term.id')
-        .join('courses', 'lecturer_course.courses_id', 'courses.id')
-        .leftJoin('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
-        .join('assignments', 'lecturer_assignment.assignment_id', 'assignments.id')
-        .join('student_assignment', 'assignments.id', 'student_assignment.assignment_id')
-        .where('student_assignment.student_id', studentId)
-        .orderBy('academic_term_id', 'desc')
+        .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+        .join('status_project', 'project_assignment.status_id', 'status_project.id')
+        .join('projects', 'project_assignment.project_id', 'projects.id')
+        .whereNotNull('project_assignment.id')
+        .andWhere('student_assignment.student_id', studentId)
+        .orderBy('lecturer_course.academic_term_id')
       return assignments
     } catch (err) {
       throw new Error(err)
@@ -208,6 +212,20 @@ module.exports = {
           .andWhere('student_assignment.student_id', stundentId)
       }
       return assignments
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getStudentAssignmentsProject: async (assignmentId, studentId) => {
+    try {
+      const projects = await knex('project_assignment').select(query.queryGetProjectRequest)
+        .join('status_project', 'project_assignment.status_id', 'status_project.id')
+        .join('projects', 'project_assignment.project_id', 'projects.id')
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .whereIn('project_assignment.assignment_id', assignmentId)
+        .andWhere('project_member.student_id', studentId)
+      return projects
     } catch (err) {
       throw new Error(err)
     }
