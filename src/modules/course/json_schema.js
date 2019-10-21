@@ -36,7 +36,7 @@ module.exports = {
     course_id: joi.number().required(),
     lecturers: joi.array().items(
       joi.object().keys({
-        course_map_lecturer: joi.number().required(),
+        course_map_lecturer: joi.number(),
         lecturer_id: joi.string().required().trim()
       })
     )

@@ -26,13 +26,18 @@ module.exports = {
 
   mapLecturerAssignment: async (lecturerCourseId, assignmentId, isCreator, isApprover) => {
     try {
-      const data = {
-        lecturer_course_id: lecturerCourseId,
-        assignment_id: assignmentId,
-        isCreator: isCreator,
-        isApprover: isApprover
+      const exist = await knex('lecturer_assignment').select('id').where('lecturer_course_id', lecturerCourseId).andWhere('assignment_id', assignmentId)
+      if (exist.length > 0) {
+        return 'exist'
+      } else {
+        const data = {
+          lecturer_course_id: lecturerCourseId,
+          assignment_id: assignmentId,
+          isCreator: isCreator,
+          isApprover: isApprover
+        }
+        await knex('lecturer_assignment').insert(data)
       }
-      await knex('lecturer_assignment').insert(data)
     } catch (err) {
       throw new Error(err)
     }

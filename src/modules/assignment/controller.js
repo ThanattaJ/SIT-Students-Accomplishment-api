@@ -216,27 +216,27 @@ module.exports = {
   },
 
   updateProjectStatus: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, json.updateProjectStatusSchema)
+    const { checkStatus, err } = validate(req.body, json.updateProjectStatusSchema)
     if (!checkStatus) return res.send(err)
 
     try {
       const { auth } = req
       if (auth.role !== 'lecturer') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
-      const { assignment_id, project_Id, status, comment } = req.query || undefined
-      const projects = await assignmentModel.updateProjectStatus(assignment_id, project_Id, status, comment)
+      const { assignment_id, project_id, status, comment } = req.body || undefined
+      const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
 
       let assignment = null
       assignment = assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
       delete assignment.lecturers
       delete assignment.students
 
-      const page = await projectModel.getShortProjectDetailById(project_Id)
+      const page = await projectModel.getShortProjectDetailById(project_id)
       let projectAssignmentStatus = page.project_detail.status_name || null
-      await notiController.sendEmail(project_Id, auth.fullname, page, 'check', assignment, projectAssignmentStatus)
+      await notiController.sendEmail(project_id, auth.fullname, page, 'check', assignment, projectAssignmentStatus)
 
       res.status(200).send({
         status: 200,
-        message: `Updated ${project_Id} success.`
+        message: `Updated ${project_id} success.`
       })
     } catch (err) {
       res.status(500).send({

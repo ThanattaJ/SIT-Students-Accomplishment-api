@@ -11,6 +11,6 @@ router.post('/', verifyToken, constroller.createAssignment)
 router.post('/join-assignment', verifyToken, constroller.joinAssignment)
 router.patch('/lecturer', verifyToken, constroller.updateLecturerApprove)
 router.patch('/', verifyToken, constroller.updateAssignment)
-router.patch('/project', verifyToken, constroller.updateProjectStatus)
+router.patch('/projects', verifyToken, constroller.updateProjectStatus)
 
 module.exports = router

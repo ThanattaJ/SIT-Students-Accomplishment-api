@@ -31,6 +31,10 @@ module.exports = {
   ],
 
   queryGetCourseAssignment: [
-    'lecturer_assignment.id as assignment_id'
+    'lecturer_assignment.assignment_id as assignment_id'
+  ],
+
+  queryGetCourseLecturer: [
+    'lecturer_course.id as lecturer_course_id'
   ]
 }

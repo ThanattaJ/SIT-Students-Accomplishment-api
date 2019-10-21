@@ -1,5 +1,6 @@
 const knex = require('../../db/knex')
-const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse } = require('./constants')
+const _ = require('lodash')
+const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseLecturer, queryGetCourseAssignment } = require('./constants')
 module.exports = {
 
   getCourse: async () => {
@@ -148,6 +149,41 @@ module.exports = {
         .where('lecturer_course.courses_id', courseId)
         .andWhere('lecturer_course.academic_term_id', academicTermId)
       return lecturerCourseId
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getCourseAssignment: async (academicTermId, courseId) => {
+    try {
+      const data = await knex('lecturer_course')
+        .distinct(queryGetCourseAssignment)
+        .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
+        .where('lecturer_course.courses_id', courseId)
+        .andWhere('lecturer_course.academic_term_id', academicTermId)
+      return data
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getCourseLecturer: async (academicTermId, courseId) => {
+    try {
+      const data = await knex('lecturer_course')
+        .select(queryGetCourseLecturer)
+        .where('lecturer_course.courses_id', courseId)
+        .andWhere('lecturer_course.academic_term_id', academicTermId)
+      return data
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  deleteLecturerCourseSemester: async (lecturers) => {
+    try {
+      const lecturerCourseId = _.map(lecturers, 'course_map_lecturer')
+      await knex('lecturer_assignment').del().whereIn('lecturer_assignment.lecturer_course_id', lecturerCourseId)
+      await knex('lecturer_course').del().whereIn('lecturer_course.id', lecturerCourseId)
     } catch (err) {
       throw new Error(err)
     }

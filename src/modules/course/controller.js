@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
 const { validate } = require('../validation')
-const { createCourseSchema, updateCourseSchema, deleteCourseSchema, getCourseSemester, updateCourseSemesterSchema, addCourseSemesterSchema, deleteCourseSemesterSchema, queryCourseNotHaveAssignmentSchema } = require('./json_schema')
+const { createCourseSchema, updateCourseSchema, deleteCourseSchema, getCourseSemester, updateCourseSemesterSchema, addCourseSemesterSchema, deleteCourseSemesterSchema } = require('./json_schema')
 const courseModel = require('./model')
 const assignmentModel = require('../assignment/model')
-// const authenController = require('../authentication/controller')
 const moment = require('moment')
 const _ = require('lodash')
 
@@ -161,9 +160,28 @@ module.exports = {
     if (!checkStatus) return res.send(err)
     try {
       const { academic_term_id, course_id, lecturers } = req.body
+
       const lecturerNotHaveCourseMapLecturerId = lecturers.filter(lecturer => lecturer.course_map_lecturer === undefined)
 
-      await manageCourseSemester(academic_term_id, course_id, lecturerNotHaveCourseMapLecturerId)
+      if (lecturerNotHaveCourseMapLecturerId.length > 0) {
+        await manageCourseSemester(academic_term_id, course_id, lecturerNotHaveCourseMapLecturerId)
+        const assignments = await courseModel.getCourseAssignment(academic_term_id, course_id)
+        const lecturers = await courseModel.getCourseLecturer(academic_term_id, course_id)
+        const lecturerList = async _ => {
+          const promises = lecturers.map(async lecturer => {
+            const assignmentList = async _ => {
+              const promises = assignments.map(async assignment => {
+                await assignmentModel.mapLecturerAssignment(lecturer.lecturer_course_id, assignment.assignment_id, false, false)
+              })
+              await Promise.all(promises)
+            }
+            await assignmentList()
+          })
+          await Promise.all(promises)
+        }
+        await lecturerList()
+      }
+
       res.status(200).send({
         status: 200,
         message: 'Update course success.'
