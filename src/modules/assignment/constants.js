@@ -79,7 +79,7 @@ module.exports = {
 
   queryGetProjectRequest: [
     'project_assignment.assignment_id',
-    'projects.id',
+    'projects.id as project_id',
     'projects.project_name_en',
     'projects.project_name_th',
     'status_project.status_name',
