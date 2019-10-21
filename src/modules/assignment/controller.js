@@ -226,7 +226,7 @@ module.exports = {
       const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
 
       let assignment = null
-      assignment = assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
+      assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
       delete assignment.lecturers
       delete assignment.students
 

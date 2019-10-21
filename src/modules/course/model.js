@@ -1,12 +1,28 @@
 const knex = require('../../db/knex')
 const _ = require('lodash')
-const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseLecturer, queryGetCourseAssignment } = require('./constants')
+const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseLecturer, queryGetCourseAssignment, queryGetProjectInCourse } = require('./constants')
 module.exports = {
 
   getCourse: async () => {
     try {
       const courses = await knex('courses').select(queryGetCourse).orderBy('course_code', 'asc').where('isDelete', false)
       return courses
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  getProjectInCourse: async (courseId) => {
+    try {
+      const project = await knex('lecturer_course').select(queryGetProjectInCourse)
+        .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
+        .join('project_assignment', 'lecturer_assignment.assignment_id', 'project_assignment.assignment_id')
+        .join('projects', 'project_assignment.project_id', 'projects.id')
+        .join('status_project', 'project_assignment.status_id', 'status_project.id')
+        .where('lecturer_course.courses_id', courseId)
+        .andWhere('status_project.status_name', 'Approve')
+        .groupBy('lecturer_assignment.assignment_id', 'lecturer_course.courses_id', 'project_assignment.assignment_id')
+      return project
     } catch (err) {
       throw new Error(err)
     }

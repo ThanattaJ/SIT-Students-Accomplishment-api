@@ -272,6 +272,9 @@ module.exports = {
         status_id: statusId[0].id,
         comment: comment
       }
+      if (status === 'Approve') {
+        data.comment = null
+      }
       const assignments = await knex('project_assignment').update(data)
         .where('project_assignment.assignment_id', assignmentId)
         .andWhere('project_assignment.project_id', projectId)

@@ -7,6 +7,7 @@ const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
 const notiController = require('../notification/controller')
 const assignmentModel = require('../assignment/model')
+const courseModel = require('../course/model')
 
 const { validate } = require('../validation')
 const { pageDefaultSchema, projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema, addExternalToAssignmentSchema } = require('./json_schema')
@@ -19,7 +20,8 @@ module.exports = {
       const { checkStatus, err } = validate(req.params, pageDefaultSchema)
       if (!checkStatus) return res.send(err)
       const { page } = req.params
-      const { year, by, search } = req.query || ''
+      const { year, by, search } = req.query || undefined
+      const courseId = req.query.course_id || undefined
       let getYear = year
       if (year === 'present') {
         const present = moment().year()
@@ -39,6 +41,13 @@ module.exports = {
       } else if (page === 'achievement') {
         result.projects = await projectModel.getAllProjects(getYear)
         result.projects = _.filter(result.projects, 'achievement')
+      } else if (page === 'assignment') {
+        if (courseId === undefined) {
+          result.courses = await courseModel.getCourse()
+        } else {
+          result.projects = await courseModel.getProjectInCourse(courseId)
+          result.projects = await projectModel.getProjectsCoverAndIsAchievement(result.projects)
+        }
       } else if (page === 'search') {
         if (by === 'tags') {
           result.projects = await projectModel.getProjectByTag(search)
@@ -48,7 +57,10 @@ module.exports = {
       }
       res.send(result)
     } catch (err) {
-      console.log(err)
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
     }
   },
 

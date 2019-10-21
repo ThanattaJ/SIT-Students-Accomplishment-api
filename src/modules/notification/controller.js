@@ -33,7 +33,7 @@ module.exports = {
         } else if (projectAssignmentStatus === 'Approve') {
           projectAssignmentStatus = 'Lecturer <b>approve</b> the project'
         } else if (projectAssignmentStatus === 'Reject') {
-          projectAssignmentStatus = `Lecturer <b>reject</b> the project and comment is ${data.project_detail.comment}`
+          projectAssignmentStatus = `Lecturer <b>reject</b> the project \n Comment: ${data.project_detail.comment}`
         }
 
         text = `

@@ -2,10 +2,21 @@ const knex = require('../../db/knex')
 
 module.exports = {
   queryGetCourse: [
-    'id',
+    'id as course_id',
     'course_code',
     'course_name',
     'course_detail'
+  ],
+
+  queryGetProjectInCourse: [
+    'projects.id',
+    'projects.project_name_th',
+    'projects.project_name_en',
+    'projects.project_abstract',
+    'projects.project_detail',
+    'projects.count_viewer',
+    'projects.count_clap',
+    'status_project.status_name'
   ],
 
   querySemester: [

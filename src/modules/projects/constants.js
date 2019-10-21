@@ -6,6 +6,7 @@ module.exports = {
     'projects.project_name_th',
     'projects.project_name_en',
     'projects.project_detail',
+    'projects.project_abstract',
     'projects.isShow',
     'projects.count_viewer',
     'projects.count_clap'
