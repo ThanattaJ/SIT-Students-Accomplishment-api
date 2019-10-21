@@ -116,7 +116,7 @@ module.exports = {
       if (typeProject === 'assignment') {
         await projectModel.mapProjectAndAssignment(projectId, assignmentId, 'create')
         await checkMemberJoinAssignment(auth.uid, projectId, assignmentId)
-        assignment = assignmentModel.getAssignmentsDetailById(assignmentId)
+        assignment = assignmentModel.getLecturerAssignmentsDetailById(assignmentId)
         delete assignment.lecturers
         delete assignment.students
       }
@@ -167,7 +167,7 @@ module.exports = {
       let projectAssignmentStatus = null
       if (type === 'Assignment') {
         await projectModel.mapProjectAndAssignment(projectId, project_detail.assignment_detail.assignment_id, 'update')
-        assignment = await assignmentModel.getAssignmentsDetailById(project_detail.assignment_detail.assignment_id)
+        assignment = await assignmentModel.getLecturerAssignmentsDetailById(project_detail.assignment_detail.assignment_id)
         projectAssignmentStatus = newDetail.project_detail.assignment_detail.project_status
         delete assignment.lecturers
         delete assignment.students
@@ -230,7 +230,7 @@ module.exports = {
 
       const project = await projectModel.getShortProjectDetailById(projectId)
       const projectAssignmentStatus = project.project_detail.status_name || null
-      const assignment = await assignmentModel.getAssignmentsDetailById(assignmentId)
+      const assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignmentId)
       delete assignment.lecturers
       delete assignment.students
 
@@ -281,7 +281,7 @@ async function getProjectDetail (projectId) {
     const assignmentId = result.project_detail.assignment_id
     let assignment = {}
     if (assignmentId !== null) {
-      assignment = await assignmentModel.getAssignmentsDetailById(assignmentId)
+      assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignmentId)
       const newLecturers = assignment.lecturers
       newLecturers.map(newLecturer => {
         delete newLecturer.isCreator

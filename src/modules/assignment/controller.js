@@ -1,17 +1,17 @@
 /* eslint-disable camelcase */
-const _ = require('lodash')
 const moment = require('moment')
 const assignmentModel = require('./model')
 const courseController = require('../course/controller')
 const projectModel = require('../projects/model')
+const filesModel = require('../files/model')
 const notiController = require('../notification/controller')
 const { validate } = require('../validation')
-const { createAssignmentSchema, getAssignmentsDetailByIdSchema, updateProjectStatusSchema, getListAssignmentSpecifyCourseSchema, updateLecturerApproverSchema, joinAssignmentSchema, getAssignmentProjectByStudentIdSchema, getProjectRequestSchema } = require('./json_schema')
+const json = require('./json_schema')
 const randomstring = require('randomstring')
 
 module.exports = {
   createAssignment: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.body, createAssignmentSchema)
+    const { checkStatus, err } = validate(req.body, json.createAssignmentSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -47,22 +47,8 @@ module.exports = {
       await mapCourseAssignment()
       res.status(200).send({
         status: 200,
-        message: 'Create Assignment Success'
+        assignment_id: assignmentId[0].id
       })
-    } catch (err) {
-      res.status(500).send({
-        status: 500,
-        message: err.message
-      })
-    }
-  },
-
-  getStudentAssignments: async (req, res, next) => {
-    try {
-      const { auth } = req
-      if (auth.role !== 'student') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
-      let assignments = await assignmentModel.getStudentAssignments(auth.uid)
-      res.send(assignments)
     } catch (err) {
       res.status(500).send({
         status: 500,
@@ -72,7 +58,7 @@ module.exports = {
   },
 
   getListAssignmentSpecifyCourse: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, getListAssignmentSpecifyCourseSchema)
+    const { checkStatus, err } = validate(req.query, json.getListAssignmentSpecifyCourseSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -105,20 +91,28 @@ module.exports = {
   },
 
   getAssignmentsDetailById: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.params, getAssignmentsDetailByIdSchema)
+    const { checkStatus, err } = validate(req.params, json.getAssignmentsDetailByIdSchema)
     if (!checkStatus) return res.send(err)
 
     try {
       const { assignment_id } = req.params
-      const assignment = await assignmentModel.getAssignmentsDetailById(assignment_id)
-      assignment.created_at = moment(assignment.created_at).format('MMM Do YYYY, h:mm:ss a')
-      assignment.updated_at = moment(assignment.updated_at).format('MMM Do YYYY, h:mm:ss a')
-      const newLecturers = assignment.lecturers
-      newLecturers.map(newLecturer => {
-        newLecturer.isCreator = newLecturer.isCreator === 1
-        newLecturer.isApprover = newLecturer.isApprover === 1
-      })
-      assignment.lecturers = newLecturers
+      const { auth } = req
+      let assignment
+      if (auth.role === 'lecturer') {
+        assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
+        assignment.created_at = moment(assignment.created_at).format('MMM Do YYYY, h:mm:ss a')
+        assignment.updated_at = moment(assignment.updated_at).format('MMM Do YYYY, h:mm:ss a')
+        const newLecturers = assignment.lecturers
+        newLecturers.map(newLecturer => {
+          newLecturer.isCreator = newLecturer.isCreator === 1
+          newLecturer.isApprover = newLecturer.isApprover === 1
+        })
+        assignment.lecturers = newLecturers
+      } else if (auth.role === 'student') {
+        assignment = await assignmentModel.getStudentAssignmentsDetailById(assignment_id, auth.uid)
+        const cover = await filesModel.getCoverImage(assignment.project_id)
+        assignment.cover_path = cover[0] ? cover[0].path_name : null
+      }
 
       res.send(assignment)
     } catch (err) {
@@ -130,7 +124,7 @@ module.exports = {
   },
 
   updateLecturerApprove: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.body, updateLecturerApproverSchema)
+    const { checkStatus, err } = validate(req.body, json.updateLecturerApproverSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -148,8 +142,27 @@ module.exports = {
     }
   },
 
+  updateAssignment: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.body, json.updateAssignmentSchema)
+    if (!checkStatus) return res.send(err)
+
+    try {
+      const { assignment_id, assignment_detail } = req.body
+      await assignmentModel.updateAssignment(assignment_id, assignment_detail)
+      res.status(200).send({
+        status: 200,
+        message: assignment_id
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
   joinAssignment: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, joinAssignmentSchema)
+    const { checkStatus, err } = validate(req.query, json.joinAssignmentSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -167,7 +180,7 @@ module.exports = {
   },
 
   getAssignmentProjectByStudentId: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, getAssignmentProjectByStudentIdSchema)
+    const { checkStatus, err } = validate(req.query, json.getAssignmentProjectByStudentIdSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -185,7 +198,7 @@ module.exports = {
   },
 
   getProjectRequest: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, getProjectRequestSchema)
+    const { checkStatus, err } = validate(req.query, json.getProjectRequestSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -203,7 +216,7 @@ module.exports = {
   },
 
   updateProjectStatus: async (req, res, next) => {
-    const { checkStatus, err } = validate(req.query, updateProjectStatusSchema)
+    const { checkStatus, err } = validate(req.query, json.updateProjectStatusSchema)
     if (!checkStatus) return res.send(err)
 
     try {
@@ -213,7 +226,7 @@ module.exports = {
       const projects = await assignmentModel.updateProjectStatus(assignment_id, project_Id, status, comment)
 
       let assignment = null
-      assignment = assignmentModel.getAssignmentsDetailById(assignment_id)
+      assignment = assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
       delete assignment.lecturers
       delete assignment.students
 

@@ -47,24 +47,23 @@ module.exports = {
     }
   },
 
-  getStudentAssignments: async (studentId) => {
+  getStudentAssignmentsDetailById: async (assignmentId, studentId) => {
     try {
       const assignments = await knex('student_assignment')
-        .select(query.queryGetAllStudentAssignments).distinct('student_assignment.assignment_id')
+        .select(query.queryGetStudentAssignmentsDetailById)
         .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
+        .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+        .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
+        .leftJoin('projects', 'project_assignment.project_id', 'projects.id')
         .join('lecturer_assignment', 'assignments.id', 'lecturer_assignment.assignment_id')
         .join('lecturer_course', 'lecturer_assignment.lecturer_course_id', 'lecturer_course.id')
         .join('courses', 'lecturer_course.courses_id', 'courses.id')
-        .join('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
-        .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
-        .join('term', 'academic_term.term_id', 'term.id')
-        .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
-        .join('status_project', 'project_assignment.status_id', 'status_project.id')
-        .join('projects', 'project_assignment.project_id', 'projects.id')
-        .whereNotNull('project_assignment.id')
+        .join('lecturers', 'lecturer_course.lecturer_id', 'lecturers.lecturer_id')
+        .where('student_assignment.assignment_id', assignmentId)
+        .andWhere('assignments.id', assignmentId)
         .andWhere('student_assignment.student_id', studentId)
-        .orderBy('lecturer_course.academic_term_id')
-      return assignments
+        .andWhere('lecturer_assignment.isCreator', true)
+      return assignments[0]
     } catch (err) {
       throw new Error(err)
     }
@@ -73,7 +72,7 @@ module.exports = {
   getListAssignmentSpecifyCourse: async (courseId) => {
     try {
       const assignments = await knex('lecturer_course')
-        .select(query.querygetListAssignmentSpecifyCourse)
+        .select(query.queryGetListAssignmentSpecifyCourse)
         .leftJoin('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
         .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
         .join('term', 'academic_term.term_id', 'term.id')
@@ -102,10 +101,10 @@ module.exports = {
     }
   },
 
-  getAssignmentsDetailById: async (assignmentsId) => {
+  getLecturerAssignmentsDetailById: async (assignmentsId) => {
     try {
       const assignments = await knex('assignments')
-        .select(query.queryGetAssignmentsDetailById)
+        .select(query.queryGetLecturerAssignmentsDetailById)
         .join('lecturer_assignment', 'assignments.id', 'lecturer_assignment.assignment_id')
         .join('lecturer_course', 'lecturer_assignment.lecturer_course_id', 'lecturer_course.id')
         .join('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
@@ -142,6 +141,15 @@ module.exports = {
   updateLecturerApprove: async (assignmentId, lecturerCourseId, isApprove) => {
     try {
       const update = await knex('lecturer_assignment').update('isApprover', isApprove).where('lecturer_course_id', lecturerCourseId).andWhere('assignment_id', assignmentId)
+      return update
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  updateAssignment: async (assignmentId, detail) => {
+    try {
+      const update = await knex('assignments').update('assignment_detail', detail).andWhere('id', assignmentId)
       return update
     } catch (err) {
       throw new Error(err)
@@ -199,16 +207,16 @@ module.exports = {
     try {
       let assignments
       if (isHave === 'false') {
-        assignments = await knex('assignments').select(query.queryGetAssignmentNotHaveProjectByStudentId)
+        assignments = await knex('assignments').select(query.queryGetAssignmenProjectByStudentId)
           .join('student_assignment', 'assignments.id', 'student_assignment.assignment_id')
-          .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+          .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
           .whereNull('project_assignment.id')
           .andWhere('student_assignment.student_id', stundentId)
-      } else {
-        assignments = await knex('assignments').select(query.queryGetAssignmentNotHaveProjectByStudentId)
-          .join('student_assignment', 'assignments.id', 'student_assignment.assignment_id')
-          .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
-          .whereNotNull('project_assignment.id')
+      } else if (isHave === 'all') {
+        assignments = await knex('student_assignment').select(query.queryGetAssignmenProjectByStudentId)
+          .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
+          .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+          .join('status_project', 'project_assignment.status_id', 'status_project.id')
           .andWhere('student_assignment.student_id', stundentId)
       }
       return assignments

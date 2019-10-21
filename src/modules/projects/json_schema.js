@@ -14,7 +14,7 @@ module.exports = {
       project_name_th: joi.string().required().trim(),
       project_name_en: joi.string().required().trim(),
       project_type_name: joi.string().required().trim(),
-      assignment_id: joi.number(),
+      assignment_id: joi.number().allow(null),
       project_detail: joi.string().required().trim().allow(null),
       project_abstract: joi.string().required().trim().allow(null),
       start_month: joi.number(),

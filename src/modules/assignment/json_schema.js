@@ -22,6 +22,11 @@ module.exports = {
     isApprove: joi.boolean().required()
   }),
 
+  updateAssignmentSchema: joi.object().keys({
+    assignment_id: joi.number().required(),
+    assignment_detail: joi.string().required().allow(null)
+  }),
+
   joinAssignmentSchema: joi.object().keys({
     join_code: joi.string().required().trim()
   }),
