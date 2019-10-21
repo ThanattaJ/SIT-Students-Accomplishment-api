@@ -122,6 +122,11 @@ module.exports = {
       }
 
       const page = await projectModel.getShortProjectDetailById(projectId)
+      page.project_detail.haveOutsider = page.project_detail.haveOutsider === 1
+      if (page.project_detail.haveOutsider) {
+        const outsiders = await userController.getOutsider(projectId)
+        page.outsiders = outsiders[0] === undefined ? [] : outsiders
+      }
       let projectAssignmentStatus = page.project_detail.status_name || null
       await notiController.sendEmail(projectId, auth.fullname, page, 'create', assignment, projectAssignmentStatus)
       res.status(200).send({
@@ -162,6 +167,11 @@ module.exports = {
 
       await filesController.updateVideo(video, projectId)
       const newDetail = await getProjectDetail(projectId)
+      newDetail.project_detail.haveOutsider = newDetail.project_detail.haveOutsider === 1
+      if (newDetail.project_detail.haveOutsider) {
+        const outsiders = await userController.getOutsider(projectId)
+        newDetail.outsiders = outsiders[0] === undefined ? [] : outsiders
+      }
 
       let assignment = null
       let projectAssignmentStatus = null

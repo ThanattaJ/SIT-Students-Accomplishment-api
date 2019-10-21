@@ -1,5 +1,6 @@
 require('dotenv').config()
 const nodemailer = require('nodemailer')
+const _ = require('lodash')
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   secureConnection: true,
@@ -16,11 +17,8 @@ module.exports = {
 
   sendEmail: async (projectId, user, data, status, assignment, projectAssignmentStatus) => {
     try {
-      const email = []
       const { students } = data
-      students.map(student => {
-        email.push(student.email)
-      })
+      const studentEmail = _.map(students, 'email')
       let text = `
       Hello, \n
       <p>${user} ${status} the ${data.project_detail.project_name_en} project</p> \n\n
@@ -51,14 +49,27 @@ module.exports = {
 
       let content = {
         from: 'admin.sit.student.accomplishment@gmail.com',
-        to: email,
+        to: studentEmail,
         subject: `"SIT Student Accomlishment: The ${data.project_detail.project_name_en} project is ${status}!"`,
         html: text
       }
       await transporter.sendMail(content)
+
+      if (assignment === null) {
+        if (data.project_detail.haveOutsider) {
+          const { outsiders } = data
+          const outsiderEmail = _.map(outsiders, 'email')
+          content = {
+            from: 'admin.sit.student.accomplishment@gmail.com',
+            to: outsiderEmail,
+            subject: `"SIT Student Accomlishment: The ${data.project_detail.project_name_en} project is ${status}!"`,
+            html: text
+          }
+          await transporter.sendMail(content)
+        }
+      }
     } catch (err) {
       throw new Error(err)
     }
   }
-
 }
