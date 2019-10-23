@@ -67,8 +67,13 @@ module.exports = {
     'status_project.status_name',
     'project_assignment.comment'
   ],
-
-  queryGetAssignmenProjectByStudentId: [
+  queryGetAssignmentIsNotHaveProject: [
+    'assignments.id as assignment_id',
+    'assignments.assignment_name',
+    'assignments.join_code',
+    'project_assignment.project_id'
+  ],
+  queryGetAssignmentProjectByStudentId: [
     'assignments.id as assignment_id',
     'assignments.assignment_name',
     'assignments.join_code',
