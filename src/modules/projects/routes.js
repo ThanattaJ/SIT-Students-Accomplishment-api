@@ -4,6 +4,7 @@ const controller = require('./controller')
 const { verifyToken } = require('../authentication/controller')
 
 router.get('/', controller.getProjectPage)
+router.get('/Top-Project', controller.getTopProject)
 router.get('/:page', controller.getAllProjects)
 
 router.post('/', verifyToken, controller.createProject)

@@ -63,6 +63,17 @@ module.exports = {
       })
     }
   },
+  getTopProject: async (req, res) => {
+    try {
+      const result = await projectModel.getTopProject()
+      res.send(result)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
 
   getProjectPage: async (req, res) => {
     const { checkStatus, err } = validate(req.query, projectPageSchema)

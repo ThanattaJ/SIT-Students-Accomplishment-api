@@ -22,6 +22,15 @@ module.exports = {
     return year[0]
   },
 
+  getTopProject: async () => {
+    let projects = await knex('projects').select(query.queryAllProjects)
+      .where('isShow', true)
+      .orderBy('projects.count_viewer', 'desc')
+      .limit(5)
+    projects = await getProjectsCoverAndIsAchievement(projects)
+    return projects
+  },
+
   getAllProjects: async (year) => {
     try {
       let projects = await knex.select(query.queryAllProjects).from('projects')
