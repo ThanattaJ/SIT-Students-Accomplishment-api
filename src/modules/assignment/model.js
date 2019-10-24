@@ -214,14 +214,14 @@ module.exports = {
       if (isHave === 'false') {
         assignments = await knex('assignments').select(query.queryGetAssignmentIsNotHaveProject)
           .join('student_assignment', 'assignments.id', 'student_assignment.assignment_id')
-          .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+          .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
           .whereNull('project_assignment.id')
           .andWhere('student_assignment.student_id', stundentId)
       } else if (isHave === 'all') {
         assignments = await knex('student_assignment').select(query.queryGetAssignmentProjectByStudentId)
           .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
-          .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
-          .join('status_project', 'project_assignment.status_id', 'status_project.id')
+          .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+          .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
           .andWhere('student_assignment.student_id', stundentId)
       }
       return assignments
