@@ -100,8 +100,6 @@ module.exports = {
       let assignment
       if (auth.role === 'lecturer') {
         assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
-        assignment.created_at = moment(assignment.created_at).format('MMM Do YYYY, h:mm:ss a')
-        assignment.updated_at = moment(assignment.updated_at).format('MMM Do YYYY, h:mm:ss a')
         const newLecturers = assignment.lecturers
         newLecturers.map(newLecturer => {
           newLecturer.isCreator = newLecturer.isCreator === 1
@@ -113,7 +111,8 @@ module.exports = {
         const cover = await filesModel.getCoverImage(assignment.project_id)
         assignment.cover_path = cover[0] ? cover[0].path_name : null
       }
-
+      assignment.created_at = moment(assignment.created_at).format('MMM Do YYYY, h:mm:ss a')
+      assignment.updated_at = moment(assignment.updated_at).format('MMM Do YYYY, h:mm:ss a')
       res.send(assignment)
     } catch (err) {
       res.status(500).send({
