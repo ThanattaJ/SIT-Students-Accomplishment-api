@@ -292,7 +292,21 @@ module.exports = {
       throw new Error(err)
     }
   },
-  getProjectsCoverAndIsAchievement
+  getProjectsCoverAndIsAchievement,
+
+  getProjectIsGroup: async (studentId, isGroup) => {
+    try {
+      const projects = await knex('projects').select(query.queryAllProjects)
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
+        .whereNull('project_assignment.project_id')
+        .andWhere('projects.isGroup', isGroup)
+        .andWhere('project_member.student_id', studentId)
+      return projects
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
 }
 
 async function getProjectTypeId (projectData) {

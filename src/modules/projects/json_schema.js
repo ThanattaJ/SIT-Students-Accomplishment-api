@@ -138,5 +138,9 @@ module.exports = {
   addExternalToAssignmentSchema: joi.object().keys({
     project_id: joi.number().required(),
     assignment_id: joi.number().required()
+  }),
+
+  projectIsGroupSchema: joi.object().keys({
+    isGroup: joi.string().required().trim()
   })
 }

@@ -5,6 +5,7 @@ const { verifyToken } = require('../authentication/controller')
 
 router.get('/', controller.getProjectPage)
 router.get('/Top-Project', controller.getTopProject)
+router.get('/group-Project', verifyToken, controller.getProjectIsGroup)
 router.get('/:page', controller.getAllProjects)
 
 router.post('/', verifyToken, controller.createProject)

@@ -7,6 +7,7 @@ exports.up = async function (knex) {
     table.text('project_detail')
     table.text('project_abstract')
     table.integer('project_type_id').unsigned().notNullable()
+    table.boolean('isGroup').defaultTo(false).notNullable()
     table.boolean('haveOutsider').defaultTo(false).notNullable()
     table.boolean('isShow').defaultTo(false).notNullable()
     table.text('tool_techniq_detail')

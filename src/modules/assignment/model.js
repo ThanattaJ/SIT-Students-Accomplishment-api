@@ -223,6 +223,12 @@ module.exports = {
           .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
           .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
           .andWhere('student_assignment.student_id', stundentId)
+      } else if (isHave === 'true') {
+        await knex('student_assignment').select(query.queryGetAssignmentProjectByStudentId)
+          .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
+          .join('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
+          .join('status_project', 'project_assignment.status_id', 'status_project.id')
+          .andWhere('student_assignment.student_id', stundentId)
       }
       return assignments
     } catch (err) {

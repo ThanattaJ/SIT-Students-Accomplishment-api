@@ -10,7 +10,7 @@ const assignmentModel = require('../assignment/model')
 const courseModel = require('../course/model')
 
 const { validate } = require('../validation')
-const { pageDefaultSchema, projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema, addExternalToAssignmentSchema } = require('./json_schema')
+const { pageDefaultSchema, projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema, addExternalToAssignmentSchema, projectIsGroupSchema } = require('./json_schema')
 
 module.exports = {
 
@@ -114,7 +114,11 @@ module.exports = {
       const assignmentId = project_data.assignment_id || ''
       const typeProject = project_data.project_type_name
       delete project_data.assignment_id
-
+      if (member.students.length > 0) {
+        project_data.isGroup = true
+      } else {
+        project_data.isGroup = false
+      }
       const projectId = await projectModel.createProject(project_data)
       if (auth && member.students.length >= 0) {
         const students = member.students || []
@@ -274,6 +278,23 @@ module.exports = {
         status: 200,
         message: `Add project to assignment successs. please wait for lecturer approve `
       })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
+  getProjectIsGroup: async (req, res) => {
+    const { checkStatus, err } = validate(req.query, projectIsGroupSchema)
+    if (!checkStatus) return res.send(err)
+    try {
+      const { auth } = req
+      const isGroup = req.query.isGroup === 'true'
+
+      const projects = await projectModel.getProjectIsGroup(auth.uid, isGroup)
+      res.send(projects)
     } catch (err) {
       res.status(500).send({
         status: 500,
