@@ -5,7 +5,9 @@ module.exports = {
     academic_term_id: joi.number().required(),
     course_id: joi.number().required(),
     assignment_name: joi.string().required().trim(),
-    assignment_detail: joi.string().trim()
+    assignment_detail: joi.string().trim(),
+    isGroup: joi.boolean().required(),
+    close_date: joi.string().required()
   }),
 
   getAssignmentsDetailByIdSchema: joi.object().keys({

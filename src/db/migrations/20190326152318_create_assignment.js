@@ -4,6 +4,8 @@ exports.up = async function (knex) {
     table.increments('id').primary()
     table.string('assignment_name').notNullable()
     table.string('assignment_detail')
+    table.boolean('isGroup').defaultTo(0).notNullable()
+    table.date('close_date').notNullable()
     table.string('join_code').notNullable()
 
     table

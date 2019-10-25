@@ -230,20 +230,6 @@ module.exports = {
     }
   },
 
-  getStudentAssignmentsProject: async (assignmentId, studentId) => {
-    try {
-      const projects = await knex('project_assignment').select(query.queryGetProjectRequest)
-        .join('status_project', 'project_assignment.status_id', 'status_project.id')
-        .join('projects', 'project_assignment.project_id', 'projects.id')
-        .join('project_member', 'projects.id', 'project_member.project_id')
-        .whereIn('project_assignment.assignment_id', assignmentId)
-        .andWhere('project_member.student_id', studentId)
-      return projects
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
   getProjectInAssignment: async (assignmentId, status) => {
     try {
       let projects
@@ -257,6 +243,7 @@ module.exports = {
         projects = await knex('project_assignment').select(query.queryGetProjectRequest)
           .join('status_project', 'project_assignment.status_id', 'status_project.id')
           .join('projects', 'project_assignment.project_id', 'projects.id')
+          .where('project_assignment.assignment_id', assignmentId)
           .andWhere('status_project.status_name', status)
       }
       return projects

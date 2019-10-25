@@ -16,8 +16,9 @@ module.exports = {
 
     try {
       const { auth } = req
-      const { academic_term_id, course_id, assignment_name, assignment_detail } = req.body
+      const { academic_term_id, course_id, assignment_name, assignment_detail, isGroup, close_date } = req.body
       const courseSemesters = await courseController.getCourseSpecifySemester(academic_term_id, course_id)
+      const closeDate = moment(close_date).format('YYYY-MM-DD')
       let code = ''
       while (true) {
         code = randomstring.generate({
@@ -33,7 +34,9 @@ module.exports = {
       const assignment = {
         assignment_name: assignment_name,
         assignment_detail: assignment_detail || null,
-        join_code: code
+        join_code: code,
+        isGroup: isGroup,
+        close_date: closeDate
       }
       const assignmentId = await assignmentModel.createAssignment(assignment)
       const mapCourseAssignment = async _ => {
@@ -68,6 +71,8 @@ module.exports = {
 
       const assignments = await assignmentModel.getListAssignmentSpecifyCourse(course_id)
       assignments.map(assignment => {
+        assignment.isGroup = assignment.isGroup === 1
+        assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
         assignment.isCreator = assignment.isCreator === 1
         assignment.isApprover = assignment.isApprover === 1
       })
@@ -111,8 +116,12 @@ module.exports = {
         const cover = await filesModel.getCoverImage(assignment.project_id)
         assignment.cover_path = cover[0] ? cover[0].path_name : null
       }
+
+      assignment.isGroup = assignment.isGroup === 1
+      assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
       assignment.created_at = moment(assignment.created_at).format('MMM Do YYYY, h:mm:ss a')
       assignment.updated_at = moment(assignment.updated_at).format('MMM Do YYYY, h:mm:ss a')
+
       res.send(assignment)
     } catch (err) {
       res.status(500).send({
@@ -186,7 +195,22 @@ module.exports = {
       const { auth } = req
       if (auth.role !== 'student') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
       const { isHave } = req.query
-      const assignments = await assignmentModel.getAssignmentIsHaveProjectByStudentId(isHave, auth.uid)
+      let assignments = await assignmentModel.getAssignmentIsHaveProjectByStudentId(isHave, auth.uid)
+
+      if (isHave === 'false') {
+        const now = moment().format('YYYY-MM-DD')
+        assignments = assignments.filter(assignment => moment(now).isSameOrBefore(assignment.close_date))
+      }
+
+      assignments.map(assignment => {
+        assignment.isGroup = assignment.isGroup === 1
+        assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
+        if (isHave === 'all') {
+          assignment.project_assignment_created_date = assignment.project_assignment_created_date === null ? null : moment(assignment.project_assignment_created_date).format('MMM Do YYYY, h:mm:ss a')
+          assignment.project_assignment_updated_date = assignment.project_assignment_updated_date === null ? null : moment(assignment.project_assignment_updated_date).format('MMM Do YYYY, h:mm:ss a')
+        }
+      })
+
       res.send(assignments)
     } catch (err) {
       res.status(500).send({
@@ -205,6 +229,12 @@ module.exports = {
       if (auth.role !== 'lecturer') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
       const { assignment_id, status } = req.query || undefined
       const projects = await assignmentModel.getProjectInAssignment(assignment_id, status)
+      console.log(projects);
+      projects.map(project => {
+        project.project_assignment_created_date = project.project_assignment_created_date === null ? null : moment(project.project_assignment_created_date).format('MMM Do YYYY, h:mm:ss a')
+        project.project_assignment_updated_date = project.project_assignment_updated_date === null ? null : moment(project.project_assignment_updated_date).format('MMM Do YYYY, h:mm:ss a')
+      })
+
       res.send(projects)
     } catch (err) {
       res.status(500).send({
@@ -228,6 +258,9 @@ module.exports = {
       assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
       delete assignment.lecturers
       delete assignment.students
+
+      assignment.isGroup = assignment.isGroup === 1
+      assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
 
       const page = await projectModel.getShortProjectDetailById(project_id)
       let projectAssignmentStatus = page.project_detail.status_name || null
