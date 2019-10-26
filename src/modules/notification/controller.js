@@ -28,7 +28,7 @@ module.exports = {
       SIT Student Accomplishment
       `
       if (assignment !== null) {
-        if (projectAssignmentStatus === 'Wating') {
+        if (projectAssignmentStatus === 'Waiting') {
           projectAssignmentStatus = '<b>Waiting</b> the lecturer approve the project'
         } else if (projectAssignmentStatus === 'Approve') {
           projectAssignmentStatus = 'Lecturer <b>approve</b> the project'

@@ -205,7 +205,7 @@ module.exports = {
   mapProjectAndAssignment: async (projectId, assignmentId, status) => {
     try {
       let id
-      const statusId = await knex('status_project').select('id').where('status_name', 'Wating')
+      const statusId = await knex('status_project').select('id').where('status_name', 'Waiting')
       if (status === 'create') {
         const data = {
           project_id: projectId,
@@ -214,7 +214,7 @@ module.exports = {
         }
         id = await knex('project_assignment').insert(data).returning('id')
       } else if (status === 'update') {
-        const statusId = await knex('status_project').select('id').where('status_name', 'Wating')
+        const statusId = await knex('status_project').select('id').where('status_name', 'Waiting')
         id = await knex('project_assignment').update('status_id', statusId[0].id)
           .where('project_id', projectId)
           .andWhere('assignment_id', assignmentId)
