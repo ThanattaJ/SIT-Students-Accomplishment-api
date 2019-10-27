@@ -18,7 +18,7 @@ module.exports = {
       const { auth } = req
       const { academic_term_id, course_id, assignment_name, assignment_detail, isGroup, close_date } = req.body
       const courseSemesters = await courseController.getCourseSpecifySemester(academic_term_id, course_id)
-      const closeDate = moment(close_date).format('YYYY-MM-DD')
+      const closeDate = moment(close_date, 'DD-MM-YYYY').format('YYYY-MM-DD')
       let code = ''
       while (true) {
         code = randomstring.generate({
