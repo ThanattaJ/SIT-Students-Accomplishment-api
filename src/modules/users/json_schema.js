@@ -21,7 +21,7 @@ module.exports = {
       lastname: joi.string().trim(),
       email: joi.string().trim().email(),
       nickname: joi.string().trim(),
-      birthday: joi.date().allow(null),
+      birthday: joi.string().allow(null),
       telephone_number: joi.string().trim().allow(null)
     }).required(),
     address: joi.object().keys({
