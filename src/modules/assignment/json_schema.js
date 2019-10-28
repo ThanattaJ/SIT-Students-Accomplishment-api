@@ -43,9 +43,9 @@ module.exports = {
   }),
 
   updateProjectStatusSchema: joi.object().keys({
-    assignment_id: joi.number().required(),
+    assignment_id: joi.number(),
     project_id: joi.number().required(),
-    status: joi.string().trim(),
+    status: joi.string().trim().required(),
     comment: joi.string().trim().allow(null)
   })
 

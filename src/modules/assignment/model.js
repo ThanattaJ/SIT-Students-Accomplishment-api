@@ -249,7 +249,6 @@ module.exports = {
         projects = await knex('project_assignment').select(query.queryGetProjectRequest)
           .join('status_project', 'project_assignment.status_id', 'status_project.id')
           .join('projects', 'project_assignment.project_id', 'projects.id')
-          .where('project_assignment.assignment_id', assignmentId)
           .andWhere('status_project.status_name', status)
       }
       return projects
@@ -265,12 +264,19 @@ module.exports = {
         status_id: statusId[0].id,
         comment: comment
       }
-      if (status === 'Approve') {
+      if (status === 'Approve' || status === 'Request') {
         data.comment = null
       }
-      const assignments = await knex('project_assignment').update(data)
-        .where('project_assignment.assignment_id', assignmentId)
-        .andWhere('project_assignment.project_id', projectId)
+
+      let assignments
+      if (status === 'Request') {
+        assignments = await knex('project_assignment').update(data)
+          .andWhere('project_assignment.project_id', projectId)
+      } else {
+        assignments = await knex('project_assignment').update(data)
+          .where('project_assignment.assignment_id', assignmentId)
+          .andWhere('project_assignment.project_id', projectId)
+      }
       return assignments
     } catch (err) {
       throw new Error(err)

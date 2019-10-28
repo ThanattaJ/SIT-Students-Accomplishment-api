@@ -249,9 +249,11 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     try {
-      const { auth } = req
-      if (auth.role !== 'lecturer') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
       const { assignment_id, project_id, status, comment } = req.body || undefined
+      const { auth } = req
+      if (auth.role === 'students' && status !== 'Request') {
+        res.status(403).send({ auth: false, message: 'Permission Denied' })
+      }
       const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
 
       let assignment = null
