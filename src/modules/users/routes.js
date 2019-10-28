@@ -5,6 +5,7 @@ const fileController = require('../files/controller')
 const { verifyToken } = require('../authentication/controller')
 
 router.get('/default', controller.getUserDefaultInformation)
+router.get('/project', controller.getUserProjectFilterTag)
 
 const uploadImg = fileController.multerImageConfig()
 router.patch('/image', verifyToken, uploadImg.single('file'), controller.updateUserImage)

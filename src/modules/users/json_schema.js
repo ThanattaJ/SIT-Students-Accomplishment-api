@@ -6,6 +6,11 @@ module.exports = {
     user_id: joi.string().required().trim()
   }),
 
+  getUserProjectFilterTag: joi.object().keys({
+    user_id: joi.string().required().trim(),
+    tag: joi.string().required().trim()
+  }),
+
   getStudentIdSchema: joi.object().keys({
     id: joi.string().required().trim()
   }),

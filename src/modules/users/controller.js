@@ -56,6 +56,22 @@ module.exports = {
     }
   },
 
+  getUserProjectFilterTag: async (req, res) => {
+    try {
+      const { checkStatus, err } = validate(req.query, json.getUserProjectFilterTag)
+      if (!checkStatus) return res.send(err)
+      const userId = req.query.user_id
+      const { tag } = req.query
+      const projects = await getProjectFilterTagByStudentId(userId, tag)
+      res.send(projects)
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
   updateUserEmail: async (req, res, next) => {
     try {
       const { checkStatus, err } = validate(req.body, json.updateUserEmailSchema)
@@ -406,4 +422,9 @@ async function getProjectByStudentId (access, userId) {
   result.allTag = await projectController.getAmountProjectTag(result.project)
 
   return result
+}
+
+async function getProjectFilterTagByStudentId (userId, tag) {
+  const projects = await projectController.getProjectFilterTagByStudentId(userId, tag)
+  return projects
 }

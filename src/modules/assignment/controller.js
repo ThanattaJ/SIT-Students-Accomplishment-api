@@ -229,7 +229,6 @@ module.exports = {
       if (auth.role !== 'lecturer') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
       const { assignment_id, status } = req.query || undefined
       const projects = await assignmentModel.getProjectInAssignment(assignment_id, status)
-      console.log(projects);
       projects.map(project => {
         project.project_assignment_created_date = project.project_assignment_created_date === null ? null : moment(project.project_assignment_created_date).format('MMM Do YYYY, h:mm:ss a')
         project.project_assignment_updated_date = project.project_assignment_updated_date === null ? null : moment(project.project_assignment_updated_date).format('MMM Do YYYY, h:mm:ss a')

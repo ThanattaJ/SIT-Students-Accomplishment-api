@@ -452,3 +452,9 @@ exports.getAmountProjectTag = async function (projects) {
     throw new Error(err)
   }
 }
+
+exports.getProjectFilterTagByStudentId = async function (studentId, tag) {
+  const projects = await projectModel.getProjectFilterTagByStudentId(studentId, tag)
+  return projects
+}
+

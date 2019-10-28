@@ -39,6 +39,7 @@ module.exports = {
     const isAdmin = await knex('lecturers').select('isAdmin').where('lecturer_id', lecturerId)
     return isAdmin[0].isAdmin === 1
   },
+
   updateUserEmail: async (userRole, id, email) => {
     try {
       let result

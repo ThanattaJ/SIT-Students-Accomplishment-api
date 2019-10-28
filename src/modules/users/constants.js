@@ -11,6 +11,7 @@ module.exports = {
     'curriculum.curriculum_name',
     'students_profile.nickname'
   ],
+
   queryLecturerDefaultInformation: [
     'lecturers.id',
     'lecturers.lecturer_id',

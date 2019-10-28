@@ -306,6 +306,21 @@ module.exports = {
     } catch (err) {
       throw new Error(err)
     }
+  },
+
+  getProjectFilterTagByStudentId: async (studentId, tag) => {
+    try {
+      let projects = await knex('projects').select(query.queryAllProjects)
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .join('project_tags', 'projects.id', 'project_tags.project_id')
+        .join('tags', 'project_tags.tag_id', 'tags.id')
+        .where('project_member.student_id', studentId)
+        .andWhere('tags.tag_name', tag)
+      projects = await getProjectsCoverAndIsAchievement(projects)
+      return projects
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }
 
