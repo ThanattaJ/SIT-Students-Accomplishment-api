@@ -80,7 +80,7 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     try {
-      const auth = req.headers.authorization ? await authenController.authorization(req.headers.authorization) : null
+      const auth = req.headers.authorization !== 'null' ? await authenController.authorization(req.headers.authorization) : null
       const projectId = req.query.project_id
       const page = await getProjectDetail(projectId)
       page.access = false
