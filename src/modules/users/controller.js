@@ -12,7 +12,7 @@ module.exports = {
 
   getUserDefaultInformation: async (req, res) => {
     try {
-      const auth = req.headers.authorization !== 'null' ? await authenController.authorization(req.headers.authorization) : null
+      const auth = req.headers.authorization && req.headers.authorization !== 'null' ? await authenController.authorization(req.headers.authorization) : null
       let userData = {}
       let userRole
       if (auth === null) {

@@ -106,9 +106,9 @@ module.exports = {
           .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
           .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')
           .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
-          .whereNotIn('id', topProjectId)
+          .whereNotIn('projects.id', topProjectId)
           .andWhere('project_member.student_id', id)
-          .andWhere('isShow', true)
+          .andWhere('projects.isShow', true)
           .orderBy('projects.created_at', 'desc')
         projects = projects.concat(unTopProject)
       }
