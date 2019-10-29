@@ -9,7 +9,7 @@ const _ = require('lodash')
 module.exports = {
   getCourse: async (req, res) => {
     try {
-      const courses = await courseModel.getCourse()
+      const courses = await courseModel.getAllCourse()
       res.send(courses)
     } catch (err) {
       res.status(500).send({

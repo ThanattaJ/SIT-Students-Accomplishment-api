@@ -3,6 +3,15 @@ const _ = require('lodash')
 const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseLecturer, queryGetCourseAssignment, queryGetProjectInCourse } = require('./constants')
 module.exports = {
 
+  getAllCourse: async () => {
+    try {
+      const courses = await knex('courses').select(queryGetCourse).where('isDelete', false)
+      return courses
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   getCourse: async () => {
     try {
       const courses = await knex('courses').distinct(queryGetCourse)
