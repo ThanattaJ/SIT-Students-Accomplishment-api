@@ -199,7 +199,7 @@ module.exports = {
 
       assignments.map(assignment => {
         const now = moment().format('YYYY-MM-DD')
-        assignment.time_out = !moment(now).isSameOrBefore(assignment.close_date)
+        assignment.time_up = !moment(now).isSameOrBefore(assignment.close_date)
         assignment.isGroup = assignment.isGroup === 1
         assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
         if (isHave === 'all') {
