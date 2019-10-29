@@ -5,7 +5,12 @@ module.exports = {
 
   getCourse: async () => {
     try {
-      const courses = await knex('courses').select(queryGetCourse).orderBy('course_code', 'asc').where('isDelete', false)
+      const courses = await knex('courses').distinct(queryGetCourse)
+        .join('lecturer_course', 'courses.id', 'lecturer_course.courses_id')
+        .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
+        .join('project_assignment', 'lecturer_assignment.assignment_id', 'project_assignment.assignment_id')
+        .orderBy('course_code', 'asc')
+        .where('isDelete', false)
       return courses
     } catch (err) {
       throw new Error(err)
@@ -22,6 +27,7 @@ module.exports = {
         .where('lecturer_course.courses_id', courseId)
         .andWhere('status_project.status_name', 'Approve')
         .groupBy('lecturer_assignment.assignment_id', 'lecturer_course.courses_id', 'project_assignment.assignment_id')
+        .orderBy('projects.count_viewer', 'desc')
       return project
     } catch (err) {
       throw new Error(err)

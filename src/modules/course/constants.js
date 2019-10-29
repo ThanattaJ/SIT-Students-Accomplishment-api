@@ -2,7 +2,7 @@ const knex = require('../../db/knex')
 
 module.exports = {
   queryGetCourse: [
-    'id as course_id',
+    'courses.id as course_id',
     'course_code',
     'course_name',
     'course_detail'
