@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const _ = require('lodash')
 const moment = require('moment')
 const assignmentModel = require('./model')
 const courseController = require('../course/controller')
@@ -245,10 +246,15 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     try {
-      const { assignment_id, project_id, status, comment } = req.body || undefined
+      let { assignment_id, project_id, status, comment } = req.body || undefined
       const { auth } = req
       if (auth.role === 'students' && status !== 'Request') {
         res.status(403).send({ auth: false, message: 'Permission Denied' })
+      }
+      let oldProjects = await assignmentModel.getProjectInAssignment(assignment_id, 'Request')
+      oldProjects = _.filter(oldProjects, { 'project_id': project_id })
+      if (oldProjects.length > 0) {
+        status = status === 'Reject' ? 'Approve' : 'Waiting'
       }
       const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
 
@@ -262,7 +268,15 @@ module.exports = {
 
       const page = await projectModel.getShortProjectDetailById(project_id)
       let projectAssignmentStatus = page.project_detail.status_name || null
-      await notiController.sendEmail(project_id, auth.fullname, page, 'check', assignment, projectAssignmentStatus)
+      if (oldProjects.length > 0) {
+        await notiController.sendEmail(project_id, auth.fullname, page, 'consider', assignment, projectAssignmentStatus)
+      } else {
+        if (auth.role !== 'students' && status !== 'Request') {
+          await notiController.sendEmail(project_id, auth.fullname, page, 'check', assignment, projectAssignmentStatus)
+        } else {
+          await notiController.sendEmail(project_id, auth.fullname, page, 'request', assignment, projectAssignmentStatus)
+        }
+      }
 
       res.status(200).send({
         status: 200,
