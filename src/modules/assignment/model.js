@@ -1,5 +1,6 @@
 const knex = require('../../db/knex')
 const query = require('./constants')
+const _ = require('lodash')
 module.exports = {
   createAssignment: async (assignment) => {
     try {
@@ -242,9 +243,30 @@ module.exports = {
       } else if (isHave === 'all') {
         assignments = await knex('student_assignment').select(query.queryGetAssignmentProjectByStudentId)
           .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
-          .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
-          .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
-          .andWhere('student_assignment.student_id', studentId)
+          .where('student_assignment.student_id', studentId)
+        const asssignmentId = _.map(assignments, 'assignment_id')
+        const projects = await knex('projects').select('projects.id', 'status_project.status_name' , 'project_assignment.created_at as project_assignment_created_date', 'project_assignment.updated_at  as project_assignment_updated_date', 'project_assignment.assignment_id')
+          .join('project_assignment', 'projects.id', 'project_assignment.project_id')
+          .join('assignments', 'project_assignment.assignment_id', 'assignments.id')
+          .join('status_project', 'project_assignment.status_id', 'status_project.id')
+          .join('project_member', 'projects.id', 'project_member.project_id')
+          .whereIn('project_assignment.assignment_id', asssignmentId)
+          .andWhere('project_member.student_id', studentId)
+        assignments.map(assignment => {
+          const assignmentId = assignment.assignment_id
+          const p = _.filter(projects, { 'assignment_id': assignmentId })
+          if (p.length > 0) {
+            assignment.project_id = p[0].project_id
+            assignment.status_name = p[0].status_name
+            assignment.created_at = p[0].project_assignment_created_date
+            assignment.updated_at = p[0].project_assignment_updated_date
+          } else {
+            assignment.project_id = null
+            assignment.status_name = null
+            assignment.created_at = null
+            assignment.updated_at = null
+          }
+        })
       } else if (isHave === 'true') {
         await knex('student_assignment').select(query.queryGetAssignmentProjectByStudentId)
           .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
@@ -298,6 +320,11 @@ module.exports = {
         assignments = await knex('project_assignment').update(data)
           .where('project_assignment.assignment_id', assignmentId)
           .andWhere('project_assignment.project_id', projectId)
+        if (status === 'Approve') {
+          await knex('projects').update('isShow', true).where('projects.id', projectId)
+        } else {
+          await knex('projects').update('isShow', false).where('projects.id', projectId)
+        }
       }
       return assignments
     } catch (err) {

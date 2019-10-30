@@ -76,12 +76,7 @@ module.exports = {
     'assignments.assignment_name',
     'assignments.join_code',
     'assignments.isGroup',
-    'assignments.close_date',
-    'project_assignment.project_id',
-    'status_project.status_name',
-    'project_assignment.comment',
-    'project_assignment.created_at as project_assignment_created_date',
-    'project_assignment.updated_at  as project_assignment_updated_date'
+    'assignments.close_date'
   ],
 
   queryGetProjectRequest: [
