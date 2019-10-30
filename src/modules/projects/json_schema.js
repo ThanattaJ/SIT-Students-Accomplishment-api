@@ -80,7 +80,7 @@ module.exports = {
             lecturer_id: joi.string().required().trim().allow(null),
             lecturer_name: joi.string().required().trim().allow(null)
           })
-        ),
+        ).allow(null),
         project_status: joi.string().required().trim().allow(null),
         comment: joi.string().required().trim().allow(null)
       })
