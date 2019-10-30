@@ -29,6 +29,7 @@ const uploadFileToStorage = function (file, fileType, id, isProfile, isResume) {
     let newFileName = file.originalname
     let fileUpload
     if (fileType === 'image') {
+      console.log('object');
       newFileName = `${Date.now()}_${file.originalname}`
       if (isProfile === false) {
         fileUpload = bucket.file(`Images/${id}/${newFileName}`)
