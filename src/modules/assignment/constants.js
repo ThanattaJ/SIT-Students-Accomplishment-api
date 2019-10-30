@@ -23,7 +23,10 @@ module.exports = {
     knex.raw('CONCAT(courses.course_code,\' \',courses.course_name) as course_name'),
     knex.raw('CONCAT(lecturers.firstname,\' \',lecturers.lastname) as lecturers_name'),
     'assignments.created_at',
-    'assignments.updated_at',
+    'assignments.updated_at'
+  ],
+
+  queryGetStudentProjectAssignmentsDetailById: [
     'projects.id as project_id',
     'projects.project_name_en',
     'projects.project_name_th',

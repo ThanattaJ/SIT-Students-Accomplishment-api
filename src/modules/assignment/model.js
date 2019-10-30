@@ -54,20 +54,41 @@ module.exports = {
 
   getStudentAssignmentsDetailById: async (assignmentId, studentId) => {
     try {
+      console.log(studentId);
+      console.log(assignmentId);
       const assignments = await knex('student_assignment')
         .select(query.queryGetStudentAssignmentsDetailById)
         .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
-        .leftJoin('project_assignment', 'assignments.id', 'project_assignment.assignment_id')
-        .leftJoin('status_project', 'project_assignment.status_id', 'status_project.id')
-        .leftJoin('projects', 'project_assignment.project_id', 'projects.id')
         .join('lecturer_assignment', 'assignments.id', 'lecturer_assignment.assignment_id')
         .join('lecturer_course', 'lecturer_assignment.lecturer_course_id', 'lecturer_course.id')
         .join('courses', 'lecturer_course.courses_id', 'courses.id')
         .join('lecturers', 'lecturer_course.lecturer_id', 'lecturers.lecturer_id')
         .where('student_assignment.assignment_id', assignmentId)
-        .andWhere('assignments.id', assignmentId)
         .andWhere('student_assignment.student_id', studentId)
         .andWhere('lecturer_assignment.isCreator', true)
+      console.log(assignments);
+      const project = await knex('projects')
+        .select(query.queryGetStudentProjectAssignmentsDetailById)
+        .join('project_assignment', 'projects.id', 'project_assignment.project_id')
+        .join('assignments', 'project_assignment.assignment_id', 'assignments.id')
+        .join('status_project', 'project_assignment.status_id', 'status_project.id')
+        .join('project_member', 'projects.id', 'project_member.project_id')
+        .where('project_member.student_id', studentId)
+        .andWhere('project_assignment.assignment_id', assignmentId)
+      console.log('project', project);
+      if (project.length > 0) {
+        assignments[0].project_id = project[0].project_id === undefined ? null : project[0].project_id
+        assignments[0].project_name_en = project[0].project_name_en === undefined ? null : project[0].project_name_en
+        assignments[0].project_name_th = project[0].project_name_th === undefined ? null : project[0].project_name_th
+        assignments[0].status_name = project[0].status_name === undefined ? null : project[0].status_name
+        assignments[0].comment = project[0].comment === undefined ? null : project[0].comment
+      } else {
+        assignments[0].project_id = null
+        assignments[0].project_name_en = null
+        assignments[0].project_name_th = null
+        assignments[0].status_name = null
+        assignments[0].comment = null
+      }
       return assignments[0]
     } catch (err) {
       throw new Error(err)

@@ -180,7 +180,7 @@ module.exports = {
       const type = project_detail.project_type_name
       console.log('................');
       await projectModel.updateProjectDetail(projectId, project_detail)
-      
+
       await manageAchievement(projectId, achievements)
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
         console.log('................');
