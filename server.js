@@ -14,6 +14,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
 }))
+app.enable('trust proxy')
 
 app.get('/', function (req, res) {
   res.status(200).send({
