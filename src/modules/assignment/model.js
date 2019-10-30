@@ -251,13 +251,13 @@ module.exports = {
         if (p.length > 0) {
           assignment.project_id = p[0].id
           assignment.status_name = p[0].status_name
-          assignment.created_at = p[0].project_assignment_created_date
-          assignment.updated_at = p[0].project_assignment_updated_date
+          assignment.project_assignment_created_date = p[0].project_assignment_created_date
+          assignment.project_assignment_updated_date = p[0].project_assignment_updated_date
         } else {
           assignment.project_id = null
           assignment.status_name = null
-          assignment.created_at = null
-          assignment.updated_at = null
+          assignment.project_assignment_created_date = null
+          assignment.project_assignment_updated_date = null
         }
       })
 

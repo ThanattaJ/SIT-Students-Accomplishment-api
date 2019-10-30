@@ -203,10 +203,8 @@ module.exports = {
         assignment.time_up = !moment(now).isSameOrBefore(assignment.close_date)
         assignment.isGroup = assignment.isGroup === 1
         assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
-        if (isHave === 'all') {
-          assignment.project_assignment_created_date = assignment.project_assignment_created_date === null ? null : moment(assignment.project_assignment_created_date).format('MMM Do YYYY, h:mm:ss a')
-          assignment.project_assignment_updated_date = assignment.project_assignment_updated_date === null ? null : moment(assignment.project_assignment_updated_date).format('MMM Do YYYY, h:mm:ss a')
-        }
+        assignment.project_assignment_created_date = assignment.project_assignment_created_date === null ? null : moment(assignment.project_assignment_created_date).format('MMM Do YYYY, h:mm:ss a')
+        assignment.project_assignment_updated_date = assignment.project_assignment_updated_date === null ? null : moment(assignment.project_assignment_updated_date).format('MMM Do YYYY, h:mm:ss a')
       })
 
       res.send(assignments)
