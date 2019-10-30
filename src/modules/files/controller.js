@@ -114,6 +114,7 @@ module.exports = {
   multerImageConfig: () => {
     const uploadImg = multer({
       fileFilter: (req, file, cb) => {
+        console.log('file', file)
         checkFileImgType(file, cb)
       },
       storage: multer.memoryStorage(),
