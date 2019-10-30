@@ -26,10 +26,11 @@ const bucket = fbAdmin.storage().bucket()
 
 const uploadFileToStorage = function (file, fileType, id, isProfile, isResume) {
   let prom = new Promise((resolve, reject) => {
+    console.log('newFileName VV');
     let newFileName = file.originalname
+    console.log(newFileName);
     let fileUpload
     if (fileType === 'image') {
-      console.log('object');
       newFileName = `${Date.now()}_${file.originalname}`
       if (isProfile === false) {
         fileUpload = bucket.file(`Images/${id}/${newFileName}`)
@@ -156,6 +157,7 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     const { file } = req
+    console.log('file.originalname', file.originalname);
     if (file === undefined) {
       return res.status(500).send({
         status: 500,
@@ -165,6 +167,7 @@ module.exports = {
     const projectId = req.body.project_id
     const isCover = (req.body.isCover === 'true')
     if (isCover) {
+      console.log('isCover', isCover);
       file.originalname = 'cover'
     }
 
