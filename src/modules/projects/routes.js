@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const controller = require('./controller')
+const { clapLimiter } = require('../limit/controller')
 const { verifyToken } = require('../authentication/controller')
 
 router.get('/', controller.getProjectPage)
@@ -13,7 +14,7 @@ router.post('/add-external-to-assignment', verifyToken, controller.addProjectExt
 
 router.patch('/', verifyToken, controller.updateProjectDetail)
 
-router.patch('/claping', controller.updateProjectClap)
+router.patch('/claping', clapLimiter, controller.updateProjectClap)
 
 router.delete('/:id', controller.deleteProject)
 
