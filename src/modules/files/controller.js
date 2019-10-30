@@ -117,10 +117,7 @@ module.exports = {
         console.log('file', file)
         checkFileImgType(file, cb)
       },
-      storage: multer.memoryStorage(),
-      limits: {
-        fileSize: 35000000
-      }
+      storage: multer.memoryStorage()
     })
     return uploadImg
   },
@@ -220,10 +217,7 @@ module.exports = {
       fileFilter: (req, file, cb) => {
         checkFileDocType(file, cb)
       },
-      storage: multer.memoryStorage(),
-      limit: {
-        fileSize: 5000000
-      }
+      storage: multer.memoryStorage()
     })
     return uploadDoc
   },
