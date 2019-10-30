@@ -9,10 +9,11 @@ const app = express()
 const apiRoute = require('./src/routes')
 const port = process.env.PORT || 7000
 
-// app.use(cors())
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
-  extended: true
+  extended: true,
+  limit: '50mb'
 }))
 
 app.get('/', function (req, res) {
