@@ -90,7 +90,7 @@ module.exports = {
         student_id: joi.string().required().trim(),
         firstname: joi.string().trim(),
         lastname: joi.string().trim(),
-        email: joi.string().trim().email()
+        email: joi.string().trim().email().allow(null)
       })
     ),
     outsiders: joi.array().items(
