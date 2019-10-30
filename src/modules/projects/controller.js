@@ -178,13 +178,16 @@ module.exports = {
       const { project_detail, outsiders, achievements, tags, video } = req.body
       const projectId = project_detail.id
       const type = project_detail.project_type_name
+      console.log('................');
       await projectModel.updateProjectDetail(projectId, project_detail)
-
+      
       await manageAchievement(projectId, achievements)
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
+        console.log('................');
         await manageOutsider(outsiders, projectId)
       }
       if (tags !== undefined) {
+        console.log('................');
         const tagsCheked = await checkTag(tags)
         tagsCheked.forEach(tag => {
           tag.project_id = projectId
@@ -213,6 +216,7 @@ module.exports = {
 
       res.send(newDetail)
     } catch (err) {
+      console.log(err);
       res.status(500).send({
         status: 500,
         message: err.message
@@ -394,6 +398,7 @@ async function manageOutsider (outsiders, projectId) {
 
 async function manageAchievement (id, achievements) {
   try {
+    console.log('hi');
     if (achievements.length > 0) {
       achievements.forEach(achievement => {
         achievements.project_id = id

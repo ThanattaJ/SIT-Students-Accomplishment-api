@@ -239,6 +239,7 @@ module.exports = {
       if (projectDetail.project_type_name) {
         projectDetail = await getProjectTypeId(projectDetail)
       }
+      console.log('object');
       await knex('projects').update(projectDetail).where('id', id)
     } catch (err) {
       return err

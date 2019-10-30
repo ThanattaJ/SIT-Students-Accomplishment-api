@@ -20,8 +20,9 @@ module.exports = {
     try {
       const date = moment().format('DD-MM-YYYY')
       const { students } = data
-      const studentEmail = _.filter(students, 'email')
+      let studentEmail = _.filter(students, 'email')
       if (studentEmail.length > 0) {
+        studentEmail = _.map(studentEmail, 'email')
         let text = `
         Hello, student\n
         <p>${user} ${status} the ${data.project_detail.project_name_en} portfolio</p> \n\n
@@ -86,8 +87,9 @@ module.exports = {
         if (assignment === null) {
           if (data.project_detail.haveOutsider) {
             const { outsiders } = data
-            const outsiderEmail = _.filter(outsiders, 'email')
+            let outsiderEmail = _.filter(outsiders, 'email')
             if (outsiderEmail.length > 0) {
+              outsiderEmail = _.map(outsiderEmail, 'email')
               content = {
                 from: 'admin.sit.student.accomplishment@gmail.com',
                 to: outsiderEmail,
