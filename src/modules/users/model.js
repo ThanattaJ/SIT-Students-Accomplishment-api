@@ -243,7 +243,13 @@ module.exports = {
 
   getListStudent: async (code) => {
     try {
-      return await knex('students').select(query.queryListStudent).where('student_id', 'like', `${code}%`)
+      let list
+      if (code === 'all') {
+        list = await knex('students').select(query.queryListStudent)
+      } else {
+        list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${code}%`)
+      }
+      return list
     } catch (err) {
       throw new Error(err)
     }
