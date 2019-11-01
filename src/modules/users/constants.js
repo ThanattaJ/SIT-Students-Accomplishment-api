@@ -81,7 +81,8 @@ module.exports = {
   queryListStudent: [
     'student_id',
     'firstname',
-    'lastname'
+    'lastname',
+    'profile_picture'
   ],
 
   queryListLecturer: [

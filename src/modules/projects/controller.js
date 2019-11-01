@@ -2,7 +2,7 @@ const moment = require('moment')
 const _ = require('lodash')
 const projectModel = require('./model')
 const authenController = require('../authentication/controller')
-const userController = require('../users/controller')
+const userModel = require('../users/model')
 const tagsController = require('../tags/controller')
 const filesController = require('../files/controller')
 const notiController = require('../notification/controller')
@@ -38,9 +38,6 @@ module.exports = {
 
       if (page === 'all') {
         result.projects = await projectModel.getAllProjects(getYear)
-      } else if (page === 'achievement') {
-        result.projects = await projectModel.getAllProjects(getYear)
-        result.projects = _.filter(result.projects, 'achievement')
       } else if (page === 'assignment') {
         if (courseId === undefined) {
           result.courses = await courseModel.getCourse()
@@ -54,6 +51,9 @@ module.exports = {
         } else if (by === 'projects') {
           result.projects = await projectModel.getProjectByName(search)
         }
+      }
+      if (page === 'profile') {
+        result.profile = await userModel.getListStudent(search, false)
       }
       res.send(result)
     } catch (err) {
@@ -151,7 +151,7 @@ module.exports = {
       const page = await projectModel.getShortProjectDetailById(projectId)
       page.project_detail.haveOutsider = page.project_detail.haveOutsider === 1
       if (page.project_detail.haveOutsider) {
-        const outsiders = await userController.getOutsider(projectId)
+        const outsiders = await userModel.getProjectOutsider(projectId)
         page.outsiders = outsiders[0] === undefined ? [] : outsiders
       }
       let projectAssignmentStatus = page.project_detail.status_name || null
@@ -199,7 +199,7 @@ module.exports = {
       const newDetail = await getProjectDetail(projectId)
       newDetail.project_detail.haveOutsider = newDetail.project_detail.haveOutsider === 1
       if (newDetail.project_detail.haveOutsider) {
-        const outsiders = await userController.getOutsider(projectId)
+        const outsiders = await userModel.getProjectOutsider(projectId)
         newDetail.outsiders = outsiders[0] === undefined ? [] : outsiders
       }
 
@@ -329,7 +329,7 @@ async function getProjectDetail (projectId) {
     result.project_detail.isShow = result.project_detail.isShow === 1
     result.project_detail.haveOutsider = result.project_detail.haveOutsider === 1
     if (result.project_detail.haveOutsider) {
-      const outsiders = await userController.getOutsider(projectId)
+      const outsiders = await userModel.getProjectOutsider(projectId)
       result.outsiders = outsiders[0] === undefined ? [] : outsiders
     }
     if (result.project_detail.references) {
@@ -384,12 +384,14 @@ async function manageOutsider (outsiders, projectId) {
       outsiderNotId.forEach(outsider => {
         outsider.project_id = projectId
       })
-      await userController.createOutsider(outsiderNotId)
+      await userModel.addProjectOutsider(outsiderNotId)
     }
 
     const outsiderHaveId = await outsiders.filter(outsider => outsider.id !== undefined)
     if (outsiderHaveId.length > 0) {
-      await userController.updateOutsider(outsiderHaveId)
+      outsiders.forEach(async outsider => {
+        await userModel.updateProjectOutsider(outsiderHaveId)
+      })
     }
   } catch (err) {
     throw new Error(err)

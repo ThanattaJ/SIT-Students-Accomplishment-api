@@ -241,13 +241,17 @@ module.exports = {
     }
   },
 
-  getListStudent: async (code) => {
+  getListStudent: async (char, isStudentId) => {
     try {
       let list
-      if (code === 'all') {
-        list = await knex('students').select(query.queryListStudent)
+      if (isStudentId) {
+        if (char === 'all') {
+          list = await knex('students').select(query.queryListStudent)
+        } else {
+          list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${char}%`)
+        }
       } else {
-        list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${code}%`)
+        list = await knex('students').select(query.queryListStudent).where('firstname', 'like', `${char}%`)
       }
       return list
     } catch (err) {

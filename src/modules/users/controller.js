@@ -304,7 +304,7 @@ module.exports = {
       if (!checkStatus) return res.send(err)
 
       const code = req.params.code
-      const list = await userModel.getListStudent(code)
+      const list = await userModel.getListStudent(code, true)
       res.send(list)
     } catch (err) {
       res.status(500).send({
@@ -364,34 +364,6 @@ module.exports = {
         status: 500,
         message: err.message
       })
-    }
-  },
-
-  createOutsider: async (data) => {
-    try {
-      const result = await userModel.addProjectOutsider(data)
-      return result
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
-  getOutsider: async (projectId) => {
-    try {
-      const outsiders = await userModel.getProjectOutsider(projectId)
-      return outsiders
-    } catch (err) {
-      throw new Error(err)
-    }
-  },
-
-  updateOutsider: async (outsiders) => {
-    try {
-      outsiders.forEach(async outsider => {
-        await userModel.updateProjectOutsider(outsider)
-      })
-    } catch (err) {
-      throw new Error(err)
     }
   },
 
