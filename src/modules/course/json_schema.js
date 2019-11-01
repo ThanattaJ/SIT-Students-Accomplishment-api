@@ -10,7 +10,8 @@ module.exports = {
   updateCourseSchema: joi.object().keys({
     code: joi.string().required().trim(),
     name: joi.string().required().trim(),
-    detail: joi.string().trim().allow(null)
+    detail: joi.string().trim().allow(null),
+    isDelete: joi.boolean()
   }),
 
   deleteCourseSchema: joi.object().keys({

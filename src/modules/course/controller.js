@@ -55,14 +55,19 @@ module.exports = {
     if (!checkStatus) return res.send(err)
 
     try {
-      const { code, name, detail } = req.body
-      const course = {
-        course_code: _.upperCase(code).replace(' ', ''),
-        course_name: name,
-        course_detail: detail || null
-      }
+      const { code, name, detail, isDelete } = req.body
       const { id } = req.query
-      const data = await courseModel.updateCourse(id, course)
+      let data
+      if (isDelete !== undefined) {
+        data = await courseModel.deleteCourse(id, false)
+      } else {
+        const course = {
+          course_code: _.upperCase(code).replace(' ', ''),
+          course_name: name,
+          course_detail: detail || null
+        }
+        data = await courseModel.updateCourse(id, course)
+      }
       res.send(data)
     } catch (err) {
       res.status(500).send({
@@ -77,7 +82,7 @@ module.exports = {
     if (!checkStatus) return res.send(err)
     try {
       const { id } = req.query
-      await courseModel.deleteCourse(id)
+      await courseModel.deleteCourse(id, false)
       res.status(200).send({
         status: 200,
         data: 'Delete course success!'

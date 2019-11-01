@@ -5,7 +5,13 @@ module.exports = {
 
   getAllCourse: async () => {
     try {
-      const courses = await knex('courses').select(queryGetCourse).where('isDelete', false)
+      let courses
+      const coursesExist = await knex('courses').select(queryGetCourse).where('isDelete', false)
+      const coursesNotExist = await knex('courses').select(queryGetCourse).where('isDelete', true)
+      courses = {
+        course: coursesExist,
+        courseIsDelete: coursesNotExist
+      }
       return courses
     } catch (err) {
       throw new Error(err)
@@ -87,9 +93,9 @@ module.exports = {
     }
   },
 
-  deleteCourse: async (id) => {
+  deleteCourse: async (id, status) => {
     try {
-      await knex('courses').update('isDelete', true).where('id', id)
+      await knex('courses').update('isDelete', status).where('id', id)
     } catch (err) {
       throw new Error(err)
     }
