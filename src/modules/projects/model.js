@@ -83,7 +83,7 @@ module.exports = {
     try {
       let projects
       if (access === true) {
-        projects = await knex('projects').select(query.queryProjectsByStudentId)
+        projects = await knex('projects').select(query.queryProjectsByStudentId).distinct('projects.id')
           .join('project_member', 'projects.id', 'project_member.project_id')
           .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
           .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')

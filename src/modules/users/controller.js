@@ -2,6 +2,7 @@
 const userModel = require('./model')
 const moment = require('moment')
 const projectController = require('../projects/controller')
+const projectModel = require('../projects/model')
 const fileController = require('../files/controller')
 const authenController = require('../authentication/controller')
 const courseController = require('../course/controller')
@@ -389,14 +390,19 @@ module.exports = {
 
 async function getProjectByStudentId (access, userId) {
   const result = {}
-  result.project = await projectController.getProjectsByStudentId(access, userId)
-  result.totalProject = await projectController.getAmountProjectUser(userId)
-  result.allTag = await projectController.getAmountProjectTag(result.project)
+  result.project = await projectModel.getProjectsByStudentId(access, userId)
+  result.totalProject = await projectModel.countProjectByYear(userId)
+  const projects = result.project
+  let allProjectId = []
+  projects.forEach(project => {
+    allProjectId.push(project.id)
+  })
+  result.allTag = await projectModel.countTagForAllProject(allProjectId)
 
   return result
 }
 
 async function getProjectFilterTagByStudentId (userId, tag) {
-  const projects = await projectController.getProjectFilterTagByStudentId(userId, tag)
+  const projects = await projectModel.getProjectFilterTagByStudentId(userId, tag)
   return projects
 }

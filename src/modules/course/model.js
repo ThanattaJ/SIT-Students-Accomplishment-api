@@ -1,6 +1,6 @@
 const knex = require('../../db/knex')
 const _ = require('lodash')
-const { queryGetCourse, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseLecturer, queryGetCourseAssignment, queryGetProjectInCourse } = require('./constants')
+const { queryGetCourse, queryGetCourseHaveAssignment, querySemester, queryGetCourseSemester, queryGetLecturerCourse, queryGetCourseLecturer, queryGetCourseAssignment, queryGetProjectInCourse } = require('./constants')
 module.exports = {
 
   getAllCourse: async () => {
@@ -20,12 +20,16 @@ module.exports = {
 
   getCourse: async () => {
     try {
-      const courses = await knex('courses').distinct(queryGetCourse)
+      const courses = await knex('courses').select(queryGetCourseHaveAssignment)
+        .distinct('courses.id as course_id')
         .join('lecturer_course', 'courses.id', 'lecturer_course.courses_id')
         .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
         .join('project_assignment', 'lecturer_assignment.assignment_id', 'project_assignment.assignment_id')
-        .orderBy('course_code', 'asc')
+        .join('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
+        .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
+        .join('term', 'academic_term.term_id', 'term.id')
         .where('isDelete', false)
+        .orderBy('course_code', 'asc')
       return courses
     } catch (err) {
       throw new Error(err)

@@ -169,6 +169,7 @@ module.exports = {
       const lecturerNotHaveCourseMapLecturerId = lecturers.filter(lecturer => lecturer.course_map_lecturer === undefined)
 
       if (lecturerNotHaveCourseMapLecturerId.length > 0) {
+        console.log('in if');
         await manageCourseSemester(academic_term_id, course_id, lecturerNotHaveCourseMapLecturerId)
         const assignments = await courseModel.getCourseAssignment(academic_term_id, course_id)
         const lecturers = await courseModel.getCourseLecturer(academic_term_id, course_id)

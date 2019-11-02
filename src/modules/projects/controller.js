@@ -40,7 +40,28 @@ module.exports = {
         result.projects = await projectModel.getAllProjects(getYear)
       } else if (page === 'assignment') {
         if (courseId === undefined) {
-          result.courses = await courseModel.getCourse()
+          const courses = await courseModel.getCourse()
+          result.courses = []
+          let coursesIdUniq = _.uniqBy(courses, 'course_id')
+          coursesIdUniq.map(course => {
+            let tmpCourse = []
+            const courseId = course.course_id
+            const specifyCourses = _.filter(courses, { 'course_id': courseId })
+            tmpCourse = {
+              course_id: specifyCourses[0].course_id,
+              course_code: specifyCourses[0].course_code,
+              course_name: specifyCourses[0].course_name,
+              term: []
+            }
+            for (let i = 0; i < specifyCourses.length; i++) {
+              const term = {
+                academic_term_id: specifyCourses[i].academic_term_id,
+                academic_term: specifyCourses[i].academic_term
+              }
+              tmpCourse['term'].push(term)
+            }
+            result.courses.push(tmpCourse)
+          })
         } else {
           result.projects = await courseModel.getProjectInCourse(courseId)
           result.projects = await projectModel.getProjectsCoverAndIsAchievement(result.projects)
@@ -178,16 +199,13 @@ module.exports = {
       const { project_detail, outsiders, achievements, tags, video } = req.body
       const projectId = project_detail.id
       const type = project_detail.project_type_name
-      console.log('................');
       await projectModel.updateProjectDetail(projectId, project_detail)
 
       await manageAchievement(projectId, achievements)
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
-        console.log('................');
         await manageOutsider(outsiders, projectId)
       }
       if (tags !== undefined) {
-        console.log('................');
         const tagsCheked = await checkTag(tags)
         tagsCheked.forEach(tag => {
           tag.project_id = projectId
@@ -216,7 +234,6 @@ module.exports = {
 
       res.send(newDetail)
     } catch (err) {
-      console.log(err);
       res.status(500).send({
         status: 500,
         message: err.message
@@ -400,7 +417,6 @@ async function manageOutsider (outsiders, projectId) {
 
 async function manageAchievement (id, achievements) {
   try {
-    console.log('hi');
     if (achievements.length > 0) {
       achievements.forEach(achievement => {
         achievements.project_id = id
@@ -428,40 +444,3 @@ async function checkMemberJoinAssignment (studentId, project, assignment) {
     throw new Error(err)
   }
 }
-
-exports.getProjectsByStudentId = async function (access, userId) {
-  try {
-    let result = await projectModel.getProjectsByStudentId(access, userId)
-    return result
-  } catch (err) {
-    throw new Error(err)
-  }
-}
-
-exports.getAmountProjectUser = async function (userId) {
-  try {
-    const result = await projectModel.countProjectByYear(userId)
-    return result
-  } catch (err) {
-    throw new Error(err)
-  }
-}
-
-exports.getAmountProjectTag = async function (projects) {
-  try {
-    let allProjectId = []
-    projects.forEach(project => {
-      allProjectId.push(project.id)
-    })
-    const result = await projectModel.countTagForAllProject(allProjectId)
-    return result
-  } catch (err) {
-    throw new Error(err)
-  }
-}
-
-exports.getProjectFilterTagByStudentId = async function (studentId, tag) {
-  const projects = await projectModel.getProjectFilterTagByStudentId(studentId, tag)
-  return projects
-}
-

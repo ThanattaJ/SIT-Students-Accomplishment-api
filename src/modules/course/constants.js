@@ -8,6 +8,15 @@ module.exports = {
     'course_detail'
   ],
 
+  queryGetCourseHaveAssignment: [
+    'courses.id as course_id',
+    'course_code',
+    'course_name',
+    'course_detail',
+    'lecturer_course.academic_term_id',
+    knex.raw('CONCAT(academic_year.academic_year_en,\'/\',term.term_number) as academic_term')
+  ],
+
   queryGetProjectInCourse: [
     'projects.id',
     'projects.project_name_th',
