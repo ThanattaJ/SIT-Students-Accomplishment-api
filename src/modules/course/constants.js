@@ -5,7 +5,8 @@ module.exports = {
     'courses.id as course_id',
     'course_code',
     'course_name',
-    'course_detail'
+    'course_detail',
+    'isDelete'
   ],
 
   queryGetCourseHaveAssignment: [
