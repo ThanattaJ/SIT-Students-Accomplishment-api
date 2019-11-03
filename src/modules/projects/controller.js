@@ -10,7 +10,7 @@ const assignmentModel = require('../assignment/model')
 const courseModel = require('../course/model')
 
 const { validate } = require('../validation')
-const { pageDefaultSchema, projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema, addExternalToAssignmentSchema, projectIsGroupSchema } = require('./json_schema')
+const { pageDefaultSchema, pageDefaultForAssignmentSchema, projectPageSchema, createProjectSchema, updateProjectDetailSchema, updateClapSchema, addExternalToAssignmentSchema, projectIsGroupSchema } = require('./json_schema')
 
 module.exports = {
 
@@ -21,7 +21,7 @@ module.exports = {
       if (!checkStatus) return res.send(err)
       const { page } = req.params
       const { year, by, search } = req.query || undefined
-      const courseId = req.query.course_id || undefined
+
       let getYear = year
       if (year === 'present') {
         const present = moment().year()
@@ -39,6 +39,11 @@ module.exports = {
       if (page === 'all') {
         result.projects = await projectModel.getAllProjects(getYear)
       } else if (page === 'assignment') {
+        const { checkStatus, err } = validate(req.query, pageDefaultForAssignmentSchema)
+        if (!checkStatus) return res.send(err)
+        const courseId = req.query.course_id || undefined
+        const academicTermId = req.query.academic_term_id || undefined
+
         if (courseId === undefined) {
           const courses = await courseModel.getCourse()
           result.courses = []
@@ -63,8 +68,8 @@ module.exports = {
             result.courses.push(tmpCourse)
           })
         } else {
-          result.projects = await courseModel.getProjectInCourse(courseId)
-          result.projects = await projectModel.getProjectsCoverAndIsAchievement(result.projects)
+          result.projects = await courseModel.getProjectInCourse(courseId, academicTermId)
+          result.projects = await projectModel.getProjectsCover(result.projects)
         }
       } else if (page === 'search') {
         if (by === 'tags') {

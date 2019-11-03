@@ -5,6 +5,11 @@ module.exports = {
     page: joi.string().required().trim()
   }),
 
+  pageDefaultForAssignmentSchema: joi.object().keys({
+    course_id: joi.number(),
+    academic_term_id: joi.number()
+  }),
+
   projectPageSchema: joi.object().keys({
     project_id: joi.number().required()
   }),

@@ -25,10 +25,12 @@ module.exports = {
         .join('lecturer_course', 'courses.id', 'lecturer_course.courses_id')
         .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
         .join('project_assignment', 'lecturer_assignment.assignment_id', 'project_assignment.assignment_id')
+        .join('status_project', 'project_assignment.status_id', 'status_project.id')
         .join('academic_term', 'lecturer_course.academic_term_id', 'academic_term.id')
         .join('academic_year', 'academic_term.academic_year_id', 'academic_year.id')
         .join('term', 'academic_term.term_id', 'term.id')
         .where('isDelete', false)
+        .andWhere('status_project.status_name', 'Approve')
         .orderBy('course_code', 'asc')
       return courses
     } catch (err) {
@@ -36,7 +38,7 @@ module.exports = {
     }
   },
 
-  getProjectInCourse: async (courseId) => {
+  getProjectInCourse: async (courseId, academicTermId) => {
     try {
       const project = await knex('lecturer_course').select(queryGetProjectInCourse)
         .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
@@ -44,8 +46,9 @@ module.exports = {
         .join('projects', 'project_assignment.project_id', 'projects.id')
         .join('status_project', 'project_assignment.status_id', 'status_project.id')
         .where('lecturer_course.courses_id', courseId)
+        .andWhere('lecturer_course.academic_term_id', academicTermId)
         .andWhere('status_project.status_name', 'Approve')
-        .groupBy('lecturer_assignment.assignment_id', 'lecturer_course.courses_id', 'project_assignment.assignment_id')
+        .groupBy('lecturer_assignment.assignment_id', 'lecturer_course.courses_id', 'project_assignment.assignment_id', 'lecturer_course.academic_term_id')
         .orderBy('projects.count_viewer', 'desc')
       return project
     } catch (err) {

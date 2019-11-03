@@ -2,13 +2,13 @@ const knex = require('../../db/knex')
 const filesModel = require('../files/model')
 const query = require('./constants')
 
-const getProjectsCoverAndIsAchievement = async (projects) => {
+const getProjectsCover = async (projects) => {
   const getProjects = async _ => {
     const promises = projects.map(async project => {
       const cover = await filesModel.getCoverImage(project.id)
       project.cover_path = cover[0] ? cover[0].path_name : null
-      const achievement = await getAchievement(project.id)
-      project.achievement = !!achievement[0]
+      const assignment = await knex('project_assignment').select().where('project_id', project.id)
+      project.assignment = !!assignment[0]
     })
     await Promise.all(promises)
   }
@@ -27,7 +27,7 @@ module.exports = {
       .where('isShow', true)
       .orderBy('projects.count_viewer', 'desc')
       .limit(5)
-    projects = await getProjectsCoverAndIsAchievement(projects)
+    projects = await getProjectsCover(projects)
     return projects
   },
 
@@ -45,7 +45,7 @@ module.exports = {
         .andWhere('created_at', 'like', `${year}%`)
         .orderBy('projects.created_at', 'desc')
       projects = projects.concat(unTopProject)
-      projects = await getProjectsCoverAndIsAchievement(projects)
+      projects = await getProjectsCover(projects)
       return projects
     } catch (err) {
       throw new Error(err)
@@ -59,7 +59,7 @@ module.exports = {
         .join('tags', 'project_tags.tag_id', 'tags.id')
         .where('tags.tag_name', 'like', `%${tagCharacter}%`)
         .andWhere('projects.isShow', true)
-      projects = await getProjectsCoverAndIsAchievement(projects)
+      projects = await getProjectsCover(projects)
       return projects
     } catch (err) {
       throw new Error(err)
@@ -72,7 +72,7 @@ module.exports = {
         .where('projects.project_name_th', 'like', `%${nameCharacter}%`)
         .orWhere('projects.project_name_en', 'like', `%${nameCharacter}%`)
         .andWhere('projects.isShow', true)
-      projects = await getProjectsCoverAndIsAchievement(projects)
+      projects = await getProjectsCover(projects)
       return projects
     } catch (err) {
       throw new Error(err)
@@ -112,7 +112,7 @@ module.exports = {
           .orderBy('projects.created_at', 'desc')
         projects = projects.concat(unTopProject)
       }
-      projects = await getProjectsCoverAndIsAchievement(projects)
+      projects = await getProjectsCover(projects)
       return projects
     } catch (err) {
       throw new Error(err)
@@ -239,7 +239,6 @@ module.exports = {
       if (projectDetail.project_type_name) {
         projectDetail = await getProjectTypeId(projectDetail)
       }
-      console.log('object');
       await knex('projects').update(projectDetail).where('id', id)
     } catch (err) {
       return err
@@ -293,7 +292,7 @@ module.exports = {
       throw new Error(err)
     }
   },
-  getProjectsCoverAndIsAchievement,
+  getProjectsCover,
 
   getProjectIsGroup: async (studentId, isGroup) => {
     try {
@@ -317,7 +316,7 @@ module.exports = {
         .join('tags', 'project_tags.tag_id', 'tags.id')
         .where('project_member.student_id', studentId)
         .andWhere('tags.tag_name', tag)
-      projects = await getProjectsCoverAndIsAchievement(projects)
+      projects = await getProjectsCover(projects)
       return projects
     } catch (err) {
       throw new Error(err)
