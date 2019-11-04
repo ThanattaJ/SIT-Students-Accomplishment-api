@@ -73,9 +73,9 @@ module.exports = {
         }
       } else if (page === 'search') {
         if (by === 'tags') {
-          result.projects = await projectModel.getProjectByTag(search)
+          result.projects = await projectModel.getProjectByTag(search, getYear)
         } else if (by === 'projects') {
-          result.projects = await projectModel.getProjectByName(search)
+          result.projects = await projectModel.getProjectByName(search, getYear)
         }
       }
       if (page === 'profile') {

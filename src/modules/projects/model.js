@@ -52,12 +52,13 @@ module.exports = {
     }
   },
 
-  getProjectByTag: async (tagCharacter) => {
+  getProjectByTag: async (tagCharacter, year) => {
     try {
-      let projects = await knex.select(query.queryAllProjects).from('projects')
+      let projects = await knex.select(query.queryAllProjects).from('projects').distinct('projects.id')
         .join('project_tags', 'projects.id', 'project_tags.project_id')
         .join('tags', 'project_tags.tag_id', 'tags.id')
-        .where('tags.tag_name', 'like', `%${tagCharacter}%`)
+        .where('projects.created_at', 'like', `${year}%`)
+        .andWhere('tags.tag_name', 'like', `%${tagCharacter}%`)
         .andWhere('projects.isShow', true)
       projects = await getProjectsCover(projects)
       return projects
@@ -66,11 +67,12 @@ module.exports = {
     }
   },
 
-  getProjectByName: async (nameCharacter) => {
+  getProjectByName: async (nameCharacter, year) => {
     try {
-      let projects = await knex.select(query.queryAllProjects).from('projects')
+      let projects = await knex.select(query.queryAllProjects).from('projects').distinct('projects.id')
         .where('projects.project_name_th', 'like', `%${nameCharacter}%`)
         .orWhere('projects.project_name_en', 'like', `%${nameCharacter}%`)
+        .andWhere('projects.created_at', 'like', `${year}%`)
         .andWhere('projects.isShow', true)
       projects = await getProjectsCover(projects)
       return projects
