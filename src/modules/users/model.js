@@ -251,7 +251,11 @@ module.exports = {
           list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${char}%`)
         }
       } else {
-        list = await knex('students').select(query.queryListStudent).where('firstname', 'like', `%${char}%`)
+        if (char === 'all') {
+          list = await knex('students').select(query.queryListStudent).orderBy('firstname', 'asc')
+        } else {
+          list = await knex('students').select(query.queryListStudent).where('firstname', 'like', `%${char}%`).orderBy('firstname', 'asc')
+        }
       }
       return list
     } catch (err) {
