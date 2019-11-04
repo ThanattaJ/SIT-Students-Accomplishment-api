@@ -251,7 +251,7 @@ module.exports = {
           list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${char}%`)
         }
       } else {
-        list = await knex('students').select(query.queryListStudent).where('firstname', 'like', `${char}%`)
+        list = await knex('students').select(query.queryListStudent).where('firstname', 'like', `%${char}%`)
       }
       return list
     } catch (err) {
