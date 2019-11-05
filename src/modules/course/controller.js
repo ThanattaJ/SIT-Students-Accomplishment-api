@@ -59,7 +59,7 @@ module.exports = {
       const { id } = req.query
       let data
       if (isDelete !== undefined) {
-        data = await courseModel.deleteCourse(id, false)
+        data = await courseModel.deleteCourse(id, isDelete)
       } else {
         const course = {
           course_code: _.upperCase(code).replace(' ', ''),
@@ -68,7 +68,7 @@ module.exports = {
         }
         data = await courseModel.updateCourse(id, course)
       }
-      res.send(data)
+      if (data === 1) res.status(200).send({ status: 200, message: 'Update Success' })
     } catch (err) {
       res.status(500).send({
         status: 500,

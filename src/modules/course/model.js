@@ -102,7 +102,8 @@ module.exports = {
 
   deleteCourse: async (id, status) => {
     try {
-      await knex('courses').update('isDelete', status).where('id', id)
+      const result = await knex('courses').update('isDelete', status).where('id', id)
+      return result
     } catch (err) {
       throw new Error(err)
     }
