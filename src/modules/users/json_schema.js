@@ -92,6 +92,11 @@ module.exports = {
     code: joi.string().required()
   }),
 
+  getListLecturerSchema: joi.object().keys({
+    academic_term_id: joi.number().required(),
+    courses_id: joi.number().required()
+  }),
+
   deleteOutsiderSchema: joi.object().keys({
     outsider_id: joi.number().required()
   })
