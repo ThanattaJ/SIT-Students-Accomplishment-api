@@ -316,6 +316,8 @@ module.exports = {
   },
 
   getListLecturer: async (req, res) => {
+    const { checkStatus, err } = validate(req.body, json.getListLecturerSchema)
+    if (!checkStatus) return res.send(err)
     try {
       const academicTermId = req.body.academic_term_id
       const courseId = req.body.courses_id

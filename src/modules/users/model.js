@@ -258,13 +258,11 @@ module.exports = {
 
   getListLecturer: async (academicTermId, courseId) => {
     try {
-      const lecturersInCourse = await knex('lecturers')
-        .select(query.queryListLecturer)
-        .join('lecturer_course', 'lecturers.lecturer_id', 'lecturer_course.lecturer_id')
-        .andWhere('lecturer_course.academic_term_id', academicTermId)
+      const lecturersInCourse = await knex('lecturer_course')
+        .select('lecturer_id')
+        .where('lecturer_course.academic_term_id', academicTermId)
         .andWhere('lecturer_course.courses_id', courseId)
       const lecturersIdInCourse = _.map(lecturersInCourse, 'lecturer_id')
-
       const lecturers = await knex('lecturers')
         .select(query.queryListLecturer)
         .whereNotIn('lecturers.lecturer_id', lecturersIdInCourse)
