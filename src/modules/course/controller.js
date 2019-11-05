@@ -59,6 +59,8 @@ module.exports = {
       const { id } = req.query
       let data
       if (isDelete !== undefined) {
+        console.log('hi');
+        console.log(isDelete);
         data = await courseModel.deleteCourse(id, isDelete)
       } else {
         const course = {
