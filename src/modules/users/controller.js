@@ -316,11 +316,11 @@ module.exports = {
   },
 
   getListLecturer: async (req, res) => {
-    const { checkStatus, err } = validate(req.body, json.getListLecturerSchema)
+    const { checkStatus, err } = validate(req.query, json.getListLecturerSchema)
     if (!checkStatus) return res.send(err)
     try {
-      const academicTermId = req.body.academic_term_id
-      const courseId = req.body.courses_id
+      const academicTermId = req.query.academic_term_id
+      const courseId = req.query.courses_id
       const list = await userModel.getListLecturer(academicTermId, courseId)
       res.send(list)
     } catch (err) {
