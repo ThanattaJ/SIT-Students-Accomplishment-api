@@ -82,7 +82,7 @@ module.exports = {
     if (!checkStatus) return res.send(err)
     try {
       const { id } = req.query
-      await courseModel.deleteCourse(id, false)
+      await courseModel.deleteCourse(id, true)
       res.status(200).send({
         status: 200,
         data: 'Delete course success!'
