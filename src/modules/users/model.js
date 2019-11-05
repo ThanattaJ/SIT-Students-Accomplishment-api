@@ -1,5 +1,6 @@
 const knex = require('../../db/knex')
 const query = require('./constants')
+const _ = require('lodash')
 
 const getProfileId = async (id) => {
   try {
@@ -255,9 +256,18 @@ module.exports = {
     }
   },
 
-  getListLecturer: async () => {
+  getListLecturer: async (academicTermId, courseId) => {
     try {
-      const lecturers = await knex('lecturers').select(query.queryListLecturer)
+      const lecturersInCourse = await knex('lecturers')
+        .select(query.queryListLecturer)
+        .join('lecturer_course', 'lecturers.lecturer_id', 'lecturer_course.lecturer_id')
+        .andWhere('lecturer_course.academic_term_id', academicTermId)
+        .andWhere('lecturer_course.courses_id', courseId)
+      const lecturersIdInCourse = _.map(lecturersInCourse, 'lecturer_id')
+
+      const lecturers = await knex('lecturers')
+        .select(query.queryListLecturer)
+        .whereNotIn('lecturers.lecturer_id', lecturersIdInCourse)
       return lecturers
     } catch (err) {
       throw new Error(err)

@@ -317,7 +317,9 @@ module.exports = {
 
   getListLecturer: async (req, res) => {
     try {
-      const list = await userModel.getListLecturer()
+      const academicTermId = req.body.academic_term_id
+      const courseId = req.body.courses_id
+      const list = await userModel.getListLecturer(academicTermId, courseId)
       res.send(list)
     } catch (err) {
       res.status(500).send({

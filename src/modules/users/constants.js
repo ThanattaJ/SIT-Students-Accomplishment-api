@@ -86,7 +86,7 @@ module.exports = {
   ],
 
   queryListLecturer: [
-    'lecturer_id',
+    'lecturers.lecturer_id',
     'firstname',
     'lastname',
     'position_name'
