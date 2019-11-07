@@ -78,7 +78,7 @@ module.exports = {
 
         let content = {
           from: 'admin.sit.student.accomplishment@gmail.com',
-          to: studentEmail,
+          to: studentEmail.toString(),
           subject: `[${date}] SIT Student Accomlishment: The ${data.project_detail.project_name_en} project is ${status}!`,
           html: text
         }

@@ -85,6 +85,16 @@ module.exports = {
     'profile_picture'
   ],
 
+  queryListPoppularStudent: [
+    'student_id',
+    'firstname',
+    'lastname',
+    'curriculum_name',
+    'email',
+    'profile_picture',
+    'viewer'
+  ],
+
   queryListLecturer: [
     'lecturers.lecturer_id',
     'firstname',

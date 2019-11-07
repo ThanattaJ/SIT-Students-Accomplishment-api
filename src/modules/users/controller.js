@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 const userModel = require('./model')
 const moment = require('moment')
-const projectController = require('../projects/controller')
 const projectModel = require('../projects/model')
 const fileController = require('../files/controller')
 const authenController = require('../authentication/controller')

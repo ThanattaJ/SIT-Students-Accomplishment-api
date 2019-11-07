@@ -295,6 +295,7 @@ module.exports = {
 
   updateProjectStatus: async (assignmentId, projectId, status, comment) => {
     try {
+      console.log(status);
       const statusId = await knex('status_project').select('id').where('status_name', status)
       const data = {
         status_id: statusId[0].id,
@@ -306,6 +307,7 @@ module.exports = {
 
       let assignments
       if (status === 'Request') {
+        console.log(data);
         assignments = await knex('project_assignment').update(data)
           .andWhere('project_assignment.project_id', projectId)
       } else {

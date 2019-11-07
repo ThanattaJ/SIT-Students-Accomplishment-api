@@ -247,8 +247,12 @@ module.exports = {
       let list
       if (isStudentId) {
         list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${char}%`)
+      } else if (char === 'all') {
+        list = await knex('students').select(query.queryListPoppularStudent)
+          .join('curriculum', 'students.curriculum_id', 'curriculum.id')
+          .limit(20).orderBy('viewer', 'desc')
       } else {
-        list = await knex('students').select(query.queryListStudent).where('firstname', 'like', `%${char}%`).orderBy('firstname', 'asc')
+        list = await knex('students').select(query.queryListPoppularStudent).where('firstname', 'like', `%${char}%`).orderBy('firstname', 'asc')
       }
       return list
     } catch (err) {

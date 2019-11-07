@@ -246,16 +246,23 @@ module.exports = {
     try {
       let { assignment_id, project_id, status, comment } = req.body || undefined
       const { auth } = req
-      if (auth.role === 'students' && status !== 'Request') {
+      if (auth.role === 'student' && status !== 'Request') {
         res.status(403).send({ auth: false, message: 'Permission Denied' })
       }
-      let oldProjects = await assignmentModel.getProjectInAssignment(assignment_id, 'Request')
-      oldProjects = _.filter(oldProjects, { 'project_id': project_id })
-      if (oldProjects.length > 0) {
-        status = status === 'Reject' ? 'Approve' : 'Waiting'
-      }
-      const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
 
+      console.log(status);
+      let oldProjects = []
+      if (auth.role !== 'student') {
+        console.log('object');
+        oldProjects = await assignmentModel.getProjectInAssignment(assignment_id, 'Request')
+        oldProjects = _.filter(oldProjects, { 'project_id': project_id })
+        if (oldProjects.length > 0) {
+          status = status === 'Reject' ? 'Approve' : 'Waiting'
+        }
+      }
+
+      const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
+      console.log('hi');
       let assignment = null
       assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
       delete assignment.lecturers
@@ -269,9 +276,12 @@ module.exports = {
       if (oldProjects.length > 0) {
         await notiController.sendEmail(project_id, auth.fullname, page, 'consider', assignment, projectAssignmentStatus)
       } else {
-        if (auth.role !== 'students' && status !== 'Request') {
+        console.log(auth.role);
+        if (auth.role !== 'student' && status !== 'Request') {
+          console.log('why');
           await notiController.sendEmail(project_id, auth.fullname, page, 'check', assignment, projectAssignmentStatus)
         } else {
+          console.log('who');
           await notiController.sendEmail(project_id, auth.fullname, page, 'request', assignment, projectAssignmentStatus)
         }
       }
