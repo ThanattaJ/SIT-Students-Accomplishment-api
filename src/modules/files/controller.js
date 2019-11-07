@@ -98,7 +98,7 @@ async function checkCoverExist (projectId) {
 }
 
 function checkFileDocType (file, cb) {
-  const filetypes = /pdf/
+  const filetypes = /pdf|zip/
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
   const mimetype = filetypes.test(file.mimetype)
   if (mimetype && extname) {
