@@ -107,6 +107,9 @@ module.exports = {
 
     try {
       const auth = req.headers.authorization && req.headers.authorization !== 'null' ? await authenController.authorization(req.headers.authorization) : null
+      console.log('----------------------------------------------');
+      console.log('auth', req.headers.authorization);
+      console.log('----------------------------------------------');
       const projectId = req.query.project_id
       const page = await getProjectDetail(projectId)
       page.access = false
