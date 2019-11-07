@@ -285,7 +285,7 @@ module.exports = {
         projects = await knex('project_assignment').select(query.queryGetProjectRequest)
           .join('status_project', 'project_assignment.status_id', 'status_project.id')
           .join('projects', 'project_assignment.project_id', 'projects.id')
-          .andWhere('status_project.status_name', status)
+          .where('status_project.status_name', status)
       }
       return projects
     } catch (err) {
