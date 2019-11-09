@@ -74,25 +74,25 @@ module.exports = {
       end_year_en: joi.number(),
       end_year_th: joi.number(),
       assignment_detail: joi.object().keys({
-        assignment_id: joi.number().required().allow(null),
-        assignment_name: joi.string().required().trim().allow(null),
-        academic_term_id: joi.number().required().allow(null),
-        academic_term: joi.string().required().trim().allow(null),
-        course_id: joi.number().required().allow(null),
-        course_name: joi.string().required().trim().allow(null),
+        assignment_id: joi.number().allow(null),
+        assignment_name: joi.string().trim().allow(null),
+        academic_term_id: joi.number().allow(null),
+        academic_term: joi.string().trim().allow(null),
+        course_id: joi.number().allow(null),
+        course_name: joi.string().trim().allow(null),
         lecturers: joi.array().items(
           joi.object().keys({
-            lecturer_id: joi.string().required().trim().allow(null),
-            lecturer_name: joi.string().required().trim().allow(null)
+            lecturer_id: joi.string().trim().allow(null),
+            lecturer_name: joi.string().trim().allow(null)
           })
         ).allow(null),
-        project_status: joi.string().required().trim().allow(null),
-        comment: joi.string().required().trim().allow(null)
+        project_status: joi.string().trim().allow(null),
+        comment: joi.string().trim().allow(null)
       })
     }).required(),
     students: joi.array().items(
       joi.object().keys({
-        student_id: joi.string().required().trim(),
+        student_id: joi.string().trim(),
         firstname: joi.string().trim(),
         lastname: joi.string().trim(),
         email: joi.string().trim().email().allow(null)
