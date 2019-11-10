@@ -252,7 +252,9 @@ module.exports = {
           .join('curriculum', 'students.curriculum_id', 'curriculum.id')
           .limit(20).orderBy('viewer', 'desc')
       } else {
-        list = await knex('students').select(query.queryListPoppularStudent).where('firstname', 'like', `%${char}%`).orderBy('firstname', 'asc')
+        list = await knex('students').select(query.queryListPoppularStudent)
+          .join('curriculum', 'students.curriculum_id', 'curriculum.id')
+          .where('firstname', 'like', `%${char}%`).orderBy('firstname', 'asc')
       }
       return list
     } catch (err) {
