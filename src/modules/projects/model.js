@@ -33,19 +33,28 @@ module.exports = {
 
   getAllProjects: async (year) => {
     try {
-      let projects = await knex.select(query.queryAllProjects).from('projects')
-        .where('isShow', true)
-        .andWhere('created_at', 'like', `${year}%`)
-        .orderBy('projects.count_viewer', 'desc')
-        .limit(4)
-      const topProjectId = projects.map(project => project.id)
-      const unTopProject = await knex('projects').select(query.queryAllProjects)
-        .whereNotIn('id', topProjectId)
-        .andWhere('isShow', true)
-        .andWhere('created_at', 'like', `${year}%`)
-        .orderBy('projects.created_at', 'desc')
-      projects = projects.concat(unTopProject)
-      projects = await getProjectsCover(projects)
+      let projects
+      if (year === 'all') {
+        projects = await knex.select(query.queryAllProjects).from('projects')
+          .where('isShow', true)
+          .orderBy('projects.count_viewer', 'desc')
+          .limit(40)
+        projects = await getProjectsCover(projects)
+      } else {
+        projects = await knex.select(query.queryAllProjects).from('projects')
+          .where('isShow', true)
+          .andWhere('created_at', 'like', `${year}%`)
+          .orderBy('projects.count_viewer', 'desc')
+          .limit(4)
+        const topProjectId = projects.map(project => project.id)
+        const unTopProject = await knex('projects').select(query.queryAllProjects)
+          .whereNotIn('id', topProjectId)
+          .andWhere('isShow', true)
+          .andWhere('created_at', 'like', `${year}%`)
+          .orderBy('projects.created_at', 'desc')
+        projects = projects.concat(unTopProject)
+        projects = await getProjectsCover(projects)
+      }
       return projects
     } catch (err) {
       throw new Error(err)
