@@ -100,7 +100,7 @@ module.exports = {
           .where('project_member.student_id', id)
           .orderBy('projects.created_at', 'desc')
       } else {
-        projects = await knex('projects').select(query.queryProjectsByStudentId)
+        projects = await knex('projects').select(query.queryProjectsByStudentId).distinct('projects.id')
           .join('project_member', 'projects.id', 'project_member.project_id')
           .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
           .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')
@@ -110,7 +110,7 @@ module.exports = {
           .orderBy('projects.count_viewer', 'desc')
           .limit(4)
         const topProjectId = projects.map(project => project.id)
-        const unTopProject = await knex('projects').select(query.queryProjectsByStudentId)
+        const unTopProject = await knex('projects').select(query.queryProjectsByStudentId).distinct('projects.id')
           .join('project_member', 'projects.id', 'project_member.project_id')
           .leftJoin('project_assignment', 'projects.id', 'project_assignment.project_id')
           .leftJoin('assignments', 'project_assignment.assignment_id', 'assignments.id')
@@ -319,7 +319,7 @@ module.exports = {
 
   getProjectFilterTagByStudentId: async (studentId, tag) => {
     try {
-      let projects = await knex('projects').select(query.queryAllProjects)
+      let projects = await knex('projects').select(query.queryAllProjects).distinct('projects.id')
         .join('project_member', 'projects.id', 'project_member.project_id')
         .join('project_tags', 'projects.id', 'project_tags.project_id')
         .join('tags', 'project_tags.tag_id', 'tags.id')
