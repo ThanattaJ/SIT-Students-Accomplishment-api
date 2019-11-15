@@ -318,9 +318,14 @@ module.exports = {
     const { checkStatus, err } = validate(req.query, json.getListLecturerSchema)
     if (!checkStatus) return res.send(err)
     try {
-      const academicTermId = req.query.academic_term_id
-      const courseId = req.query.courses_id
-      const list = await userModel.getListLecturer(academicTermId, courseId)
+      const academicTermId = req.query.academic_term_id || undefined
+      const courseId = req.query.courses_id || undefined
+      let list
+      if (academicTermId !== undefined && courseId !== undefined) {
+        list = await userModel.getListLecturer(academicTermId, courseId)
+      } else {
+        list = await userModel.getListLecturer()
+      }
       res.send(list)
     } catch (err) {
       res.status(500).send({
