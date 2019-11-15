@@ -216,6 +216,7 @@ module.exports = {
       if (tags !== undefined) {
         const tagsCheked = await checkTag(tags)
         tagsCheked.forEach(tag => {
+          delete tag.tag_name
           tag.project_id = projectId
         })
         await projectModel.updateProjectTag(tagsCheked, projectId)
@@ -335,14 +336,17 @@ module.exports = {
 
 async function checkTag (tags) {
   try {
-    const tagIdUndefined = tags.filter(tag => tag.tag_id === undefined)
-    const tagId = await tagsController.createTag(tagIdUndefined)
-    tags.forEach(tag => {
-      if (tag.tag_id !== undefined) {
-        tagId.push({ tag_id: tag.tag_id })
+    const check = tags.map(async tag => {
+      const tagId = await tagsController.checkTag(tag.tag_name)
+      if (tagId.length > 0) {
+        tag.tag_id = tagId[0].tag_id
+      } else {
+        const tagId = await tagsController.createTag(tag.tag_name)
+        tag.tag_id = tagId[0].tag_id
       }
     })
-    return tagId
+    await Promise.all(check)
+    return tags
   } catch (err) {
     throw new Error(err)
   }
@@ -414,8 +418,8 @@ async function manageOutsider (outsiders, projectId) {
 
     const outsiderHaveId = await outsiders.filter(outsider => outsider.id !== undefined)
     if (outsiderHaveId.length > 0) {
-      outsiders.forEach(async outsider => {
-        await userModel.updateProjectOutsider(outsiderHaveId)
+      outsiderHaveId.forEach(async outsider => {
+        await userModel.updateProjectOutsider(outsider)
       })
     }
   } catch (err) {

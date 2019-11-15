@@ -4,9 +4,17 @@ module.exports = {
 
   createTag: async (tagName) => {
     try {
-      await knex('tags').insert(tagName)
-      const name = tagName.map(tag => tag.tag_name)
-      const tagId = await knex('tags').select('id as tag_id').whereIn('tag_name', name)
+      await knex('tags').insert({ 'tag_name': tagName })
+      const tagId = await knex('tags').select('id as tag_id').where('tag_name', tagName)
+      return tagId
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  checkTag: async (tagName) => {
+    try {
+      const tagId = await knex('tags').select('id as tag_id').where('tag_name', tagName)
       return tagId
     } catch (err) {
       throw new Error(err)

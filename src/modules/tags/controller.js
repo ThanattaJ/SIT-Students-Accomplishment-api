@@ -13,6 +13,15 @@ module.exports = {
     }
   },
 
+  checkTag: async (tagName) => {
+    try {
+      const tagId = await tagModel.checkTag(tagName)
+      return tagId
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   getTagByCharacter: async (req, res) => {
     try {
       const { checkStatus, err } = validate(req.params, getTagByCharacterSchema)
