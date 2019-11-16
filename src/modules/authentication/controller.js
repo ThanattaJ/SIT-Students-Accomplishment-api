@@ -84,6 +84,7 @@ const login = (req, res, next) => {
         const isAdmin = await userModel.getLecturerIsAdmin(payload.uid)
         res.status(200).send({
           status: 200,
+          fullname: payload.fullname,
           token: jwt.encode(payload, SECRET),
           isAdmin: isAdmin
         })
