@@ -91,6 +91,7 @@ const login = (req, res, next) => {
       }
       res.status(200).send({
         status: 200,
+        fullname: payload.fullname,
         token: jwt.encode(payload, SECRET)
       })
     }
