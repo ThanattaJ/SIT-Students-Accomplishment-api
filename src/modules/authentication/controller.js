@@ -42,8 +42,8 @@ const login = (req, res, next) => {
         payload = {
           uid: user.uid,
           fullname: user.givenName || user.gecos,
-          email: user.mail.search('@') ? user.mail : '',
-          description: user.description.search('@') ? 'IT' : user.description,
+          email: user.mail || '',
+          description: user.description.indexOf('@') !== -1 ? 'IT' : user.description,
           role: detail.role,
           iat: new Date().getTime()
         }
@@ -78,22 +78,25 @@ const login = (req, res, next) => {
           }
         }
         await userModel.createUser(detail.role, data, payload.description)
+      } else {
+        payload.fullname = exist[0].firstname
       }
       const SECRET = process.env.AUTHEN_SECRET_KEY
       if (payload.role === 'lecturer') {
         const isAdmin = await userModel.getLecturerIsAdmin(payload.uid)
         res.status(200).send({
           status: 200,
-          fullname: exist[0].firstname || payload.fullname,
+          fullname: payload.fullname,
           token: jwt.encode(payload, SECRET),
           isAdmin: isAdmin
         })
+      } else {
+        res.status(200).send({
+          status: 200,
+          fullname: payload.fullname,
+          token: jwt.encode(payload, SECRET)
+        })
       }
-      res.status(200).send({
-        status: 200,
-        fullname: exist[0].firstname || payload.fullname,
-        token: jwt.encode(payload, SECRET)
-      })
     }
   })(req, res, next)
 }
