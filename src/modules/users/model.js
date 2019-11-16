@@ -319,11 +319,11 @@ module.exports = {
 
   checkUser: async (role, userId) => {
     if (role === 'student') {
-      const id = await knex('students').select('student_id').where('student_id', userId)
-      return id.length > 0
+      const data = await knex('students').select('student_id', 'firstname').where('student_id', userId)
+      return data
     } else if (role === 'lecturer') {
-      const id = await knex('lecturers').select('lecturer_id').where('lecturer_id', userId)
-      return id.length > 0
+      const data = await knex('lecturers').select('lecturer_id', 'firstname').where('lecturer_id', userId)
+      return data
     } else {
       throw new Error('Invalid role_ user')
     }

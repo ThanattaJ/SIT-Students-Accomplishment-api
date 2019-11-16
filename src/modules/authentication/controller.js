@@ -58,7 +58,7 @@ const login = (req, res, next) => {
         }
       }
       const exist = await userModel.checkUser(detail.role, payload.uid)
-      if (!exist) {
+      if (!exist.length > 0) {
         let data = {}
         const name = payload.fullname.split(' ')
         if (detail.role === 'student') {
@@ -84,14 +84,14 @@ const login = (req, res, next) => {
         const isAdmin = await userModel.getLecturerIsAdmin(payload.uid)
         res.status(200).send({
           status: 200,
-          fullname: payload.fullname,
+          fullname: exist[0].firstname || payload.fullname,
           token: jwt.encode(payload, SECRET),
           isAdmin: isAdmin
         })
       }
       res.status(200).send({
         status: 200,
-        fullname: payload.fullname,
+        fullname: exist[0].firstname || payload.fullname,
         token: jwt.encode(payload, SECRET)
       })
     }
