@@ -2,8 +2,7 @@
 exports.up = async function (knex) {
   await knex.schema.createTable('education_level', function (table) {
     table.increments('id').primary()
-    table.string('level_name_en').notNullable()
-    table.string('level_name_th').notNullable()
+    table.string('level_name').notNullable()
 
     table
       .timestamp('created_at')

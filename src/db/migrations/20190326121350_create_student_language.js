@@ -13,6 +13,7 @@ exports.up = async function (knex) {
       .timestamp('updated_at')
       .notNullable()
       .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+    table.unique(['students_profile_id', 'language_id'], 'student_language_index_unique')
   })
 }
 

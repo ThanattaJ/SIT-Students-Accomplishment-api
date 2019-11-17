@@ -11,28 +11,24 @@ exports.seed = function (knex, Promise) {
           let student = {
             id: i,
             student_id: `5913050000${i}`,
-            password: `5913050000${i}`,
             curriculum_id: Math.floor(Math.random() * Math.floor(3) + 1),
-            firstname_en: faker.name.firstName(),
-            lastname_en: faker.name.lastName(),
+            firstname: faker.name.firstName(),
+            lastname: faker.name.lastName(),
             email: faker.internet.email()
           }
           await knex('students').insert(student)
           const profileId = await knex('students_profile').insert({
             id: i,
             student_id: student.student_id,
-            nickname_en: student.firstname_en,
+            nickname: student.firstname,
             birthday: faker.date.past(),
-            telephone_number: faker.phone.phoneNumber(),
-            nationality_en: 'Thai',
-            nationality_th: 'ไทย'
+            telephone_number: faker.phone.phoneNumber()
           })
-          await knex('student_address_en').insert({
+          await knex('student_address').insert({
             id: i,
             students_profile_id: profileId[0]
           })
-          await knex('student_address_th').insert({
-            id: i,
+          await knex('students_social').insert({
             students_profile_id: profileId[0]
           })
         }

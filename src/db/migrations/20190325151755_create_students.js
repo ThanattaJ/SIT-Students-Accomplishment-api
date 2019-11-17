@@ -3,17 +3,14 @@ exports.up = async function (knex) {
   await knex.schema.createTable('students', function (table) {
     table.increments('id').primary()
     table.string('student_id').notNullable()
-    table.string('password').notNullable()
     table.integer('curriculum_id').unsigned()
     table.text('introduce_detail')
-    table.string('firstname_en').notNullable()
-    table.string('lastname_en').notNullable()
-    table.string('firstname_th')
-    table.string('lastname_th')
-    table.double('university_gpa', 3, 2)
+    table.string('firstname').notNullable()
+    table.string('lastname').notNullable()
     table.string('email')
     table.string('profile_picture')
-    table.integer('viwer').defaultTo(0)
+    table.string('resume_picture')
+    table.integer('viewer').defaultTo(0)
     table.integer('resume_gen_count').defaultTo(0)
 
     table

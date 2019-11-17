@@ -1,4 +1,5 @@
 const tagModel = require('./model')
+const _ = require('lodash')
 const { validate } = require('../validation')
 const { getTagByCharacterSchema } = require('./json_schema')
 
@@ -6,7 +7,18 @@ module.exports = {
 
   createTag: async (tagName) => {
     try {
+      tagName = _.startCase(tagName)
       const tagId = await tagModel.createTag(tagName)
+      return tagId
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
+  checkTag: async (tagName) => {
+    try {
+      tagName = _.startCase(tagName)
+      const tagId = await tagModel.checkTag(tagName)
       return tagId
     } catch (err) {
       throw new Error(err)

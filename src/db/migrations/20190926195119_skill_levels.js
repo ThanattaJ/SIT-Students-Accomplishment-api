@@ -1,8 +1,8 @@
 
 exports.up = async function (knex) {
-  await knex.schema.createTable('lecturer_position', function (table) {
+  await knex.schema.createTable('skill_level', function (table) {
     table.increments('id').primary()
-    table.string('position_name')
+    table.string('level_name').notNullable()
 
     table
       .timestamp('created_at')
@@ -16,5 +16,5 @@ exports.up = async function (knex) {
 }
 
 exports.down = async function (knex) {
-  await knex.schema.dropTable('lecturer_position')
+  await knex.schema.dropTable('skill_level')
 }

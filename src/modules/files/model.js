@@ -2,14 +2,14 @@ const knex = require('../../db/knex')
 const { queryPathName } = require('./constants')
 module.exports = {
 
-  createImage: async (image) => {
+  createProjectImage: async (image) => {
     try {
       await knex('project_images').insert(image)
     } catch (err) {
       throw new Error(err)
     }
   },
-  createDocument: async (document) => {
+  createProjectDocument: async (document) => {
     try {
       await knex('project_documents').insert(document)
     } catch (err) {
@@ -25,7 +25,7 @@ module.exports = {
     }
   },
 
-  deleteImage: async (path) => {
+  deleteProjectImage: async (path) => {
     try {
       await knex('project_images').del().where(queryPathName, 'like', `%${path}`)
     } catch (err) {
@@ -33,7 +33,7 @@ module.exports = {
     }
   },
 
-  deleteDocument: async (path) => {
+  deleteProjectDocument: async (path) => {
     try {
       await knex('project_documents').del().where(queryPathName, 'like', `%${path}`)
     } catch (err) {

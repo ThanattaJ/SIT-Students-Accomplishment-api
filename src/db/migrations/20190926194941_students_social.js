@@ -1,13 +1,17 @@
 
 exports.up = async function (knex) {
-  await knex.schema.createTable('student_address_th', function (table) {
-    table.increments('id').primary()
+  await knex.schema.createTable('students_social', function (table) {
     table.integer('students_profile_id').unsigned().notNullable()
-    table.string('description_th')
-    table.string('district_th')
-    table.string('subdistrict_th')
-    table.string('province_th')
-    table.string('postcode_th')
+    table.string('Twitter')
+    table.string('Facebook')
+    table.string('Instagram')
+    table.string('Linkedin')
+    table.string('Github')
+    table.string('Pinterest')
+    table.string('Vimeo')
+    table.string('Tumblr')
+    table.string('Flickr')
+    table.string('Link')
 
     table
       .timestamp('created_at')
@@ -23,5 +27,5 @@ exports.up = async function (knex) {
 }
 
 exports.down = async function (knex) {
-  await knex.schema.dropTable('student_address_th')
+  await knex.schema.dropTable('students_social')
 }

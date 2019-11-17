@@ -1,13 +1,13 @@
 
 exports.up = async function (knex) {
-  await knex.schema.createTable('student_address_en', function (table) {
+  await knex.schema.createTable('student_address', function (table) {
     table.increments('id').primary()
     table.integer('students_profile_id').unsigned().notNullable()
-    table.string('description_en')
-    table.string('district_en')
-    table.string('subdistrict_en')
-    table.string('province_en')
-    table.string('postcode_en')
+    table.string('description')
+    table.string('district')
+    table.string('subdistrict')
+    table.string('province')
+    table.string('postcode')
 
     table
       .timestamp('created_at')
@@ -23,5 +23,5 @@ exports.up = async function (knex) {
 }
 
 exports.down = async function (knex) {
-  await knex.schema.dropTable('student_address_en')
+  await knex.schema.dropTable('student_address')
 }
