@@ -246,7 +246,7 @@ module.exports = {
     try {
       let list
       if (isStudentId) {
-        list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `${char}%`)
+        list = await knex('students').select(query.queryListStudent).where('student_id', 'like', `%${char}%`)
       } else if (char === 'all') {
         list = await knex('students').select(query.queryListPoppularStudent)
           .join('curriculum', 'students.curriculum_id', 'curriculum.id')
