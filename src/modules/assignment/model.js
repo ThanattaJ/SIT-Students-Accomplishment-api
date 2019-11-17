@@ -237,7 +237,7 @@ module.exports = {
         .join('assignments', 'student_assignment.assignment_id', 'assignments.id')
         .where('student_assignment.student_id', studentId)
       const asssignmentId = _.map(assignments, 'assignment_id')
-      const projects = await knex('projects').select('projects.id', 'status_project.status_name' , 'project_assignment.created_at as project_assignment_created_date', 'project_assignment.updated_at  as project_assignment_updated_date', 'project_assignment.assignment_id')
+      const projects = await knex('projects').select('projects.id', 'status_project.status_name', 'project_assignment.comment', 'project_assignment.created_at as project_assignment_created_date', 'project_assignment.updated_at  as project_assignment_updated_date', 'project_assignment.assignment_id')
         .join('project_assignment', 'projects.id', 'project_assignment.project_id')
         .join('assignments', 'project_assignment.assignment_id', 'assignments.id')
         .join('status_project', 'project_assignment.status_id', 'status_project.id')
@@ -251,11 +251,13 @@ module.exports = {
         if (p.length > 0) {
           assignment.project_id = p[0].id
           assignment.status_name = p[0].status_name
+          assignment.comment = p[0].comment
           assignment.project_assignment_created_date = p[0].project_assignment_created_date
           assignment.project_assignment_updated_date = p[0].project_assignment_updated_date
         } else {
           assignment.project_id = null
           assignment.status_name = null
+          assignment.comment = null
           assignment.project_assignment_created_date = null
           assignment.project_assignment_updated_date = null
         }

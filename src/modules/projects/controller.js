@@ -141,6 +141,7 @@ module.exports = {
       project_data.start_year_th = project_data.start_year_en + 543
       project_data.end_year_th = project_data.end_year_en + 543
       const assignmentId = project_data.assignment_id || ''
+      console.log('assignmentId', project_data.assignment_id);
       const typeProject = project_data.project_type_name
       delete project_data.assignment_id
       if (member.students.length > 0) {
@@ -167,14 +168,15 @@ module.exports = {
       if (achievements !== undefined) {
         await manageAchievement(projectId, achievements)
       }
-
+      
       let assignment = null
       if (typeProject === 'assignment') {
+        console.log('assignmentId', assignmentId);
         await projectModel.mapProjectAndAssignment(projectId, assignmentId, 'create')
-        await checkMemberJoinAssignment(auth.uid, projectId, assignmentId)
-        assignment = assignmentModel.getLecturerAssignmentsDetailById(assignmentId)
+        assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignmentId)
         delete assignment.lecturers
         delete assignment.students
+        await checkMemberJoinAssignment(auth.uid, member, assignment)
       }
 
       const page = await projectModel.getShortProjectDetailById(projectId)
@@ -190,6 +192,7 @@ module.exports = {
         project_id: projectId
       })
     } catch (err) {
+      console.log(err);
       res.status(500).send({
         status: 500,
         message: err.message
@@ -301,7 +304,7 @@ module.exports = {
       delete assignment.lecturers
       delete assignment.students
 
-      await checkMemberJoinAssignment(auth.uid, project, assignment)
+      await checkMemberJoinAssignment(project.students, project, assignment)
 
       await notiController.sendEmail(projectId, auth.fullname, project, 'add', assignment, projectAssignmentStatus)
       res.status(200).send({

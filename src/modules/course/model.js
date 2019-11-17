@@ -40,7 +40,7 @@ module.exports = {
 
   getProjectInCourse: async (courseId, academicTermId) => {
     try {
-      const project = await knex('lecturer_course').select(queryGetProjectInCourse)
+      const project = await knex('lecturer_course').select(queryGetProjectInCourse).distinct('project_assignment.project_id')
         .join('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
         .join('project_assignment', 'lecturer_assignment.assignment_id', 'project_assignment.assignment_id')
         .join('projects', 'project_assignment.project_id', 'projects.id')
@@ -48,7 +48,6 @@ module.exports = {
         .where('lecturer_course.courses_id', courseId)
         .andWhere('lecturer_course.academic_term_id', academicTermId)
         .andWhere('status_project.status_name', 'Approve')
-        .groupBy('lecturer_assignment.assignment_id', 'lecturer_course.courses_id', 'project_assignment.assignment_id', 'lecturer_course.academic_term_id')
         .orderBy('projects.count_viewer', 'desc')
       return project
     } catch (err) {

@@ -206,7 +206,6 @@ module.exports = {
         assignment.project_assignment_created_date = assignment.project_assignment_created_date === null ? null : moment(assignment.project_assignment_created_date).format('MMM Do YYYY, h:mm:ss a')
         assignment.project_assignment_updated_date = assignment.project_assignment_updated_date === null ? null : moment(assignment.project_assignment_updated_date).format('MMM Do YYYY, h:mm:ss a')
       })
-
       res.send(assignments)
     } catch (err) {
       res.status(500).send({
