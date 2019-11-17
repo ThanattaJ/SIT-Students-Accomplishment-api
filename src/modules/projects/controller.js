@@ -234,7 +234,7 @@ module.exports = {
         delete assignment.lecturers
         delete assignment.students
       }
-      // await notiController.sendEmail(projectId, auth.fullname, newDetail, 'update', assignment, projectAssignmentStatus)
+      await notiController.sendEmail(projectId, auth.fullname, newDetail, 'update', assignment, projectAssignmentStatus)
       
       res.send(newDetail)
     } catch (err) {
@@ -246,8 +246,8 @@ module.exports = {
   },
 
   updateProjectClap: async (req, res) => {
-    // const { checkStatus, err } = validate(req.body, updateClapSchema)
-    // if (!checkStatus) return res.send(err)
+    const { checkStatus, err } = validate(req.body, updateClapSchema)
+    if (!checkStatus) return res.send(err)
 
     try {
       const projectId = req.body.project_id
