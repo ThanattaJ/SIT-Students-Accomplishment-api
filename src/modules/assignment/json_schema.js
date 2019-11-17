@@ -15,7 +15,8 @@ module.exports = {
   }),
 
   getListAssignmentSpecifyCourseSchema: joi.object().keys({
-    course_id: joi.number().required()
+    course_id: joi.number().required(),
+    academic_term_id: joi.number().required()
   }),
 
   updateLecturerApproverSchema: joi.object().keys({

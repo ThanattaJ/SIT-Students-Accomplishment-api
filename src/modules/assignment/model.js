@@ -96,7 +96,7 @@ module.exports = {
     }
   },
 
-  getListAssignmentSpecifyCourse: async (lecturerId, courseId) => {
+  getListAssignmentSpecifyCourse: async (lecturerId, courseId, academic_term_id) => {
     try {
       const assignments = await knex('lecturer_course')
         .select(query.queryGetListAssignmentSpecifyCourse)
@@ -107,7 +107,8 @@ module.exports = {
         .leftJoin('lecturer_assignment', 'lecturer_course.id', 'lecturer_assignment.lecturer_course_id')
         .join('assignments', 'lecturer_assignment.assignment_id', 'assignments.id')
         .where('courses.id', courseId)
-        .where('lecturer_course.lecturer_id', lecturerId)
+        .andWhere('academic_term.id', academic_term_id)
+        .andWhere('lecturer_course.lecturer_id', lecturerId)
         .groupBy('assignments.id')
       return assignments
     } catch (err) {

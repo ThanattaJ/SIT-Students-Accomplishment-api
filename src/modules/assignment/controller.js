@@ -67,10 +67,10 @@ module.exports = {
 
     try {
       const { auth } = req
-      const { course_id } = req.query
+      const { course_id, academic_term_id } = req.query
       if (auth.role !== 'lecturer') { res.status(403).send({ auth: false, message: 'Permission Denied' }) }
 
-      const assignments = await assignmentModel.getListAssignmentSpecifyCourse(auth.uid, course_id)
+      const assignments = await assignmentModel.getListAssignmentSpecifyCourse(auth.uid, course_id, academic_term_id)
       assignments.map(assignment => {
         assignment.isGroup = assignment.isGroup === 1
         assignment.close_date = moment(assignment.close_date).format('DD-MM-YYYY')
