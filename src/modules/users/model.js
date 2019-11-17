@@ -294,9 +294,11 @@ module.exports = {
 
   getProjectOutsider: async (projectId) => {
     try {
+      console.log('get outsider');
       const outsiders = await knex.select(query.queryProjectOutsider).from('project_outsiders').where('project_id', projectId)
       return outsiders
     } catch (err) {
+      console.log(err);
       throw new Error(err)
     }
   },

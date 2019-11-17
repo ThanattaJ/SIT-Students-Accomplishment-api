@@ -107,9 +107,6 @@ module.exports = {
 
     try {
       const auth = req.headers.authorization && req.headers.authorization !== 'null' ? await authenController.authorization(req.headers.authorization) : null
-      console.log('----------------------------------------------');
-      console.log('auth', req.headers.authorization);
-      console.log('----------------------------------------------');
       const projectId = req.query.project_id
       const page = await getProjectDetail(projectId)
       page.access = false
@@ -141,8 +138,7 @@ module.exports = {
       project_data.start_year_th = project_data.start_year_en + 543
       project_data.end_year_th = project_data.end_year_en + 543
       const assignmentId = project_data.assignment_id || ''
-      console.log('assignmentId', project_data.assignment_id);
-      const typeProject = project_data.project_type_name
+      const typeProject = project_data.assignment_id === null ? 'External' : 'Assignment'
       delete project_data.assignment_id
       if (member.students.length > 0) {
         project_data.isGroup = true
@@ -168,10 +164,9 @@ module.exports = {
       if (achievements !== undefined) {
         await manageAchievement(projectId, achievements)
       }
-      
+
       let assignment = null
-      if (typeProject === 'assignment') {
-        console.log('assignmentId', assignmentId);
+      if (typeProject === 'Assignment') {
         await projectModel.mapProjectAndAssignment(projectId, assignmentId, 'create')
         assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignmentId)
         delete assignment.lecturers
@@ -192,7 +187,6 @@ module.exports = {
         project_id: projectId
       })
     } catch (err) {
-      console.log(err);
       res.status(500).send({
         status: 500,
         message: err.message
@@ -211,7 +205,6 @@ module.exports = {
       const projectId = project_detail.id
       const type = project_detail.project_type_name
       await projectModel.updateProjectDetail(projectId, project_detail)
-
       await manageAchievement(projectId, achievements)
       if (project_detail.haveOutsider && outsiders !== undefined && outsiders.length > 0) {
         await manageOutsider(outsiders, projectId)
@@ -224,7 +217,6 @@ module.exports = {
         })
         await projectModel.updateProjectTag(tagsCheked, projectId)
       }
-
       await filesController.updateVideo(video, projectId)
       const newDetail = await getProjectDetail(projectId)
       newDetail.project_detail.haveOutsider = newDetail.project_detail.haveOutsider === 1
@@ -232,7 +224,7 @@ module.exports = {
         const outsiders = await userModel.getProjectOutsider(projectId)
         newDetail.outsiders = outsiders[0] === undefined ? [] : outsiders
       }
-
+      
       let assignment = null
       let projectAssignmentStatus = null
       if (type === 'Assignment') {
@@ -242,8 +234,8 @@ module.exports = {
         delete assignment.lecturers
         delete assignment.students
       }
-      await notiController.sendEmail(projectId, auth.fullname, newDetail, 'update', assignment, projectAssignmentStatus)
-
+      // await notiController.sendEmail(projectId, auth.fullname, newDetail, 'update', assignment, projectAssignmentStatus)
+      
       res.send(newDetail)
     } catch (err) {
       res.status(500).send({
@@ -254,8 +246,8 @@ module.exports = {
   },
 
   updateProjectClap: async (req, res) => {
-    const { checkStatus, err } = validate(req.body, updateClapSchema)
-    if (!checkStatus) return res.send(err)
+    // const { checkStatus, err } = validate(req.body, updateClapSchema)
+    // if (!checkStatus) return res.send(err)
 
     try {
       const projectId = req.body.project_id
@@ -296,7 +288,10 @@ module.exports = {
       const { auth } = req
       const projectId = _.toNumber(req.query.project_id)
       const assignmentId = _.toNumber(req.query.assignment_id)
+      console.log(assignmentId);
+      console.log(projectId);
       await projectModel.mapProjectAndAssignment(projectId, assignmentId, 'create')
+      await projectModel.changeProjectType(projectId)
 
       const project = await projectModel.getShortProjectDetailById(projectId)
       const projectAssignmentStatus = project.project_detail.status_name || null
@@ -402,7 +397,6 @@ async function getProjectDetail (projectId) {
 
     result.project_detail.created_at = moment(result.project_detail.created_at).format('MMM Do YYYY, h:mm:ss a')
     result.project_detail.updated_at = moment(result.project_detail.updated_at).format('MMM Do YYYY, h:mm:ss a')
-
     return result
   } catch (err) {
     throw new Error(err)

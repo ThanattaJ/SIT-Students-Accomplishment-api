@@ -249,10 +249,8 @@ module.exports = {
         res.status(403).send({ auth: false, message: 'Permission Denied' })
       }
 
-      console.log(status);
       let oldProjects = []
       if (auth.role !== 'student') {
-        console.log('object');
         oldProjects = await assignmentModel.getProjectInAssignment(assignment_id, 'Request')
         oldProjects = _.filter(oldProjects, { 'project_id': project_id })
         if (oldProjects.length > 0) {
@@ -261,7 +259,6 @@ module.exports = {
       }
 
       const projects = await assignmentModel.updateProjectStatus(assignment_id, project_id, status, comment)
-      console.log('hi');
       let assignment = null
       assignment = await assignmentModel.getLecturerAssignmentsDetailById(assignment_id)
       delete assignment.lecturers
@@ -275,12 +272,9 @@ module.exports = {
       if (oldProjects.length > 0) {
         await notiController.sendEmail(project_id, auth.fullname, page, 'consider', assignment, projectAssignmentStatus)
       } else {
-        console.log(auth.role);
         if (auth.role !== 'student' && status !== 'Request') {
-          console.log('why');
           await notiController.sendEmail(project_id, auth.fullname, page, 'check', assignment, projectAssignmentStatus)
         } else {
-          console.log('who');
           await notiController.sendEmail(project_id, auth.fullname, page, 'request', assignment, projectAssignmentStatus)
         }
       }

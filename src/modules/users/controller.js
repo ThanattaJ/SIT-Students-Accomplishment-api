@@ -47,7 +47,6 @@ module.exports = {
         await userModel.updateProfileCounting('viewer', userData.profile.student_id)
         userData.profile.viewer++
       }
-      console.log(userData);
       res.send(userData)
     } catch (err) {
       res.status(500).send({
