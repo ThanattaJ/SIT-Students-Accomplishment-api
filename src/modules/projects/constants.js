@@ -39,6 +39,7 @@ module.exports = {
     'projects.isShow',
     'projects.tool_techniq_detail',
     'projects.references',
+    'projects.github',
     'projects.count_viewer',
     'projects.count_clap',
     'projects.start_month',

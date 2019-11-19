@@ -27,7 +27,7 @@ module.exports = {
         Hello, student\n
         <p>${user} ${status} the ${data.project_detail.project_name_en} portfolio</p> \n\n
         <p>Can see more detail in link at below. \n
-        <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
+        <b><u>Link:</u></b>: ${process.env.FRONT_PATH}/ProjectDetail/${projectId} </p> \n\n
         <b>Best Regard</b>, \n
         SIT Student Accomplishment
         `
@@ -48,7 +48,7 @@ module.exports = {
             <p>${user} ${status} the ${data.project_detail.project_name_en} portfolio for editing a portfolio</p> \n
             <p>Status Portfolio Now: ${projectAssignmentStatus}</p>\n\n
             <p>Can see more detail in link at below. \n
-            <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
+            <b><u>Link:</u></b>: ${process.env.FRONT_PATH}/ProjectDetail/${projectId} </p> \n\n
             <b>Best Regard</b>, \n
             SIT Student Accomplishment
             `
@@ -59,7 +59,7 @@ module.exports = {
             <p>${status} the ${data.project_detail.project_name_en} portfolio for editing a portfolio</p> \n
             <p>Status Portfolio Now: ${projectAssignmentStatus}</p>\n\n
             <p>Can see more detail in link at below. \n
-            <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
+            <b><u>Link:</u></b>: ${process.env.FRONT_PATH}/ProjectDetail/${projectId} </p> \n\n
             <b>Best Regard</b>, \n
             SIT Student Accomplishment
             `
@@ -69,7 +69,7 @@ module.exports = {
             <p>${user} ${status} the ${data.project_detail.project_name_en} portfolio in the ${assignment.course_name} subject</p> \n
             <p>Status Portfolio Now: ${projectAssignmentStatus}</p>\n\n
             <p>Can see more detail in link at below. \n
-            <b><u>Link:</u></b>: https://accomplishment-sit.netlify.com/ProjectDetail/${projectId} </p> \n\n
+            <b><u>Link:</u></b>: ${process.env.FRONT_PATH}/ProjectDetail/${projectId} </p> \n\n
             <b>Best Regard</b>, \n
             SIT Student Accomplishment
             `

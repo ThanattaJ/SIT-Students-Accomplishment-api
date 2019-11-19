@@ -6,6 +6,7 @@ exports.up = async function (knex) {
     table.string('project_name_en').notNullable()
     table.text('project_detail')
     table.text('project_abstract')
+    table.string('github')
     table.integer('project_type_id').unsigned().notNullable()
     table.boolean('isGroup').defaultTo(false).notNullable()
     table.boolean('haveOutsider').defaultTo(false).notNullable()
