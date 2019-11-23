@@ -1,6 +1,5 @@
 module.exports = {
   queryStudentDefaultInformation: [
-    'students.id',
     'students.student_id',
     'students.firstname',
     'students.lastname',

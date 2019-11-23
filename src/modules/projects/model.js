@@ -213,7 +213,6 @@ module.exports = {
 
   mapProjectAndAssignment: async (projectId, assignmentId, status) => {
     try {
-
       let id
       const statusId = await knex('status_project').select('id').where('status_name', 'Waiting')
       if (status === 'create') {
@@ -238,7 +237,6 @@ module.exports = {
   changeProjectType: async (projectId) => {
     try {
       const projectTypeId = await knex('project_type').select('id').where('project_type_name', 'Assignment')
-      console.log(projectTypeId);
       await knex('projects').update({ project_type_id: projectTypeId[0].id }).where('id', projectId)
     } catch (err) {
       throw new Error(err)
@@ -252,11 +250,12 @@ module.exports = {
     }
   },
 
-  updateProjectDetail: async (id, projectDetail, achievementData) => {
+  updateProjectDetail: async (id, projectDetail) => {
     try {
       if (projectDetail.project_type_name) {
         projectDetail = await getProjectTypeId(projectDetail)
       }
+      delete projectDetail.assignment_detail
       await knex('projects').update(projectDetail).where('id', id)
     } catch (err) {
       return err

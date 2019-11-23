@@ -224,7 +224,7 @@ module.exports = {
         const outsiders = await userModel.getProjectOutsider(projectId)
         newDetail.outsiders = outsiders[0] === undefined ? [] : outsiders
       }
-      
+
       let assignment = null
       let projectAssignmentStatus = null
       if (type === 'Assignment') {
@@ -235,7 +235,7 @@ module.exports = {
         delete assignment.students
       }
       await notiController.sendEmail(projectId, auth.fullname, newDetail, 'update', assignment, projectAssignmentStatus)
-      
+
       res.send(newDetail)
     } catch (err) {
       res.status(500).send({
@@ -288,8 +288,6 @@ module.exports = {
       const { auth } = req
       const projectId = _.toNumber(req.query.project_id)
       const assignmentId = _.toNumber(req.query.assignment_id)
-      console.log(assignmentId);
-      console.log(projectId);
       await projectModel.mapProjectAndAssignment(projectId, assignmentId, 'create')
       await projectModel.changeProjectType(projectId)
 

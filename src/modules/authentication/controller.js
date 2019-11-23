@@ -104,7 +104,6 @@ const login = (req, res, next) => {
 const authorization = (token) => {
   try {
     const SECRET = process.env.AUTHEN_SECRET_KEY
-    console.log(jwt.decode(token, SECRET))
     return jwt.decode(token, SECRET)
   } catch (err) {
     throw new Error(err)

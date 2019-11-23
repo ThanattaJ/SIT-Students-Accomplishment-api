@@ -65,6 +65,7 @@ module.exports = {
       haveOutsider: joi.boolean(),
       tool_techniq_detail: joi.string().trim().allow(null),
       references: joi.string().trim().allow(null),
+      github: joi.string().trim().allow(null),
       count_viewer: joi.number(),
       count_clap: joi.number(),
       start_month: joi.number(),

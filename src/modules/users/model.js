@@ -89,11 +89,11 @@ module.exports = {
     }
   },
 
-  updateProfileCounting: async (action, stundetId) => {
+  updateProfileCounting: async (action, studentId) => {
     try {
-      const count = await knex('students').select(action).where('student_id', stundetId)
+      const count = await knex('students').select(action).where('student_id', studentId)
       count[0][`${action}`]++
-      await knex('students').update(count[0]).where('student_id', stundetId)
+      await knex('students').update(count[0]).where('student_id', studentId)
       return count[0]
     } catch (err) {
       throw new Error(err)
@@ -294,11 +294,9 @@ module.exports = {
 
   getProjectOutsider: async (projectId) => {
     try {
-      console.log('get outsider');
       const outsiders = await knex.select(query.queryProjectOutsider).from('project_outsiders').where('project_id', projectId)
       return outsiders
     } catch (err) {
-      console.log(err);
       throw new Error(err)
     }
   },
