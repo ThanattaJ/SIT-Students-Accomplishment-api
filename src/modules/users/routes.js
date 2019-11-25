@@ -14,6 +14,7 @@ router.get('/generate-resume/:id', verifyToken, controller.getStudentInformation
 router.patch('/generate-resume/:id', verifyToken, controller.updateStudentInformation)
 router.patch('/count-generate-resume', verifyToken, controller.updateResemeCounting)
 router.patch('/email', verifyToken, controller.updateUserEmail)
+router.patch('/admin', verifyToken, controller.updateLecturerAdmin)
 router.patch('/languages', verifyToken, controller.updateStudentLanguage)
 router.patch('/educations', verifyToken, controller.updateStudentEducation)
 router.patch('/skills', verifyToken, controller.updateStudentSkill)

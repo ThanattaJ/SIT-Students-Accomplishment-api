@@ -100,6 +100,14 @@ module.exports = {
     }
   },
 
+  updateLecturerAdmin: async (lecturerId, isAdmin) => {
+    try {
+      await knex('lecturers').update({ isAdmin: isAdmin }).where('lecturer_id', lecturerId)
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+
   getStudentInformationById: async (id) => {
     try {
       let result = {}

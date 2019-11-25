@@ -19,6 +19,11 @@ module.exports = {
     email: joi.string().required().trim()
   }),
 
+  updateLecturerAdmin: joi.object().keys({
+    lecturerId: joi.string().required().trim(),
+    isAdmin: joi.boolean().required()
+  }),
+
   updateStudentIdSchema: joi.object().keys({
     profile: joi.object().keys({
       biology: joi.string().trim().allow(null),

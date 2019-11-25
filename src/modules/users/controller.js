@@ -179,6 +179,26 @@ module.exports = {
     }
   },
 
+  updateLecturerAdmin: async (req, res, next) => {
+    const { checkStatus, err } = validate(req.body, json.updateLecturerAdmin)
+    if (!checkStatus) return res.send(err)
+    try {
+      if (!checkStatus) return res.send(err)
+      const { lecturerId, isAdmin } = req.body
+
+      await userModel.updateLecturerAdmin(lecturerId, isAdmin)
+      res.status(200).send({
+        status: 200,
+        message: 'Update Success'
+      })
+    } catch (err) {
+      res.status(500).send({
+        status: 500,
+        message: err.message
+      })
+    }
+  },
+
   updateStudentLanguage: async (req, res, next) => {
     const { checkStatus, err } = validate(req.body, json.updateStudentLanguageSchema)
     if (!checkStatus) return res.send(err)
@@ -326,6 +346,10 @@ module.exports = {
       } else {
         list = await userModel.getListLecturer()
       }
+      list = list.map(lecturer => {
+        lecturer.isAdmin = lecturer.isAdmin !== 0
+        return lecturer
+      })
       res.send(list)
     } catch (err) {
       res.status(500).send({

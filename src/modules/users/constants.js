@@ -98,7 +98,8 @@ module.exports = {
     'lecturers.lecturer_id',
     'firstname',
     'lastname',
-    'position_name'
+    'position_name',
+    'isAdmin'
   ],
 
   queryProjectOutsider: [
