@@ -276,7 +276,7 @@ async function triggerTerm () {
     let term
     if (moment(now).isBetween(`${year}-05-01`, `${year}-11-30`)) {
       term = 1
-    } else if (moment(now).isBetween(`${year}-12-01`, `${year}-04-30`)) {
+    } else if (moment(now).isBetween(`${year}-12-01`, `${parseInt(year) + 1}-04-30`)) {
       term = 2
     }
     return await courseModel.checkAcademicTerm(term, year)
