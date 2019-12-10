@@ -7,15 +7,6 @@ exports.up = async function (knex) {
     table.date('birthday')
     table.string('telephone_number')
 
-    table
-      .timestamp('created_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP'))
-    table
-      .timestamp('updated_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
     table.foreign('student_id').references('students.student_id')
   })
 }

@@ -225,7 +225,7 @@ module.exports = {
 
   getLanguages: async () => {
     try {
-      const list = await knex('languages').select('id', 'language_name')
+      const list = await knex('languages').select('id', 'language_name').orderBy('language_name', 'asc')
       return list
     } catch (err) {
       throw new Error(err)

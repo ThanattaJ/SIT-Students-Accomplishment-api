@@ -9,15 +9,6 @@ exports.up = async function (knex) {
     table.string('province')
     table.string('postcode')
 
-    table
-      .timestamp('created_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP'))
-    table
-      .timestamp('updated_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
     table.foreign('students_profile_id').references('students_profile.id')
   })
 }

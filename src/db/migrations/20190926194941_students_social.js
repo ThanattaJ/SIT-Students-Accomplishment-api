@@ -1,6 +1,7 @@
 
 exports.up = async function (knex) {
   await knex.schema.createTable('students_social', function (table) {
+    table.increments('id').primary()
     table.integer('students_profile_id').unsigned().notNullable()
     table.string('Twitter')
     table.string('Facebook')
@@ -12,15 +13,6 @@ exports.up = async function (knex) {
     table.string('Tumblr')
     table.string('Flickr')
     table.string('Link')
-
-    table
-      .timestamp('created_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP'))
-    table
-      .timestamp('updated_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 
     table.foreign('students_profile_id').references('students_profile.id')
   })

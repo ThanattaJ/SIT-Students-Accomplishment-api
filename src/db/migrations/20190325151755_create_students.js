@@ -13,15 +13,6 @@ exports.up = async function (knex) {
     table.integer('viewer').defaultTo(0)
     table.integer('resume_gen_count').defaultTo(0)
 
-    table
-      .timestamp('created_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP'))
-    table
-      .timestamp('updated_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
     table.unique('student_id')
     table.foreign('curriculum_id').references('curriculum.id')
   })

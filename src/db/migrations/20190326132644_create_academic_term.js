@@ -5,15 +5,6 @@ exports.up = async function (knex) {
     table.integer('academic_year_id').unsigned().references('academic_year.id')
     table.integer('term_id').unsigned().references('term.id')
 
-    table
-      .timestamp('created_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP'))
-    table
-      .timestamp('updated_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
-
     table.unique(['academic_year_id', 'term_id'])
   })
 }

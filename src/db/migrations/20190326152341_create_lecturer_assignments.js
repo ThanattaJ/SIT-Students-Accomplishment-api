@@ -6,15 +6,6 @@ exports.up = async function (knex) {
     table.integer('assignment_id').unsigned().references('assignments.id')
     table.boolean('isCreator').notNullable().defaultTo(false)
     table.boolean('isApprover').notNullable().defaultTo(false)
-
-    table
-      .timestamp('created_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP'))
-    table
-      .timestamp('updated_at')
-      .notNullable()
-      .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
   })
 }
 
