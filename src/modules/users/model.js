@@ -19,6 +19,7 @@ module.exports = {
         const profile = await knex('students').select(query.queryStudentDefaultInformation)
           .join('curriculum', 'students.curriculum_id', 'curriculum.id')
           .join('students_profile', 'students.student_id', 'students_profile.student_id')
+          .join('students_social', 'students_profile.id', 'students_social.students_profile_id')
           .where('students.student_id', id)
         result = {
           'profile': profile[0]

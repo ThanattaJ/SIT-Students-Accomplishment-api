@@ -8,7 +8,17 @@ module.exports = {
     'students.viewer',
     'students.resume_gen_count',
     'curriculum.curriculum_name',
-    'students_profile.nickname'
+    'students_profile.nickname',
+    'students_social.Twitter',
+    'students_social.Facebook',
+    'students_social.Instagram',
+    'students_social.Linkedin',
+    'students_social.Github',
+    'students_social.Pinterest',
+    'students_social.Vimeo',
+    'students_social.Tumblr',
+    'students_social.Flickr',
+    'students_social.Link'
   ],
 
   queryLecturerDefaultInformation: [
