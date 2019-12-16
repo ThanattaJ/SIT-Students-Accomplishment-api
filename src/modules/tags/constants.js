@@ -1,6 +1,6 @@
 module.exports = {
   queryTagByChar: [
-    'id',
-    'tag_name'
+    'tags.id',
+    'tags.tag_name'
   ]
 }
