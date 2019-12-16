@@ -311,11 +311,11 @@ module.exports = {
         assignments = await knex('project_assignment').update(data)
           .where('project_assignment.assignment_id', assignmentId)
           .andWhere('project_assignment.project_id', projectId)
-        if (status === 'Approve') {
-          await knex('projects').update('isShow', true).where('projects.id', projectId)
-        } else {
-          await knex('projects').update('isShow', false).where('projects.id', projectId)
-        }
+      }
+      if (status === 'Approve') {
+        await knex('projects').update('isShow', true).where('projects.id', projectId)
+      } else {
+        await knex('projects').update('isShow', false).where('projects.id', projectId)
       }
       return assignments
     } catch (err) {
