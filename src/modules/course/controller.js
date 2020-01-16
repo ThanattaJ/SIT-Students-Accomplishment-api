@@ -104,6 +104,7 @@ module.exports = {
       const { semester_id } = req.query
       if (semester_id === undefined) {
         const semester = await triggerTerm()
+        console.log(semester);
         courses = await courseModel.getCourseSemester(semester[semester.length - 1].academic_term_id)
         page.semester = semester
       } else {
@@ -272,12 +273,13 @@ module.exports = {
 async function triggerTerm () {
   try {
     const now = moment().format('YYYY-MM-DD')
-    const year = moment().format('YYYY')
+    let year = moment().format('YYYY')
     let term
     if (moment(now).isBetween(`${year}-05-01`, `${year}-11-30`)) {
       term = 1
-    } else if (moment(now).isBetween(`${year}-12-01`, `${parseInt(year) + 1}-04-30`)) {
+    } else if (moment(now).isBetween(`${year}-12-01`, `${parseInt(year) + 1}-04-30`) || moment(now).isBetween(`${parseInt(year) - 1}-12-01`, `${year}-04-30`)) {
       term = 2
+      year = moment(now).isBetween(`${year}-12-01`, `${parseInt(year) + 1}-04-30`) ? year : year - 1
     }
     return await courseModel.checkAcademicTerm(term, year)
   } catch (err) {
